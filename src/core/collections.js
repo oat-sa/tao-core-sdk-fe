@@ -23,7 +23,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 
-import 'lib/polyfill/es6-collections';
+import 'es5lib/polyfill/es6-collections';
 
 //window should have beend feed by the polyfill
 //

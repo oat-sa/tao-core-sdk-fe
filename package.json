@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "webpack-dev-server --mode=development --config ./build/webpack.config.test.js",
+    "test:keepAlive": "webpack-dev-server --mode=development --config ./build/webpack.config.test.js",
+    "test": "node ./build/testrunner.js",
     "build": "rollup --config ./build/rollup.config.js"
   },
   "keywords": [],
@@ -14,9 +15,11 @@
     "file-loader": "^3.0.1",
     "glob": "^7.1.3",
     "html-webpack-plugin": "^3.2.0",
+    "node-qunit-puppeteer": "^1.0.12",
     "qunit": "^2.9.2",
     "rollup": "^1.10.1",
     "rollup-plugin-alias": "^1.5.1",
+    "rollup-plugin-copy": "^2.0.0",
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^4.2.3",
     "rollup-plugin-uglify": "^6.0.2",
@@ -28,5 +31,6 @@
   "peerDependencies": {
     "jquery": "^3.4.0",
     "lodash": "^4.17.11"
-  }
+  },
+  "dependencies": {}
 }

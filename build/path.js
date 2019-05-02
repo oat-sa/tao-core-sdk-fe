@@ -1,5 +1,4 @@
-
-/*
+/**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
@@ -14,18 +13,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 Open Assessment Technologies SA
+ * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
- * Wrap the Promise Polyfill
- *
- * @author Bertrand Chevrier <bertrand@taotesting.com>
- */
-
-import 'es5lib/polyfill/es6-promise';
-
-/**
- * @exports core/promise
- */
-export default window.Promise || es6Promise.Promise;
+  * This file contains path definitions for build scripts.
+  */
+ const path = require("path");
+ const rootPath = path.resolve(__dirname, "..");
+ 
+module.exports = {
+    srcDir: path.resolve(rootPath, "src"),
+    testDir: path.resolve(rootPath, "test"),
+    outputDir: path.resolve(rootPath, "dist"),
+    testOutputDir: path.resolve(rootPath, "test")
+};
+ 

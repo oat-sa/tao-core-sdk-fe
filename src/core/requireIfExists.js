@@ -49,11 +49,10 @@ function requireIfExists(uri) {
         }
 
         try {
-            import(/* webpackIgnore: true */'/' + uri + '.js').then(resolve).catch(function() {
+            eval("import('/' + '" + uri + "' + '.js')").then(resolve).catch(function() {
                 resolve(null);
             });
         } catch(e) {
-            console.log(e);
             // require the module with error handling
             amdRequire([uri], resolve, failed);
         }

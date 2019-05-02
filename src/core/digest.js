@@ -26,7 +26,7 @@
  */
 
 import _ from 'lodash';
-import 'lib/polyfill/webcrypto-shim';
+import 'es5lib/polyfill/webcrypto-shim';
 
 //get the native implementation of the CryptoSubtle
 var subtle = window.crypto.subtle || window.crypto.webkitSubtle;

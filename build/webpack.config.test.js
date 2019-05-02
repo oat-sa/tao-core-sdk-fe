@@ -1,44 +1,85 @@
+/**
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ */
+
 const path = require('path');
+const glob = require('glob');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = () => ({
-    entry: {
-        'test.built': path.resolve(__dirname, '..', 'test', 'core', 'requireIfExists', 'test.js')
-    },
-    mode: 'development',
-    output: {
-        path: path.resolve(__dirname, '..', 'dist')
-    },
-    externals: [
-        'lib/polyfill/es6-promise'
-    ],
-    module: {
-        rules: [
-            {
-                test: /qunit/,
-                use: [{ loader: 'file-loader' }],
-              },
-        ]
-    },
-    plugins: [
-            new HtmlWebpackPlugin({
-                filename: 'test.html',
-                template: path.resolve(__dirname, '..', 'test', 'core', 'requireIfExists', 'test.html'),
-                inject: false
-            })
-    ],
-    resolve: {
-        alias: {
-            core: path.resolve(__dirname, '..', 'src', 'core')
-        }
-    },
-    devServer: {
-        contentBase: path.resolve(__dirname, '..', 'dist'),
-        watchContentBase: true,
-        compress: false,
-        publicPath: '/',
-        hot: false,
-        host: '0.0.0.0',
-        disableHostCheck: true
+const { srcDir, testDir, outputDir, testOutputDir } = require('./path');
+
+module.exports = (mode = 'development', testName) => {
+    // if no specific test defined, run all of them
+    if (typeof testName !== 'string') {
+        testName = '*';
     }
-});
+
+    // collect tests
+    const tests = glob.sync(path.join(testDir, '**', testName, '**', '*.js')).reduce((memo, test) => {
+        const testDirName = path.dirname(path.relative(testDir, test));
+        const testFileName = path.basename(test, '.js');
+        memo[`${testDirName}/${testFileName}`] = test;
+        return memo;
+    }, {});
+
+    // is there any tests
+    if (Object.keys(tests).length === 0) {
+        console.error('No tests were found!');
+        process.exit();
+    }
+
+    return {
+        entry: tests,
+        mode,
+        output: {
+            path: testOutputDir
+        },
+        module: {
+            rules: [
+                {
+                    test: /qunit/,
+                    use: [{ loader: 'file-loader' }]
+                }
+            ]
+        },
+        externals: ['vertx'],
+        plugins: Object.keys(tests).map(
+            test =>
+                new HtmlWebpackPlugin({
+                    filename: `${path.dirname(test)}/test.html`,
+                    template: path.join(testDir, path.dirname(test), 'test.html'),
+                    inject: false
+                })
+        ),
+        resolve: {
+            alias: {
+                core: path.resolve(srcDir, 'core'),
+                es5lib: path.resolve(srcDir, 'es5lib')
+            }
+        },
+        devServer: {
+            contentBase: [testOutputDir, outputDir],
+            watchContentBase: true,
+            compress: false,
+            publicPath: '/',
+            hot: false,
+            host: '0.0.0.0',
+            disableHostCheck: true,
+            stats: false
+        }
+    };
+};
