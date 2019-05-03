@@ -17,6 +17,7 @@
     "html-webpack-plugin": "^3.2.0",
     "inject-loader": "^4.0.1",
     "node-qunit-puppeteer": "^1.0.12",
+    "promise-limit": "^2.7.0",
     "qunit": "^2.9.2",
     "rewiremock": "^3.13.6",
     "rollup": "^1.10.1",
@@ -32,7 +33,8 @@
   },
   "peerDependencies": {
     "jquery": "^1.12.4",
-    "lodash": "^2.4.1"
+    "lodash": "^2.4.1",
+    "handlebars": "^1.3.0"
   },
   "dependencies": {}
 }

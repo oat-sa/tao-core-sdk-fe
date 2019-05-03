@@ -21,9 +21,10 @@ const path = require('path');
 const { runQunitPuppeteer, printResultSummary, printFailedTests } = require('node-qunit-puppeteer');
 const webpack = require('webpack');
 const webpackDevServer = require('webpack-dev-server');
+const promiseLimit = require('promise-limit');
 
 const config = require('./webpack.config.test');
-const { testDir, testOutputDir, outputDir } = require('./path');
+const { testDir } = require('./path');
 
 const TESTNAME = process.argv[2] || '*';
 
@@ -34,6 +35,7 @@ const HOST = '127.0.0.1' || process.env.HOST;
 const PORT = '8082' || process.env.PORT;
 
 let hasFailed = false;
+const limit = promiseLimit(5);
 
 server.listen(PORT, HOST, err => {
     if (err) {
@@ -53,18 +55,20 @@ server.listen(PORT, HOST, err => {
                 redirectConsole: true
             };
 
-            return runQunitPuppeteer(qunitArgs)
-                .then(result => {
-                    printResultSummary(result, console);
+            return limit(() =>
+                runQunitPuppeteer(qunitArgs)
+                    .then(result => {
+                        printResultSummary(result, console);
 
-                    if (result.stats.failed > 0) {
-                        printFailedTests(result, console);
-                        hasFailed = true;
-                    }
-                })
-                .catch(ex => {
-                    console.error(ex);
-                });
+                        if (result.stats.failed > 0) {
+                            printFailedTests(result, console);
+                            hasFailed = true;
+                        }
+                    })
+                    .catch(ex => {
+                        console.error(ex);
+                    })
+            );
         })
     ).then(() => {
         process.exit(hasFailed ? -1 : 0);

@@ -18,8 +18,8 @@
 /**
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
-import connectivity from 'core/connectivity';
+define(['core/connectivity'], function(connectivity) {
+    'use strict';
 
     QUnit.module('API');
 
@@ -186,3 +186,4 @@ import connectivity from 'core/connectivity';
         update(connectivity.isOnline);
         connectivity.on('change', update);
     });
+});

@@ -57,7 +57,7 @@ module.exports = (mode = 'development', testName) => {
                 }
             ]
         },
-        externals: ['vertx', 'moment', 'lib/store/idbstore'],
+        externals: ['vertx', 'lib/store/idbstore', 'fs'],
         plugins: [].concat(
             Object.keys(tests).map(
                 test =>

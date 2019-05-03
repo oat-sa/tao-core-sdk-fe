@@ -18,48 +18,48 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
+define(['jquery', 'core/customEvent'], function($, customEvent) {
+    'use strict';
 
-import $ from 'jquery';
-import customEvent from 'core/customEvent';
+    QUnit.module('API');
 
-QUnit.module('API');
-
-QUnit.test('customEvent api', function(assert) {
-    assert.ok(typeof customEvent === 'function', 'The customEvent module exposes a function');
-});
-
-QUnit.module('Events');
-
-QUnit.test('jQuery', function(assert) {
-    var ready = assert.async();
-    var element = $('#elem1');
-    var eventName = 'custom';
-    var data = 'hello';
-
-    element.on(eventName, function(event) {
-        assert.ok(true, 'The event has been triggered');
-        assert.equal(event.type, eventName, 'The event has the right name');
-        assert.equal(event.originalEvent.detail, data, 'The event has provided the right data');
-
-        ready();
+    QUnit.test('customEvent api', function(assert) {
+        assert.ok(typeof customEvent === 'function', 'The customEvent module exposes a function');
     });
 
-    customEvent(element.get(0), eventName, data);
-});
+    QUnit.module('Events');
 
-QUnit.test('native', function(assert) {
-    var ready = assert.async();
-    var element = document.getElementById('elem2');
-    var eventName = 'custom';
-    var data = 'hello';
+    QUnit.test('jQuery', function(assert) {
+        var ready = assert.async();
+        var element = $('#elem1');
+        var eventName = 'custom';
+        var data = 'hello';
 
-    element.addEventListener(eventName, function(event) {
-        assert.ok(true, 'The event has been triggered');
-        assert.equal(event.type, eventName, 'The event has the right name');
-        assert.equal(event.detail, data, 'The event has provided the right data');
+        element.on(eventName, function(event) {
+            assert.ok(true, 'The event has been triggered');
+            assert.equal(event.type, eventName, 'The event has the right name');
+            assert.equal(event.originalEvent.detail, data, 'The event has provided the right data');
 
-        ready();
+            ready();
+        });
+
+        customEvent(element.get(0), eventName, data);
     });
 
-    customEvent(element, eventName, data);
+    QUnit.test('native', function(assert) {
+        var ready = assert.async();
+        var element = document.getElementById('elem2');
+        var eventName = 'custom';
+        var data = 'hello';
+
+        element.addEventListener(eventName, function(event) {
+            assert.ok(true, 'The event has been triggered');
+            assert.equal(event.type, eventName, 'The event has the right name');
+            assert.equal(event.detail, data, 'The event has provided the right data');
+
+            ready();
+        });
+
+        customEvent(element, eventName, data);
+    });
 });
