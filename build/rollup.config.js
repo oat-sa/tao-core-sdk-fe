@@ -39,7 +39,7 @@ export default inputs.map(input => {
         input,
         output: {
             dir: path.join(outputDir, dir),
-            format: 'umd',
+            format: 'amd',
             name
         },
         external: [
@@ -56,7 +56,7 @@ export default inputs.map(input => {
             'lib/store/idbstore',
             'lib/decimal/decimal',
             'lib/expr-eval/expr-eval',
-            'ui/feedback',
+            // 'ui/feedback',
         ].concat(localExternals).concat(libExternals),
         plugins: [
             alias({

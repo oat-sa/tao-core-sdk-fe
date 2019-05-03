@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Test - Connectivity</title>
+        <link rel="stylesheet" type="text/css" href="/<%= require('qunit/qunit/qunit.css') %>">
+        <script type="text/javascript" src="/<%= require('qunit/qunit/qunit.js') %>"></script>
+        <script type="text/javascript" src="/<%= require('qunit-parameterize') %>"></script>
+        <style>
+            .external {
+                margin: 10px auto;
+                text-align: center;
+            }
+            .visual {
+                margin: auto;
+                width: 50px;
+                height: 50px;
+                border-radius: 50px;
+                border: solid 1px grey;
+                transition: background-color 900ms ease-out;
+            }
+            .visual.online{
+                background-color: #499849;
+                transition: background-color 900ms ease-out;
+            }
+            .visual.offline{
+                background-color: #B82D24;
+                transition: background-color 900ms ease-out;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <div class="external">
+            <p>Try to switch off your network cable, disable the wifi, etc.</p>
+            <div class="visual"></div>
+        </div>
+        <script type="text/javascript" src="./test.js"></script>
+    </body>
+</html>

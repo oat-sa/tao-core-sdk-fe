@@ -19,8 +19,9 @@
 const path = require('path');
 const glob = require('glob');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
-const { srcDir, testDir, outputDir, testOutputDir } = require('./path');
+const { testDir, outputDir, testOutputDir } = require('./path');
 
 module.exports = (mode = 'development', testName) => {
     // if no specific test defined, run all of them
@@ -56,19 +57,24 @@ module.exports = (mode = 'development', testName) => {
                 }
             ]
         },
-        externals: ['vertx'],
-        plugins: Object.keys(tests).map(
-            test =>
-                new HtmlWebpackPlugin({
-                    filename: `${path.dirname(test)}/test.html`,
-                    template: path.join(testDir, path.dirname(test), 'test.html'),
-                    inject: false
-                })
+        externals: ['vertx', 'moment', 'lib/store/idbstore'],
+        plugins: [].concat(
+            Object.keys(tests).map(
+                test =>
+                    new HtmlWebpackPlugin({
+                        filename: `${path.dirname(test)}/test.html`,
+                        template: path.join(testDir, path.dirname(test), 'test.html'),
+                        inject: false
+                    })
+            )
         ),
         resolve: {
             alias: {
-                core: path.resolve(srcDir, 'core'),
-                es5lib: path.resolve(srcDir, 'es5lib')
+                core: path.resolve(outputDir, 'core'),
+                es5lib: path.resolve(outputDir, 'es5lib'),
+                'lib/uuid': path.resolve(outputDir, 'es5lib', 'uuid'),
+                module: path.resolve(__dirname, 'module'),
+                'qunit-parameterize': path.resolve(__dirname, '..', 'qunit', 'qunit2-parameterize.js')
             }
         },
         devServer: {

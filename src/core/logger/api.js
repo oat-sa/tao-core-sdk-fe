@@ -262,22 +262,28 @@ loggerFactory.load = function load(providerConfigs){
         _.forEach(providerConfigs, function (providerConfig, providerName) {
             modules.push(providerName);
         });
-        require(modules, function(){
-            var loadedProviders = [].slice.call(arguments);
-            _.forEach(loadedProviders, function (provider, moduleKey){
-                try {
-                    self.register(provider, providerConfigs[modules[moduleKey]]);
-                } catch(err){
-                    reject(err);
-                }
-            });
 
-            //flush messages that arrived before the providers are there
-            self.flush();
+        try {
+            import(/* webpackIgnore: true */ '/' + modules[0] + '.js').then(resolve).catch(reject);
+        } catch(e) {
+            var amdRequire = window.require;
+            amdRequire(modules, function(){
+                var loadedProviders = [].slice.call(arguments);
+                _.forEach(loadedProviders, function (provider, moduleKey){
+                    try {
+                        self.register(provider, providerConfigs[modules[moduleKey]]);
+                    } catch(err){
+                        reject(err);
+                    }
+                });
 
-            resolve();
+                //flush messages that arrived before the providers are there
+                self.flush();
 
-        }, reject);
+                resolve();
+            },
+            reject);
+        }
     });
 };
 
