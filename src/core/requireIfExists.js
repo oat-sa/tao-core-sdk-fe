@@ -21,8 +21,6 @@
 
 import Promise from 'core/promise';
 
-var amdRequire = window.require;
-
 /**
  * Requires an optional module. It the module does not exist, an empty resource is provided (null).
  * @param {String} uri - The URI of the module to require
@@ -41,21 +39,15 @@ function requireIfExists(uri) {
                 define(failedId, function () {
                     return null;
                 });
-                amdRequire([failedId], resolve);
+                require([failedId], resolve);
             } else {
                 // others errors are not handled
                 throw err;
             }
         }
 
-        try {
-            eval("import('/' + '" + uri + "' + '.js')").then(resolve).catch(function() {
-                resolve(null);
-            });
-        } catch(e) {
-            // require the module with error handling
-            amdRequire([uri], resolve, failed);
-        }
+        // require the module with error handling
+        require([uri], resolve, failed);
     });
 }
 

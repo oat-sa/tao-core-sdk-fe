@@ -3,12 +3,25 @@
     <head>
         <meta charset="utf-8">
         <title>Test - Cached Store</title>
-        <link rel="stylesheet" type="text/css" href="/<%= require('qunit/qunit/qunit.css') %>">
-        <script type="text/javascript" src="/<%= require('qunit/qunit/qunit.js') %>"></script>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function(){
+                require(['qunitEnv'], function() {
+                    //mock storage
+                    requirejs.config({
+                        "paths": {
+                            "core/store" : "test/core/cachedStore/storeMock"
+                        }
+                    });
+                    require(['test/core/cachedStore/test'], function() {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
     </head>
     <body>
         <div id="qunit"></div>
         <div id="qunit-fixture"></div>
-        <script type="text/javascript" src="./test.js"></script>
     </body>
 </html>

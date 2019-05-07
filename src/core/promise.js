@@ -23,7 +23,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 
-import 'es5lib/polyfill/es6-promise';
+import 'lib/polyfill/es6-promise';
 
 /**
  * @exports core/promise

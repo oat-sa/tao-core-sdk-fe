@@ -57,7 +57,7 @@ module.exports = (mode = 'development', testName) => {
                 }
             ]
         },
-        externals: ['vertx', 'lib/store/idbstore', 'fs'],
+        externals: ['vertx', 'lib/store/idbstore', 'fs', 'context'],
         plugins: [].concat(
             Object.keys(tests).map(
                 test =>
@@ -71,8 +71,8 @@ module.exports = (mode = 'development', testName) => {
         resolve: {
             alias: {
                 core: path.resolve(outputDir, 'core'),
-                es5lib: path.resolve(outputDir, 'es5lib'),
-                'lib/uuid': path.resolve(outputDir, 'es5lib', 'uuid'),
+                lib: path.resolve(outputDir, 'lib'),
+                util: path.resolve(outputDir, 'util'),
                 module: path.resolve(__dirname, 'module'),
                 'qunit-parameterize': path.resolve(__dirname, '..', 'qunit', 'qunit2-parameterize.js')
             }

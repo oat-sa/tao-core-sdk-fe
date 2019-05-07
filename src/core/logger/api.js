@@ -262,28 +262,22 @@ loggerFactory.load = function load(providerConfigs){
         _.forEach(providerConfigs, function (providerConfig, providerName) {
             modules.push(providerName);
         });
+        require(modules, function(){
+            var loadedProviders = [].slice.call(arguments);
+            _.forEach(loadedProviders, function (provider, moduleKey){
+                try {
+                    self.register(provider, providerConfigs[modules[moduleKey]]);
+                } catch(err){
+                    reject(err);
+                }
+            });
 
-        try {
-            import(/* webpackIgnore: true */ '/' + modules[0] + '.js').then(resolve).catch(reject);
-        } catch(e) {
-            var amdRequire = window.require;
-            amdRequire(modules, function(){
-                var loadedProviders = [].slice.call(arguments);
-                _.forEach(loadedProviders, function (provider, moduleKey){
-                    try {
-                        self.register(provider, providerConfigs[modules[moduleKey]]);
-                    } catch(err){
-                        reject(err);
-                    }
-                });
+            //flush messages that arrived before the providers are there
+            self.flush();
 
-                //flush messages that arrived before the providers are there
-                self.flush();
+            resolve();
 
-                resolve();
-            },
-            reject);
-        }
+        }, reject);
     });
 };
 
@@ -295,7 +289,6 @@ loggerFactory.load = function load(providerConfigs){
  * @throws TypeError
  */
 loggerFactory.register = function register(provider, providerConfig){
-
     if(!_.isPlainObject(provider) || !_.isFunction(provider.log)){
         throw new TypeError('A log provider is an object with a log method');
     }

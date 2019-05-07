@@ -1,10 +1,10 @@
 {
   "name": "new-tao-core",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:keepAlive": "webpack-dev-server --mode=development --config ./build/webpack.config.test.js",
+    "test:keepAlive": "npx http-server -c-1 -o /test",
     "test": "node ./build/testrunner.js",
     "build": "rollup --config ./build/rollup.config.js"
   },
@@ -12,29 +12,23 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "file-loader": "^3.0.1",
     "glob": "^7.1.3",
-    "html-webpack-plugin": "^3.2.0",
-    "inject-loader": "^4.0.1",
+    "http-server": "^0.11.1",
+    "mime": "^2.4.2",
     "node-qunit-puppeteer": "^1.0.12",
     "promise-limit": "^2.7.0",
     "qunit": "^2.9.2",
-    "rewiremock": "^3.13.6",
+    "require-css": "^0.1.10",
     "rollup": "^1.10.1",
     "rollup-plugin-alias": "^1.5.1",
     "rollup-plugin-copy": "^2.0.0",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^4.2.3",
-    "rollup-plugin-uglify": "^6.0.2",
-    "style-loader": "^0.23.1",
-    "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.1",
-    "webpack-dev-server": "^3.3.1"
+    "rollup-plugin-uglify": "^6.0.2"
   },
-  "peerDependencies": {
+  "dependencies": {
+    "handlebars": "^1.3.0",
     "jquery": "^1.12.4",
     "lodash": "^2.4.1",
-    "handlebars": "^1.3.0"
-  },
-  "dependencies": {}
+    "moment": "^2.24.0"
+  }
 }

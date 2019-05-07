@@ -3,9 +3,6 @@
     <head>
         <meta charset="utf-8">
         <title>Test - Connectivity</title>
-        <link rel="stylesheet" type="text/css" href="/<%= require('qunit/qunit/qunit.css') %>">
-        <script type="text/javascript" src="/<%= require('qunit/qunit/qunit.js') %>"></script>
-        <script type="text/javascript" src="/<%= require('qunit-parameterize') %>"></script>
         <style>
             .external {
                 margin: 10px auto;
@@ -28,6 +25,16 @@
                 transition: background-color 900ms ease-out;
             }
         </style>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function(){
+                require(['qunitEnv'], function() {
+                    require(['test/core/connectivity/test'], function() {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
     </head>
     <body>
         <div id="qunit"></div>
@@ -36,6 +43,5 @@
             <p>Try to switch off your network cable, disable the wifi, etc.</p>
             <div class="visual"></div>
         </div>
-        <script type="text/javascript" src="./test.js"></script>
     </body>
 </html>

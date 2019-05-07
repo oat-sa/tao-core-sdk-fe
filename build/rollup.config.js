@@ -21,15 +21,15 @@ import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import json from 'rollup-plugin-json';
 import copy from 'rollup-plugin-copy';
-// import {uglify} from 'rollup-plugin-uglify';
+import {uglify} from 'rollup-plugin-uglify';
 
 const {srcDir, outputDir} = require('./path');
 
-const inputs = glob.sync(path.join(srcDir, '!(es5lib)', '**', '*.js'));
+const inputs = glob.sync(path.join(srcDir, '!(lib)', '**', '*.js'));
 const localExternals = inputs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
 
-const es5libs = glob.sync(path.join(srcDir, 'es5lib', '**', '*.js'));
-const libExternals = es5libs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
+const libs = glob.sync(path.join(srcDir, 'lib', '**', '*.js'));
+const libExternals = libs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
 
 export default inputs.map(input => {
     const name = path.basename(input, '.js');
@@ -63,18 +63,18 @@ export default inputs.map(input => {
                 resolve: ['.js', '.json'],
                 core: path.resolve(srcDir, 'core'),
                 util: path.resolve(srcDir, 'util'),
-                es5lib: path.resolve(srcDir, 'es5lib')
+                lib: path.resolve(srcDir, 'lib')
               }),
             json({
                 preferConst: false
             }),
             copy({
                 targets: [
-                  path.resolve(srcDir, 'es5lib')
+                  path.resolve(srcDir, 'lib')
                 ],
                 outputFolder: outputDir,
-            })
-            //   uglify()
+            }),
+            uglify()
         ]
     };
 });

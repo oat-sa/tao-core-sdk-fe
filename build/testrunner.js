@@ -19,17 +19,12 @@
 const glob = require('glob');
 const path = require('path');
 const { runQunitPuppeteer, printResultSummary, printFailedTests } = require('node-qunit-puppeteer');
-const webpack = require('webpack');
-const webpackDevServer = require('webpack-dev-server');
 const promiseLimit = require('promise-limit');
+const httpServer = require('http-server');
 
-const config = require('./webpack.config.test');
 const { testDir } = require('./path');
 
 const TESTNAME = process.argv[2] || '*';
-
-const webpackConfig = config('development', TESTNAME);
-const server = new webpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
 
 const HOST = '127.0.0.1' || process.env.HOST;
 const PORT = '8082' || process.env.PORT;
@@ -37,18 +32,17 @@ const PORT = '8082' || process.env.PORT;
 let hasFailed = false;
 const limit = promiseLimit(5);
 
-server.listen(PORT, HOST, err => {
+httpServer.createServer().listen(PORT, HOST, err => {
     if (err) {
         console.log(err);
         process.exit(-1);
     }
-
     Promise.all(
         glob.sync(path.join(testDir, '**', TESTNAME, '**', '*.html')).map(testFile => {
             const test = path.relative(testDir, testFile);
             const qunitArgs = {
                 // Path to qunit tests suite
-                targetUrl: `http://${HOST}:${PORT}/${test}`,
+                targetUrl: `http://${HOST}:${PORT}/test/${test}`,
                 // (optional, 30000 by default) global timeout for the tests suite
                 timeout: 10000,
                 // (optional, false by default) should the browser console be redirected or not
