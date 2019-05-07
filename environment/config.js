@@ -19,13 +19,17 @@
 requirejs.config({
     baseUrl: '/',
     paths: {
-        css: 'node_modules/require-css/css.min',
+        css: '/node_modules/require-css/css.min',
+        json: '/node_modules/requirejs-plugins/src/json',
+        async: '/node_modules/requirejs-plugins/src/async',
+
         'qunit-parameterize': '/environment/qunit2-parameterize',
         qunit: '/node_modules/qunit/qunit',
         test: '/test',
 
         core: '/dist/core',
         lib: '/dist/lib',
+        util: '/dist/util',
         
         jquery: '/node_modules/jquery/dist/jquery.min',
         lodash: '/node_modules/lodash/lodash',
@@ -39,3 +43,9 @@ define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
 define('qunitEnv', ['qunitLibs'], function() {
     require(['qunit-parameterize']);
 });
+
+define('context', ['module'], function(module){
+    return module.config();
+});
+
+define('i18n', [], () => text => text);

@@ -20,7 +20,8 @@ const glob = require('glob');
 const path = require('path');
 const { runQunitPuppeteer, printResultSummary, printFailedTests } = require('node-qunit-puppeteer');
 const promiseLimit = require('promise-limit');
-const httpServer = require('http-server');
+const HttpServer = require('http-server');
+const fs = require('fs');
 
 const { testDir } = require('./path');
 
@@ -32,7 +33,21 @@ const PORT = '8082' || process.env.PORT;
 let hasFailed = false;
 const limit = promiseLimit(5);
 
-httpServer.createServer().listen(PORT, HOST, err => {
+new HttpServer.createServer({
+    before: [
+        function(req, res) {
+            if (req.method === 'POST') {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                fs.readFile(path.join(__dirname, '..', req.url), (err, data) => {
+                    if (err) throw err;
+                    res.end(data.toString());
+                  });
+            } else {
+                res.emit('next');
+            }
+        }
+    ]
+}).listen(PORT, HOST, err => {
     if (err) {
         console.log(err);
         process.exit(-1);
@@ -44,7 +59,7 @@ httpServer.createServer().listen(PORT, HOST, err => {
                 // Path to qunit tests suite
                 targetUrl: `http://${HOST}:${PORT}/test/${test}`,
                 // (optional, 30000 by default) global timeout for the tests suite
-                timeout: 10000,
+                timeout: 30000,
                 // (optional, false by default) should the browser console be redirected or not
                 redirectConsole: true
             };
@@ -60,6 +75,7 @@ httpServer.createServer().listen(PORT, HOST, err => {
                         }
                     })
                     .catch(ex => {
+                        console.error(testFile);
                         console.error(ex);
                     })
             );

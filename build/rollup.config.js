@@ -74,7 +74,7 @@ export default inputs.map(input => {
                 ],
                 outputFolder: outputDir,
             }),
-            uglify()
+            // uglify()
         ]
     };
 });
