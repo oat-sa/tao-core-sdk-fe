@@ -151,7 +151,6 @@ define([
             $screen.append($expr);
             $screen.append($res);
 
-            scrollHelper.scrollTo($expr, $screen);
             // scrollTo
             currentScrollTop = $screen.scrollTop();
             scrollTop = $expr.offset().top - $screen.offset().top + currentScrollTop;

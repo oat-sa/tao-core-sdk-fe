@@ -555,12 +555,12 @@
         "expected": "1.1752011936438014"
     },
     {
-        "title": "radian => sinh PI",
-        "expression": "sinh PI",
+        "title": "radian => sinh 2*PI",
+        "expression": "sinh 2*PI",
         "config": {
             "degree": false
         },
-        "expected": "11.548739357257748"
+        "expected": "11.394118012887876"
     },
     {
         "title": "radian => (sinh 0)*10^20",
@@ -587,12 +587,12 @@
         "expected": "0.7615941559557649"
     },
     {
-        "title": "radian => tanh PI",
-        "expression": "tanh PI",
+        "title": "radian => tanh 2*PI",
+        "expression": "tanh 2*PI",
         "config": {
             "degree": false
         },
-        "expected": "0.99627207622075"
+        "expected": "3.0285819634241324"
     },
     {
         "title": "radian => acosh 0",
@@ -947,12 +947,12 @@
         "expected": "1.1752011936438014"
     },
     {
-        "title": "degree => sinh PI",
-        "expression": "sinh PI",
+        "title": "degree => sinh 2*PI",
+        "expression": "sinh 2*PI",
         "config": {
             "degree": true
         },
-        "expected": "11.548739357257748"
+        "expected": "11.394118012887876"
     },
     {
         "title": "degree => (sinh 0)*10^20",
@@ -979,12 +979,12 @@
         "expected": "0.7615941559557649"
     },
     {
-        "title": "degree => tanh PI",
-        "expression": "tanh PI",
+        "title": "degree => tanh 2*PI",
+        "expression": "tanh 2*PI",
         "config": {
             "degree": true
         },
-        "expected": "0.99627207622075"
+        "expected": "3.0285819634241324"
     },
     {
         "title": "degree => acosh 0",

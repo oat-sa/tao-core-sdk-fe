@@ -170,17 +170,17 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
 
         setTimeout(function() {
             assert.deepEqual(states, {a: 'started', b: 'waiting', c: 'waiting'});
-        }, 10);
+        }, 50);
         setTimeout(function() {
             assert.deepEqual(states, {a: 'done', b: 'started', c: 'waiting'});
-        }, 110);
+        }, 150);
         setTimeout(function() {
             assert.deepEqual(states, {a: 'done', b: 'done', c: 'started'});
-        }, 210);
+        }, 250);
         setTimeout(function() {
             assert.deepEqual(states, {a: 'done', b: 'done', c: 'done'});
             ready();
-        }, 310);
+        }, 350);
     });
 
     QUnit.test('serie resolved data and reject', function(assert) {
