@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:keepAlive": "npx http-server -c-1 -o /test",
+    "test:keepAlive": "node ./build/webserver.js",
     "test": "node ./build/testrunner.js",
     "build": "rollup --config ./build/rollup.config.js"
   },

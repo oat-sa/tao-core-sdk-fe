@@ -20,56 +20,43 @@ const glob = require('glob');
 const path = require('path');
 const { runQunitPuppeteer, printResultSummary, printFailedTests } = require('node-qunit-puppeteer');
 const promiseLimit = require('promise-limit');
-const HttpServer = require('http-server');
-const fs = require('fs');
+
+const webServer = require('./webserver');
 
 const { testDir } = require('./path');
 
 const TESTNAME = process.argv[2] || '*';
 
-const HOST = '127.0.0.1' || process.env.HOST;
-const PORT = '8082' || process.env.PORT;
-
 let hasFailed = false;
 const limit = promiseLimit(5);
 
-new HttpServer.createServer({
-    before: [
-        function(req, res) {
-            if (req.method === 'POST') {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                fs.readFile(path.join(__dirname, '..', req.url), (err, data) => {
-                    if (err) throw err;
-                    res.end(data.toString());
-                  });
-            } else {
-                res.emit('next');
-            }
-        }
-    ]
-}).listen(PORT, HOST, err => {
-    if (err) {
-        console.log(err);
-        process.exit(-1);
-    }
+webServer.then(({host, port}) =>
     Promise.all(
         glob.sync(path.join(testDir, '**', TESTNAME, '**', '*.html')).map(testFile => {
             const test = path.relative(testDir, testFile);
             const qunitArgs = {
                 // Path to qunit tests suite
-                targetUrl: `http://${HOST}:${PORT}/test/${test}`,
+                targetUrl: `http://${host}:${port}/test/${test}`,
                 // (optional, 30000 by default) global timeout for the tests suite
                 timeout: 30000,
                 // (optional, false by default) should the browser console be redirected or not
-                redirectConsole: true
+                redirectConsole: false
             };
 
             return limit(() =>
                 runQunitPuppeteer(qunitArgs)
                     .then(result => {
-                        printResultSummary(result, console);
+                        if (TESTNAME === '*') {
+                            process.stdout.write('.');
+                        } else {
+                            process.stdout.write(`${testFile} `);
+                            printResultSummary(result, console);
+                            console.log();
+                        }
+                        
 
                         if (result.stats.failed > 0) {
+                            console.log(`\n${testFile}`);
                             printFailedTests(result, console);
                             hasFailed = true;
                         }
@@ -81,6 +68,7 @@ new HttpServer.createServer({
             );
         })
     ).then(() => {
+        console.log();
         process.exit(hasFailed ? -1 : 0);
-    });
-});
+    })
+);
