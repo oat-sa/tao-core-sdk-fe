@@ -1,19 +1,37 @@
 {
-  "name": "new-tao-core",
+  "name": "@oat-sa/tao-core-sdk",
   "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
+  "displayName": "TAO Core SDK",
+  "description": "Core libraries of TAO",
+  "homepage": "https://github.com/oat-sa/tao-core-sdk-fe#readme",
+  "files": [
+    "dist/"
+  ],
+  "license": "GPL-2.0",
   "scripts": {
     "test:keepAlive": "node ./build/webserver.js",
     "test": "node ./build/testrunner.js",
-    "build": "rollup --config ./build/rollup.config.js"
+    "build": "rollup --config ./build/rollup.config.js",
+    "lint": "eslint src/util src/core test",
+    "prepare": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oat-sa/tao-core-sdk-fe.git"
+  },
+  "keywords": [
+    "tao",
+    "core",
+    "sdk",
+    "fe",
+    "frontend"
+  ],
   "devDependencies": {
     "@oat-sa/expr-eval": "^1.3.0",
     "decimal.js": "^10.1.1",
+    "eslint": "^5.16.0",
+    "eslint-plugin-es": "^1.4.0",
+    "eslint-plugin-jsdoc": "^4.8.3",
     "glob": "^7.1.3",
     "http-server": "^0.11.1",
     "jquery-simulate": "^1.0.2",
@@ -31,8 +49,8 @@
     "text": "github:requirejs/text#2.0.16"
   },
   "dependencies": {
-    "handlebars": "^1.3.0",
-    "jquery": "^1.12.4",
+    "handlebars": "^4.1.2",
+    "jquery": "^3.4.1",
     "lodash": "^2.4.1",
     "moment": "^2.24.0"
   }
