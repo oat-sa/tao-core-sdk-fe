@@ -19,9 +19,10 @@
 requirejs.config({
     baseUrl: '/',
     paths: {
-        css: '/node_modules/require-css/css.min',
+        css: '/node_modules/require-css/css',
         json: '/node_modules/requirejs-plugins/src/json',
         async: '/node_modules/requirejs-plugins/src/async',
+        text: '/node_modules/text/text',
 
         'qunit-parameterize': '/environment/qunit2-parameterize',
         'jquery.simulate': '/node_modules/jquery-simulate/jquery.simulate',
@@ -32,10 +33,13 @@ requirejs.config({
         lib: '/dist/lib',
         util: '/dist/util',
         
-        jquery: '/node_modules/jquery/dist/jquery.min',
+        jquery: '/node_modules/jquery/dist/jquery',
         lodash: '/node_modules/lodash/lodash',
         moment: '/node_modules/moment/moment',
-        handlebars: '/node_modules/handlebars/dist/handlebars.amd.min'
+        handlebars: '/node_modules/handlebars/dist/handlebars.amd',
+
+        'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
+        'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle'
     },
     shim: {
         'jquery.simulate': {
