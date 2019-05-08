@@ -24,6 +24,7 @@ requirejs.config({
         async: '/node_modules/requirejs-plugins/src/async',
 
         'qunit-parameterize': '/environment/qunit2-parameterize',
+        'jquery.simulate': '/node_modules/jquery-simulate/jquery.simulate',
         qunit: '/node_modules/qunit/qunit',
         test: '/test',
 
@@ -36,13 +37,19 @@ requirejs.config({
         moment: '/node_modules/moment/moment',
         handlebars: '/node_modules/handlebars/dist/handlebars.amd.min'
     },
+    shim: {
+        'jquery.simulate': {
+            deps: ['jquery']
+        },
+        'qunit-parameterize': {
+            deps: ['qunit/qunit']
+        }
+    },
     waitSeconds: 15
 });
 
 define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
-define('qunitEnv', ['qunitLibs'], function() {
-    require(['qunit-parameterize']);
-});
+define('qunitEnv', ['qunitLibs', 'qunit-parameterize']);
 
 define('context', ['module'], function(module){
     return module.config();
