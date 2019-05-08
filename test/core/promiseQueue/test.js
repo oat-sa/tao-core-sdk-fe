@@ -146,7 +146,7 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                 setTimeout(function() {
                     states.a = 'done';
                     resolve();
-                }, 100);
+                }, 500);
             });
         });
         queue.serie(function b() {
@@ -155,7 +155,7 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                 setTimeout(function a() {
                     states.b = 'done';
                     resolve();
-                }, 100);
+                }, 500);
             });
         });
         queue.serie(function c() {
@@ -164,23 +164,23 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                 setTimeout(function a() {
                     states.c = 'done';
                     resolve();
-                }, 100);
+                }, 500);
             });
         });
 
         setTimeout(function() {
             assert.deepEqual(states, {a: 'started', b: 'waiting', c: 'waiting'});
-        }, 50);
+        }, 250);
         setTimeout(function() {
             assert.deepEqual(states, {a: 'done', b: 'started', c: 'waiting'});
-        }, 150);
+        }, 750);
         setTimeout(function() {
             assert.deepEqual(states, {a: 'done', b: 'done', c: 'started'});
-        }, 250);
+        }, 1250);
         setTimeout(function() {
             assert.deepEqual(states, {a: 'done', b: 'done', c: 'done'});
             ready();
-        }, 350);
+        }, 1750);
     });
 
     QUnit.test('serie resolved data and reject', function(assert) {
