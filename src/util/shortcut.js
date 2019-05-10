@@ -33,7 +33,6 @@
  *
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-
 import shortcutRegistry from 'util/shortcut/registry';
 
 /**

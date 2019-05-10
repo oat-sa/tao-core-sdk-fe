@@ -284,5 +284,4 @@ define(['jquery', 'util/shortcut', 'jquery.simulate'], function($, shortcutHelpe
             shortcutHelper.add('mouseLeftClick+V', $.noop);
         }, 'The helper refuses to register shortcut that mix keyboard and mouse');
     });
-
 });

@@ -42,12 +42,20 @@ define(['jquery', 'util/download'], function($, download) {
     });
 
     QUnit.test('Mis-usage', function(assert) {
-        assert.throws(function() {
-            download('');
-        }, TypeError, 'Invalid filename');
-        assert.throws(function() {
-            download('QunitDownloadUndefined.json');
-        }, TypeError, 'Invalid content');
+        assert.throws(
+            function() {
+                download('');
+            },
+            TypeError,
+            'Invalid filename'
+        );
+        assert.throws(
+            function() {
+                download('QunitDownloadUndefined.json');
+            },
+            TypeError,
+            'Invalid content'
+        );
     });
 
     QUnit.module('Visual test');
@@ -55,6 +63,4 @@ define(['jquery', 'util/download'], function($, download) {
     $('#visual-test button').on('click', function() {
         download('QunitDownloadObjectManual.json', testObject);
     });
-
 });
-

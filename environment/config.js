@@ -32,11 +32,12 @@ requirejs.config({
         core: '/dist/core',
         lib: '/dist/lib',
         util: '/dist/util',
-        
-        jquery: '/node_modules/jquery/dist/jquery',
+
+        jquery: '/node_modules/jquery/jquery',
         lodash: '/node_modules/lodash/lodash',
         moment: '/node_modules/moment/moment',
         handlebars: '/node_modules/handlebars/dist/handlebars.amd',
+        'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
 
         'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
         'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle'
@@ -55,7 +56,7 @@ requirejs.config({
 define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
 define('qunitEnv', ['qunitLibs', 'qunit-parameterize']);
 
-define('context', ['module'], function(module){
+define('context', ['module'], function(module) {
     return module.config();
 });
 

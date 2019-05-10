@@ -26,20 +26,19 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import module from 'module';
 import loggerFactory from 'core/logger/api';
-    
+
 /**
  * The default configuration if nothing
  * is found on the module config
  */
 var defaultConfig = {
-    level : loggerFactory.levels.warn,
-    loggers : {
-        'core/logger/console' : {
-            'level' : 'warn'
+    level: loggerFactory.levels.warn,
+    loggers: {
+        'core/logger/console': {
+            level: 'warn'
         }
     }
 };
@@ -52,16 +51,16 @@ loggerFactory.setDefaultLevel(config.level);
 loggerFactory.load(config.loggers);
 
 /**
-     * Catch uncaught errors
-     * @param msg - error message
-     * @param url - current url
-     * @param line - line number
-     * @param col - column number
-     * @param error - error object (not all browsers support).
-     * @return {boolean}
-     */
-window.onerror = function (msg, url, line, col, error) {
-    logger.error("Caught[via window.onerror]: '" + msg + "' from " + url + ":" + line + ":" + col);
+ * Catch uncaught errors
+ * @param msg - error message
+ * @param url - current url
+ * @param line - line number
+ * @param col - column number
+ * @param error - error object (not all browsers support).
+ * @return {boolean}
+ */
+window.onerror = function(msg, url, line, col, error) {
+    logger.error("Caught[via window.onerror]: '" + msg + "' from " + url + ':' + line + ':' + col);
 };
 
 /**
@@ -69,7 +68,7 @@ window.onerror = function (msg, url, line, col, error) {
  * @param {String|Number} level - the new log level
  * @returns {String} the defined level
  */
-window.setTaoLogLevel = function setTaoLogLevel(level){
+window.setTaoLogLevel = function setTaoLogLevel(level) {
     return loggerFactory.setDefaultLevel(level);
 };
 

@@ -1,5 +1,4 @@
 define(['jquery', 'core/encoder/time'], function($, TimeEnc) {
-
     QUnit.test('encode', function(assert) {
         assert.expect(3);
 
@@ -18,4 +17,3 @@ define(['jquery', 'core/encoder/time'], function($, TimeEnc) {
         assert.equal(TimeEnc.decode('00:00:30'), 30);
     });
 });
-

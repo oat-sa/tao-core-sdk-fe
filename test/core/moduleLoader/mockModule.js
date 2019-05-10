@@ -1,12 +1,10 @@
-define([], function(){
+define([], function() {
     'use strict';
 
-    return function(){
+    return function() {
         return {
-            name : 'mock',
-            init : function(){
-
-            }
+            name: 'mock',
+            init: function() {}
         };
     };
 });

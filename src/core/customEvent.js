@@ -57,8 +57,7 @@ if (window.CustomEvent) {
         return event;
     };
 } else {
-    createEvent = function createEventDummy() {
-    };
+    createEvent = function createEventDummy() {};
 }
 
 /**
@@ -90,7 +89,6 @@ if (document.dispatchEvent) {
         return false;
     };
 }
-
 
 /**
  * Triggers a custom event using native methods

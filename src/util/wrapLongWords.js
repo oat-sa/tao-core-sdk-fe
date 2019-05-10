@@ -41,7 +41,7 @@ var getCutTerm = function getCutTerm(longWord, chunkExp) {
         newFirst = '',
         offenders = ['.', ':', ';'];
 
-    while(i--) {
+    while (i--) {
         newFirst = cutTerms[i].charAt(0);
         if (offenders.indexOf(newFirst) > -1) {
             cutTerms[i] = cutTerms[i].substr(1);
@@ -70,7 +70,7 @@ function wrapLongWords(str, threshold) {
         i = longWords.length,
         cut;
 
-    while(i--) {
+    while (i--) {
         cut = getCutTerm(longWords[i], chunkExp);
         str = str.replace(new RegExp(regexEscape(longWords[i]), 'g'), cut);
     }

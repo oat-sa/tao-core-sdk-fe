@@ -27,25 +27,30 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
         assert.expect(3);
         assert.ok(typeof asyncProcessFactory === 'function', 'the module exposes a function');
         assert.ok(typeof asyncProcessFactory() === 'object', 'the factory produces an object');
-        assert.ok(asyncProcessFactory() !== asyncProcessFactory(), 'the factory produces a different object at each call');
+        assert.ok(
+            asyncProcessFactory() !== asyncProcessFactory(),
+            'the factory produces a different object at each call'
+        );
     });
 
     var asyncProcessApi = [
-        {name: 'isRunning', title: 'isRunning'},
-        {name: 'start', title: 'start'},
-        {name: 'addStep', title: 'addStep'},
-        {name: 'done', title: 'done'}
+        { name: 'isRunning', title: 'isRunning' },
+        { name: 'start', title: 'start' },
+        { name: 'addStep', title: 'addStep' },
+        { name: 'done', title: 'done' }
     ];
 
-    QUnit
-        .cases.init(asyncProcessApi)
-        .test('asyncProcess API ', function(data, assert) {
-            assert.expect(1);
+    QUnit.cases.init(asyncProcessApi).test('asyncProcess API ', function(data, assert) {
+        assert.expect(1);
 
-            var asyncProcess = asyncProcessFactory();
+        var asyncProcess = asyncProcessFactory();
 
-            assert.equal(typeof asyncProcess[data.name], 'function', 'The asyncProcess expose a "' + data.name + '" function');
-        });
+        assert.equal(
+            typeof asyncProcess[data.name],
+            'function',
+            'The asyncProcess expose a "' + data.name + '" function'
+        );
+    });
 
     QUnit.test('simple process', function(assert) {
         var ready = assert.async(4);
@@ -81,7 +86,6 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
             assert.equal(asyncProcess.isRunning(), false, 'The process is now finished');
             ready();
         });
-
 
         assert.ok('object' === typeof p, 'The done method returns an object');
         assert.ok('function' === typeof p.then && 'function' === typeof p.catch, 'The done method returns a promise');
@@ -127,7 +131,10 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
                 });
 
                 assert.ok('object' === typeof p, 'The done method returns an object');
-                assert.ok('function' === typeof p.then && 'function' === typeof p.catch, 'The done method returns a promise');
+                assert.ok(
+                    'function' === typeof p.then && 'function' === typeof p.catch,
+                    'The done method returns a promise'
+                );
 
                 p.then(function() {
                     assert.ok(true, 'The promise is resolved');
@@ -143,7 +150,11 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
 
         assert.equal(asyncProcess.start(process), true, 'The process has started');
 
-        assert.equal(asyncProcess.start(process), false, 'No other process can start until the current one is finished');
+        assert.equal(
+            asyncProcess.start(process),
+            false,
+            'No other process can start until the current one is finished'
+        );
 
         assert.equal(asyncProcess.isRunning(), true, 'There is a running process at this time');
     });
@@ -180,17 +191,21 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
             assert.ok(true, 'The process main has been called');
             assert.ok(asyncProcess.isRunning(), 'The process is running');
 
-            asyncProcess.addStep(new Promise(function(resolve) {
-                setTimeout(function() {
-                    resolve(1);
-                }, 300);
-            }));
+            asyncProcess.addStep(
+                new Promise(function(resolve) {
+                    setTimeout(function() {
+                        resolve(1);
+                    }, 300);
+                })
+            );
 
-            asyncProcess.addStep(new Promise(function(resolve) {
-                setTimeout(function() {
-                    resolve(2);
-                }, 400);
-            }));
+            asyncProcess.addStep(
+                new Promise(function(resolve) {
+                    setTimeout(function() {
+                        resolve(2);
+                    }, 400);
+                })
+            );
 
             setTimeout(function() {
                 var p = asyncProcess.done(function(err, data) {
@@ -205,7 +220,10 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
                 });
 
                 assert.ok('object' === typeof p, 'The done method returns an object');
-                assert.ok('function' === typeof p.then && 'function' === typeof p.catch, 'The done method returns a promise');
+                assert.ok(
+                    'function' === typeof p.then && 'function' === typeof p.catch,
+                    'The done method returns a promise'
+                );
 
                 p.then(function(data) {
                     assert.ok(true, 'The promise is resolved');
@@ -226,7 +244,11 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
 
         assert.equal(asyncProcess.start(process), true, 'The process has started');
 
-        assert.equal(asyncProcess.start(process), false, 'No other process can start until the current one is finished');
+        assert.equal(
+            asyncProcess.start(process),
+            false,
+            'No other process can start until the current one is finished'
+        );
 
         assert.equal(asyncProcess.isRunning(), true, 'There is a running process at this time');
     });
@@ -256,17 +278,21 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
             assert.ok(true, 'The process main has been called');
             assert.ok(asyncProcess.isRunning(), 'The process is running');
 
-            asyncProcess.addStep(new Promise(function(resolve, reject) {
-                setTimeout(function() {
-                    reject('oups');
-                }, 300);
-            }));
+            asyncProcess.addStep(
+                new Promise(function(resolve, reject) {
+                    setTimeout(function() {
+                        reject('oups');
+                    }, 300);
+                })
+            );
 
-            asyncProcess.addStep(new Promise(function(resolve) {
-                setTimeout(function() {
-                    resolve(2);
-                }, 400);
-            }));
+            asyncProcess.addStep(
+                new Promise(function(resolve) {
+                    setTimeout(function() {
+                        resolve(2);
+                    }, 400);
+                })
+            );
 
             setTimeout(function() {
                 var p = asyncProcess.done(function(err) {
@@ -277,7 +303,10 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
                 });
 
                 assert.ok('object' === typeof p, 'The done method returns an object');
-                assert.ok('function' === typeof p.then && 'function' === typeof p.catch, 'The done method returns a promise');
+                assert.ok(
+                    'function' === typeof p.then && 'function' === typeof p.catch,
+                    'The done method returns a promise'
+                );
 
                 p.then(function() {
                     assert.ok(false, 'The promise must be rejected!');
@@ -293,9 +322,12 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
 
         assert.equal(asyncProcess.start(process), true, 'The process has started');
 
-        assert.equal(asyncProcess.start(process), false, 'No other process can start until the current one is finished');
+        assert.equal(
+            asyncProcess.start(process),
+            false,
+            'No other process can start until the current one is finished'
+        );
 
         assert.equal(asyncProcess.isRunning(), true, 'There is a running process at this time');
     });
-
 });

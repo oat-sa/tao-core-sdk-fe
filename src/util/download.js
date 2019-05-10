@@ -20,9 +20,8 @@
  *
  * @author Martin Nicholson <martin@taotesting.com>
  */
-
 import _ from 'lodash';
-    
+
 /**
  * Make the browser start downloading a file
  * @param {String} filename

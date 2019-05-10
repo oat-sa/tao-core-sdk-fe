@@ -61,19 +61,19 @@ var createEvent = function createEvent(eventName, eventOptions) {
         event = document.createEvent('MouseEvents');
         event.initMouseEvent(
             eventName,
-            eventOptions.bubbles     || false,
-            eventOptions.cancelable  || false,
-            eventOptions.view        || null,
-            eventOptions.detail      || 0,
-            eventOptions.screenX     || 0,
-            eventOptions.screenY     || 0,
-            eventOptions.clientX     || 0,
-            eventOptions.clientY     || 0,
-            eventOptions.ctrlKey     || false,
-            eventOptions.altKey      || false,
-            eventOptions.shiftKey    || false,
-            eventOptions.metaKey     || false,
-            eventOptions.button      || 0,
+            eventOptions.bubbles || false,
+            eventOptions.cancelable || false,
+            eventOptions.view || null,
+            eventOptions.detail || 0,
+            eventOptions.screenX || 0,
+            eventOptions.screenY || 0,
+            eventOptions.clientX || 0,
+            eventOptions.clientY || 0,
+            eventOptions.ctrlKey || false,
+            eventOptions.altKey || false,
+            eventOptions.shiftKey || false,
+            eventOptions.metaKey || false,
+            eventOptions.button || 0,
             eventOptions.relatedTarget || null
         );
     }
@@ -109,7 +109,6 @@ if (document.dispatchEvent) {
     };
 }
 
-
 /**
  * Triggers a mouse event using native methods
  * @param {HTMLElement} element
@@ -125,4 +124,4 @@ export default function triggerMouseEvent(element, eventName, eventOptions) {
     }
     event = createEvent(eventName, eventOptions);
     return dispatchEvent(element, eventName, event);
-};
+}

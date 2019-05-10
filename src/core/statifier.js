@@ -67,7 +67,6 @@
  *
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-
 import _ from 'lodash';
 
 /**
@@ -101,7 +100,7 @@ function statifierFactory(target) {
          * @returns {statesApi}
          */
         setState: function setState(name, value) {
-            if (typeof(value) === 'undefined') {
+            if (typeof value === 'undefined') {
                 value = true;
             }
             states[name] = !!value;
@@ -122,23 +121,29 @@ function statifierFactory(target) {
          * @returns {Array}
          */
         getStates: function getStates() {
-            return _.reduce(states, function(result, state, key) {
-                if (state) {
-                    result.push(key);
-                }
-                return result;
-            }, []);
+            return _.reduce(
+                states,
+                function(result, state, key) {
+                    if (state) {
+                        result.push(key);
+                    }
+                    return result;
+                },
+                []
+            );
         }
     };
 
     target = target || {};
 
-    _(statesApi).functions().forEach(function(method){
-        target[method] = function delegate(){
-            var args =  [].slice.call(arguments);
-            return statesApi[method].apply(target, args);
-        };
-    });
+    _(statesApi)
+        .functions()
+        .forEach(function(method) {
+            target[method] = function delegate() {
+                var args = [].slice.call(arguments);
+                return statesApi[method].apply(target, args);
+            };
+        });
 
     return target;
 }

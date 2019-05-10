@@ -29,12 +29,13 @@ define(['util/config'], function(configHelper) {
         assert.equal(typeof configHelper, 'object', 'The config helper module exposes an object');
     });
 
-    QUnit.cases.init([
-        {title: 'build'},
-        {title: 'from'}
-    ]).test('helpers/config API ', function(data, assert) {
+    QUnit.cases.init([{ title: 'build' }, { title: 'from' }]).test('helpers/config API ', function(data, assert) {
         assert.expect(1);
-        assert.equal(typeof configHelper[data.title], 'function', 'The config helper exposes a "' + data.title + '" function');
+        assert.equal(
+            typeof configHelper[data.title],
+            'function',
+            'The config helper exposes a "' + data.title + '" function'
+        );
     });
 
     QUnit.test('helpers/config.build', function(assert) {
@@ -52,9 +53,17 @@ define(['util/config'], function(configHelper) {
 
         assert.expect(3);
 
-        assert.deepEqual(configHelper.build(), {}, 'The config helper build() returns an empty object if no data is provided');
+        assert.deepEqual(
+            configHelper.build(),
+            {},
+            'The config helper build() returns an empty object if no data is provided'
+        );
         assert.deepEqual(configHelper.build(source), source, 'The config helper build() returns the expected config');
-        assert.deepEqual(configHelper.build(source, defaults), expected, 'The config helper build() returns the expected config with defaults values');
+        assert.deepEqual(
+            configHelper.build(source, defaults),
+            expected,
+            'The config helper build() returns the expected config with defaults values'
+        );
     });
 
     QUnit.test('helpers/config.from', function(assert) {
@@ -86,12 +95,24 @@ define(['util/config'], function(configHelper) {
 
         assert.expect(4);
 
-        assert.deepEqual(configHelper.from(), {}, 'The config helper from() returns an empty object if no data is provided');
-        assert.deepEqual(configHelper.from(source, entries), expected, 'The config helper from() returns the expected config');
-        assert.deepEqual(configHelper.from(source, entries, defaults), expectedDefaults, 'The config helper from() returns the expected config with defaults values');
+        assert.deepEqual(
+            configHelper.from(),
+            {},
+            'The config helper from() returns an empty object if no data is provided'
+        );
+        assert.deepEqual(
+            configHelper.from(source, entries),
+            expected,
+            'The config helper from() returns the expected config'
+        );
+        assert.deepEqual(
+            configHelper.from(source, entries, defaults),
+            expectedDefaults,
+            'The config helper from() returns the expected config with defaults values'
+        );
 
         assert.throws(function() {
-            configHelper.from(source, {no: true});
+            configHelper.from(source, { no: true });
         }, 'The config helper from() throws an error is a required config entry is missing');
     });
 });

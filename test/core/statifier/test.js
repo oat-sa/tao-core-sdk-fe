@@ -18,12 +18,7 @@
 define(['core/statifier'], function(statifier) {
     'use strict';
 
-    var statifierApi = [
-        {title: 'getState'},
-        {title: 'setState'},
-        {title: 'clearStates'},
-        {title: 'getStates'}
-    ];
+    var statifierApi = [{ title: 'getState' }, { title: 'setState' }, { title: 'clearStates' }, { title: 'getStates' }];
 
     QUnit.module('statifier');
 
@@ -40,19 +35,20 @@ define(['core/statifier'], function(statifier) {
         assert.equal(statifier(obj), obj, 'The factory returns the provided object if any');
     });
 
-    QUnit
-        .cases.init(statifierApi)
-        .test('method ', function(data, assert) {
-            assert.expect(1);
-            assert.equal(typeof statifier()[data.title], 'function', 'The statifier instance exposes a "' + data.title + '" function');
-        });
+    QUnit.cases.init(statifierApi).test('method ', function(data, assert) {
+        assert.expect(1);
+        assert.equal(
+            typeof statifier()[data.title],
+            'function',
+            'The statifier instance exposes a "' + data.title + '" function'
+        );
+    });
 
     QUnit.module('statification');
 
     QUnit.test('delegates', function(assert) {
         var target = {
-            something: function something() {
-            },
+            something: function something() {},
             foo: 'bar'
         };
         var states = statifier(target);
@@ -85,7 +81,11 @@ define(['core/statifier'], function(statifier) {
         assert.equal(states.getState('foo'), true, 'A not empty string is equivalent to true, the state should exist');
 
         assert.equal(states.setState('foo', ''), states, 'The setState() method should return the instance');
-        assert.equal(states.getState('foo'), false, 'An empty string is equivalent to false, the state should be removed');
+        assert.equal(
+            states.getState('foo'),
+            false,
+            'An empty string is equivalent to false, the state should be removed'
+        );
 
         assert.equal(states.setState('foo'), states, 'The setState() method should return the instance');
         assert.equal(states.getState('foo'), true, 'When no value is provided, the state should be set');
@@ -125,12 +125,10 @@ define(['core/statifier'], function(statifier) {
         assert.equal(states.setState('bar', true), states, 'The setState() method should return the instance');
         assert.equal(states.getState('bar'), true, 'The state "bar" should exist now');
 
-        assert.deepEqual(states.getStates(), ["foo", "bar"], 'The states "foo" and "bar" should be set');
+        assert.deepEqual(states.getStates(), ['foo', 'bar'], 'The states "foo" and "bar" should be set');
 
         assert.equal(states.setState('foo', false), states, 'The setState() method should return the instance');
 
-        assert.deepEqual(states.getStates(), ["bar"], 'Now only she states "bar" should be set');
-
+        assert.deepEqual(states.getStates(), ['bar'], 'Now only she states "bar" should be set');
     });
-
 });

@@ -18,7 +18,6 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-
 import Promise from 'core/promise';
 
 /**
@@ -36,7 +35,7 @@ function requireIfExists(uri) {
             if (failedId === uri) {
                 // fake the module, then ensure it is truly loaded
                 requirejs.undef(failedId);
-                define(failedId, function () {
+                define(failedId, function() {
                     return null;
                 });
                 require([failedId], resolve);

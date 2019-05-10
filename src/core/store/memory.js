@@ -21,11 +21,9 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import Promise from 'core/promise';
 import uuid from 'lib/uuid';
-    
 
 /**
  * where data dwelves
@@ -43,9 +41,8 @@ var idStore;
  * @returns {Object} the store backend
  * @throws {TypeError} without a storeName
  */
-var memoryStorageBackend = function memoryStorageBackend(storeName){
-
-    if(_.isEmpty(storeName) || !_.isString(storeName)){
+var memoryStorageBackend = function memoryStorageBackend(storeName) {
+    if (_.isEmpty(storeName) || !_.isString(storeName)) {
         throw new TypeError('The store name is required');
     }
 
@@ -55,17 +52,16 @@ var memoryStorageBackend = function memoryStorageBackend(storeName){
      * The store
      */
     return {
-
         /**
          * Get an item with the given key
          * @param {String} key
          * @returns {Promise} with the result in resolve, undfined if nothing
          */
-        getItem : function getItem(key){
-            if (! _.isPlainObject(memoryStore[storeName])) {
+        getItem: function getItem(key) {
+            if (!_.isPlainObject(memoryStore[storeName])) {
                 return Promise.resolve();
             }
-            return Promise.resolve( memoryStore[storeName][key] );
+            return Promise.resolve(memoryStore[storeName][key]);
         },
 
         /**
@@ -74,8 +70,8 @@ var memoryStorageBackend = function memoryStorageBackend(storeName){
          * @param {*} value - the item value
          * @returns {Promise} with true in resolve if added/updated
          */
-        setItem : function setItem(key, value){
-            if (! _.isPlainObject(memoryStore[storeName])) {
+        setItem: function setItem(key, value) {
+            if (!_.isPlainObject(memoryStore[storeName])) {
                 memoryStore[storeName] = {};
             }
             memoryStore[storeName][key] = value;
@@ -87,7 +83,7 @@ var memoryStorageBackend = function memoryStorageBackend(storeName){
          * @param {String} key - the item key
          * @returns {Promise} with true in resolve if removed
          */
-        removeItem : function removeItem(key){
+        removeItem: function removeItem(key) {
             memoryStore[storeName] = _.omit(memoryStore[storeName], key);
             return Promise.resolve(typeof memoryStore[storeName][key] === 'undefined');
         },
@@ -96,7 +92,7 @@ var memoryStorageBackend = function memoryStorageBackend(storeName){
          * Get all store items
          * @returns {Promise<Object>} with a collection of items
          */
-        getItems : function getItems(){
+        getItems: function getItems() {
             return Promise.resolve(memoryStore[storeName]);
         },
 
@@ -104,7 +100,7 @@ var memoryStorageBackend = function memoryStorageBackend(storeName){
          * Clear the current store
          * @returns {Promise} with true in resolve once cleared
          */
-        clear : function clear(){
+        clear: function clear() {
             memoryStore[storeName] = {};
             return Promise.resolve(true);
         },
@@ -113,7 +109,7 @@ var memoryStorageBackend = function memoryStorageBackend(storeName){
          * Delete the database related to the current store
          * @returns {Promise} with true in resolve once cleared
          */
-        removeStore : function removeStore() {
+        removeStore: function removeStore() {
             memoryStore = _.omit(memoryStore, storeName);
             return Promise.resolve(typeof memoryStore[storeName] === 'undefined');
         }
@@ -129,7 +125,7 @@ memoryStorageBackend.removeAll = function removeAll(validate) {
     if (!_.isFunction(validate)) {
         validate = null;
     }
-    memoryStore = _.omit(memoryStore, function(store, storeName){
+    memoryStore = _.omit(memoryStore, function(store, storeName) {
         return validate ? validate(storeName) : true;
     });
     return Promise.resolve(true);
@@ -146,10 +142,10 @@ memoryStorageBackend.getAll = function getAll(validate) {
         validate = null;
     }
     storeNames = _(memoryStore)
-        .map(function(store, storeName){
+        .map(function(store, storeName) {
             return storeName;
         })
-        .filter(function(storeName){
+        .filter(function(storeName) {
             return validate ? validate(storeName) : true;
         })
         .value();
@@ -161,10 +157,9 @@ memoryStorageBackend.getAll = function getAll(validate) {
  * Get the identifier of the storage
  * @returns {Promise} that resolves with the store identifier
  */
-memoryStorageBackend.getStoreIdentifier = function getStoreIdentifier(){
-
+memoryStorageBackend.getStoreIdentifier = function getStoreIdentifier() {
     //we use the storeName also as the id
-    if(_.isEmpty(idStore)){
+    if (_.isEmpty(idStore)) {
         idStore = uuid();
     }
     return Promise.resolve(idStore);

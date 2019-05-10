@@ -24,7 +24,6 @@
  */
 
 export default {
-
     /**
      * Check if an element is inside another, based on it's coords
      * (this is not a check if the element is a DOM children of the container).
@@ -34,19 +33,24 @@ export default {
      * @param {HTMLElement} element - the element to check against the container
      * @returns {Boolean*} or undefined if the parameters are incorrect, so check your return value type.
      */
-    isInside : function isInside(container, element) {
+    isInside: function isInside(container, element) {
         var containerCoords;
         var elementCoords;
-        if(container instanceof HTMLElement && element instanceof HTMLElement){
+        if (container instanceof HTMLElement && element instanceof HTMLElement) {
             containerCoords = container.getBoundingClientRect();
-            elementCoords   = element.getBoundingClientRect();
+            elementCoords = element.getBoundingClientRect();
 
-            if(typeof containerCoords === 'object' && typeof elementCoords === 'object'){
-
-                return elementCoords.top >= containerCoords.top       && elementCoords.top <= containerCoords.bottom &&
-                        elementCoords.left >= containerCoords.left     && elementCoords.left <= containerCoords.right &&
-                        elementCoords.bottom <= containerCoords.bottom && elementCoords.bottom >= containerCoords.top &&
-                        elementCoords.right <= containerCoords.right   && elementCoords.right >= containerCoords.left;
+            if (typeof containerCoords === 'object' && typeof elementCoords === 'object') {
+                return (
+                    elementCoords.top >= containerCoords.top &&
+                    elementCoords.top <= containerCoords.bottom &&
+                    elementCoords.left >= containerCoords.left &&
+                    elementCoords.left <= containerCoords.right &&
+                    elementCoords.bottom <= containerCoords.bottom &&
+                    elementCoords.bottom >= containerCoords.top &&
+                    elementCoords.right <= containerCoords.right &&
+                    elementCoords.right >= containerCoords.left
+                );
             }
         }
     },
@@ -62,17 +66,20 @@ export default {
      * @param {HTMLElement} element - the element to check against the container
      * @returns {Boolean*} or undefined if the parameters are incorrect, so check your return value type.
      */
-    isOver : function isInside(container, element) {
+    isOver: function isInside(container, element) {
         var containerCoords;
         var elementCoords;
-        if(container instanceof HTMLElement && element instanceof HTMLElement){
+        if (container instanceof HTMLElement && element instanceof HTMLElement) {
             containerCoords = container.getBoundingClientRect();
-            elementCoords   = element.getBoundingClientRect();
+            elementCoords = element.getBoundingClientRect();
 
-            if(typeof containerCoords === 'object' && typeof elementCoords === 'object'){
-
-                return elementCoords.top >= containerCoords.top  && elementCoords.top <= containerCoords.bottom &&
-                        elementCoords.left >= containerCoords.left && elementCoords.left <= containerCoords.right;
+            if (typeof containerCoords === 'object' && typeof elementCoords === 'object') {
+                return (
+                    elementCoords.top >= containerCoords.top &&
+                    elementCoords.top <= containerCoords.bottom &&
+                    elementCoords.left >= containerCoords.left &&
+                    elementCoords.left <= containerCoords.right
+                );
             }
         }
     }

@@ -32,7 +32,11 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
 
         assert.equal(typeof moduleLoader, 'function', 'The module loader exposes a function');
         assert.equal(typeof moduleLoader(), 'object', 'The module loader produces an object');
-        assert.notStrictEqual(moduleLoader(), moduleLoader(), 'The module loader provides a different object on each call');
+        assert.notStrictEqual(
+            moduleLoader(),
+            moduleLoader(),
+            'The module loader provides a different object on each call'
+        );
     });
 
     QUnit.test('loader methods', function(assert) {
@@ -65,43 +69,74 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
     QUnit.test('required module format', function(assert) {
         assert.expect(7);
 
-        assert.throws(function() {
-            moduleLoader({12: {}});
-        }, TypeError, 'Wrong category format');
+        assert.throws(
+            function() {
+                moduleLoader({ 12: {} });
+            },
+            TypeError,
+            'Wrong category format'
+        );
 
-        assert.throws(function() {
-            moduleLoader([{}]);
-        }, TypeError, 'Wrong category format');
+        assert.throws(
+            function() {
+                moduleLoader([{}]);
+            },
+            TypeError,
+            'Wrong category format'
+        );
 
-        assert.throws(function() {
-            moduleLoader({'foo': true});
-        }, TypeError, 'The module list must be an array');
+        assert.throws(
+            function() {
+                moduleLoader({ foo: true });
+            },
+            TypeError,
+            'The module list must be an array'
+        );
 
-        assert.throws(function() {
-            moduleLoader({'foo': [true]});
-        }, TypeError, 'The module list must be an array of objects');
+        assert.throws(
+            function() {
+                moduleLoader({ foo: [true] });
+            },
+            TypeError,
+            'The module list must be an array of objects'
+        );
 
-        assert.throws(function() {
-            moduleLoader({'foo': [_.noop]});
-        }, TypeError, 'The module list must be an array of objects');
+        assert.throws(
+            function() {
+                moduleLoader({ foo: [_.noop] });
+            },
+            TypeError,
+            'The module list must be an array of objects'
+        );
 
-        assert.throws(function() {
-            moduleLoader({'foo': [{}]}, _.isFunction);
-        }, TypeError, 'The module list must be an array of functions');
+        assert.throws(
+            function() {
+                moduleLoader({ foo: [{}] }, _.isFunction);
+            },
+            TypeError,
+            'The module list must be an array of functions'
+        );
 
-        assert.throws(function() {
-            moduleLoader({'foo': ['true', {}]});
-        }, TypeError, 'The module list must be an array with only objects');
+        assert.throws(
+            function() {
+                moduleLoader({ foo: ['true', {}] });
+            },
+            TypeError,
+            'The module list must be an array with only objects'
+        );
 
         moduleLoader({
             foo: [{}],
             bar: [{}, {}]
         });
 
-        moduleLoader({
-            foo: [_.noop],
-            bar: [_.noop, _.noop]
-        }, _.isFunction);
+        moduleLoader(
+            {
+                foo: [_.noop],
+                bar: [_.noop, _.noop]
+            },
+            _.isFunction
+        );
     });
 
     QUnit.test('required module loading', function(assert) {
@@ -139,28 +174,44 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
 
         assert.equal(typeof loader, 'object', 'The loader is an object');
 
-        assert.throws(function() {
-            loader.add(12);
-        }, TypeError, 'Add requires an object');
+        assert.throws(
+            function() {
+                loader.add(12);
+            },
+            TypeError,
+            'Add requires an object'
+        );
 
-        assert.throws(function() {
-            loader.add({
-                foo: '12',
-                bar: true
-            });
-        }, TypeError, 'Add requires an object with a module and a category');
+        assert.throws(
+            function() {
+                loader.add({
+                    foo: '12',
+                    bar: true
+                });
+            },
+            TypeError,
+            'Add requires an object with a module and a category'
+        );
 
-        assert.throws(function() {
-            loader.add({
-                module: 'foo'
-            });
-        }, TypeError, 'Add requires an object with a category');
+        assert.throws(
+            function() {
+                loader.add({
+                    module: 'foo'
+                });
+            },
+            TypeError,
+            'Add requires an object with a category'
+        );
 
-        assert.throws(function() {
-            loader.add({
-                category: 'foo'
-            });
-        }, TypeError, 'Add requires an object with a module');
+        assert.throws(
+            function() {
+                loader.add({
+                    category: 'foo'
+                });
+            },
+            TypeError,
+            'Add requires an object with a module'
+        );
 
         loader.add({
             module: 'foo',
@@ -189,13 +240,15 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
         assert.ok(promise instanceof Promise, 'The load method returns a Promise');
         assert.deepEqual(loader.getModules('mock'), [], 'The loader mock category is empty');
 
-        promise.then(function() {
-            assert.equal(loader.getModules('mock').length, 1, 'The mock category contains now a module');
-            ready();
-        }).catch(function(e) {
-            assert.ok(false, e);
-            ready();
-        });
+        promise
+            .then(function() {
+                assert.equal(loader.getModules('mock').length, 1, 'The mock category contains now a module');
+                ready();
+            })
+            .catch(function(e) {
+                assert.ok(false, e);
+                ready();
+            });
     });
 
     QUnit.test('load a wrong module', function(assert) {
@@ -219,13 +272,15 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
         assert.ok(promise instanceof Promise, 'The load method returns a Promise');
         assert.deepEqual(loader.getModules('mock'), [], 'The loader mock category is empty');
 
-        promise.then(function() {
-            assert.ok(false, 'The promise should fail since the loaded provider is wrong');
-            ready();
-        }).catch(function(e) {
-            assert.ok(true, e);
-            ready();
-        });
+        promise
+            .then(function() {
+                assert.ok(false, 'The promise should fail since the loaded provider is wrong');
+                ready();
+            })
+            .catch(function(e) {
+                assert.ok(true, e);
+                ready();
+            });
     });
 
     QUnit.test('load a bundle', function(assert) {
@@ -249,29 +304,34 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
         assert.ok(promise instanceof Promise, 'The load method returns a Promise');
         assert.deepEqual(loader.getModules('mock'), [], 'The loader mock category is empty');
 
-        promise.then(function() {
-            assert.equal(loader.getModules('mock').length, 1, 'The mock category contains now one module');
+        promise
+            .then(function() {
+                assert.equal(loader.getModules('mock').length, 1, 'The mock category contains now one module');
 
-            ready();
-        }).catch(function(e) {
-            assert.ok(false, e);
-            ready();
-        });
+                ready();
+            })
+            .catch(function(e) {
+                assert.ok(false, e);
+                ready();
+            });
     });
 
     QUnit.test('load load multiple modules from a bundle', function(assert) {
         var ready = assert.async();
-        var modules = [{
-            module: 'test/core/moduleLoader/mockAModule',
-            bundle: 'test/core/moduleLoader/mockBundle.min',
-            category: 'mock',
-            position: 1
-        }, {
-            module: 'test/core/moduleLoader/mockBModule',
-            bundle: 'test/core/moduleLoader/mockBundle.min',
-            category: 'mock',
-            position: 0
-        }];
+        var modules = [
+            {
+                module: 'test/core/moduleLoader/mockAModule',
+                bundle: 'test/core/moduleLoader/mockBundle.min',
+                category: 'mock',
+                position: 1
+            },
+            {
+                module: 'test/core/moduleLoader/mockBModule',
+                bundle: 'test/core/moduleLoader/mockBundle.min',
+                category: 'mock',
+                position: 0
+            }
+        ];
         var loader, promise;
 
         assert.expect(5);
@@ -286,14 +346,16 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
         assert.ok(promise instanceof Promise, 'The load method returns a Promise');
         assert.deepEqual(loader.getModules('mock'), [], 'The loader mock category is empty');
 
-        promise.then(function() {
-            assert.equal(loader.getModules('mock').length, 2, 'The mock category contains now one module');
+        promise
+            .then(function() {
+                assert.equal(loader.getModules('mock').length, 2, 'The mock category contains now one module');
 
-            ready();
-        }).catch(function(e) {
-            assert.ok(false, e);
-            ready();
-        });
+                ready();
+            })
+            .catch(function(e) {
+                assert.ok(false, e);
+                ready();
+            });
     });
 
     QUnit.test('remove a module', function(assert) {
@@ -313,12 +375,19 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
 
         assert.deepEqual(loader.remove('mock'), loader, 'The loader chains');
 
-        loader.load().then(function() {
-            assert.equal(loader.getModules('test/core/moduleLoader/mockModule').length, 0, 'The mock module has been removed');
-            ready();
-        }).catch(function(e) {
-            assert.ok(false, e);
-            ready();
-        });
+        loader
+            .load()
+            .then(function() {
+                assert.equal(
+                    loader.getModules('test/core/moduleLoader/mockModule').length,
+                    0,
+                    'The mock module has been removed'
+                );
+                ready();
+            })
+            .catch(function(e) {
+                assert.ok(false, e);
+                ready();
+            });
     });
 });

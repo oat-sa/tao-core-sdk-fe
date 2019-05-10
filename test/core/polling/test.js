@@ -31,29 +31,31 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
     });
 
     var testReviewApi = [
-        {name: 'async', title: 'async'},
-        {name: 'next', title: 'next'},
-        {name: 'start', title: 'start'},
-        {name: 'stop', title: 'stop'},
-        {name: 'setInterval', title: 'setInterval'},
-        {name: 'getInterval', title: 'getInterval'},
-        {name: 'setAction', title: 'setAction'},
-        {name: 'getAction', title: 'getAction'},
-        {name: 'setContext', title: 'setContext'},
-        {name: 'getContext', title: 'getContext'},
-        {name: 'getIteration', title: 'getIteration'},
-        {name: 'setMax', title: 'setMax'},
-        {name: 'getMax', title: 'getMax'},
-        {name: 'is', title: 'is'}
+        { name: 'async', title: 'async' },
+        { name: 'next', title: 'next' },
+        { name: 'start', title: 'start' },
+        { name: 'stop', title: 'stop' },
+        { name: 'setInterval', title: 'setInterval' },
+        { name: 'getInterval', title: 'getInterval' },
+        { name: 'setAction', title: 'setAction' },
+        { name: 'getAction', title: 'getAction' },
+        { name: 'setContext', title: 'setContext' },
+        { name: 'getContext', title: 'getContext' },
+        { name: 'getIteration', title: 'getIteration' },
+        { name: 'setMax', title: 'setMax' },
+        { name: 'getMax', title: 'getMax' },
+        { name: 'is', title: 'is' }
     ];
 
-    QUnit
-        .cases.init(testReviewApi)
-        .test('instance API ', function(data, assert) {
-            var instance = polling();
-            assert.expect(1);
-            assert.equal(typeof instance[data.name], 'function', 'The polling instance exposes a "' + data.title + '" function');
-        });
+    QUnit.cases.init(testReviewApi).test('instance API ', function(data, assert) {
+        var instance = polling();
+        assert.expect(1);
+        assert.equal(
+            typeof instance[data.name],
+            'function',
+            'The polling instance exposes a "' + data.title + '" function'
+        );
+    });
 
     QUnit.test('API', function(assert) {
         var instance = polling();
@@ -65,7 +67,11 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
         assert.expect(18);
 
         assert.equal(instance.getInterval(), 60000, 'The polling instance has set a default value for the interval');
-        assert.equal(instance.getContext(), instance, 'The polling instance has set a default value for the call context');
+        assert.equal(
+            instance.getContext(),
+            instance,
+            'The polling instance has set a default value for the call context'
+        );
         assert.equal(instance.getAction(), null, 'The polling instance has no action callback for now');
 
         assert.equal(instance.setInterval(interval), instance, 'The method setInterval returns the instance');
@@ -74,13 +80,25 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
         assert.equal(instance.setAction(action), instance, 'The method setAction returns the instance');
 
         assert.equal(instance.getInterval(), interval, 'The polling instance has set the right value for the interval');
-        assert.equal(instance.getContext(), context, 'The polling instance has set the right value for the call context');
-        assert.equal(instance.getMax(), max, 'The polling instance has set the right value for the max number of iterations');
+        assert.equal(
+            instance.getContext(),
+            context,
+            'The polling instance has set the right value for the call context'
+        );
+        assert.equal(
+            instance.getMax(),
+            max,
+            'The polling instance has set the right value for the max number of iterations'
+        );
         assert.equal(instance.getAction(), action, 'The polling instance has set the right action callback');
 
         var instance2 = polling(action);
         assert.equal(instance2.getInterval(), 60000, 'The polling instance has set a default value for the interval');
-        assert.equal(instance2.getContext(), instance2, 'The polling instance has set a default value for the call context');
+        assert.equal(
+            instance2.getContext(),
+            instance2,
+            'The polling instance has set a default value for the call context'
+        );
         assert.equal(instance2.getAction(), action, 'The polling instance has set the right action callback');
 
         var instance3 = polling({
@@ -89,9 +107,21 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
             context: context,
             max: max
         });
-        assert.equal(instance3.getInterval(), interval, 'The polling instance has set the right value for the interval');
-        assert.equal(instance3.getContext(), context, 'The polling instance has set the right value for the call context');
-        assert.equal(instance3.getMax(), max, 'The polling instance has set the right value for the max number of iterations');
+        assert.equal(
+            instance3.getInterval(),
+            interval,
+            'The polling instance has set the right value for the interval'
+        );
+        assert.equal(
+            instance3.getContext(),
+            context,
+            'The polling instance has set the right value for the call context'
+        );
+        assert.equal(
+            instance3.getMax(),
+            max,
+            'The polling instance has set the right value for the max number of iterations'
+        );
         assert.equal(instance3.getAction(), action, 'The polling instance has set the right action callback');
     });
 
@@ -153,14 +183,22 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
         });
 
         instance.on('call', function() {
-            assert.ok(true, 'The polling instance triggers event when the action is called [step ' + context.step + ']');
+            assert.ok(
+                true,
+                'The polling instance triggers event when the action is called [step ' + context.step + ']'
+            );
             ready1();
         });
 
         instance.on('resolved', function() {
             assert.equal(instance.is('processing'), false, 'The instance must not be in state processing');
             assert.equal(instance.is('pending'), true, 'The instance must be in state pending');
-            assert.ok(true, 'The polling instance triggers event when the action is validated in async mode [step ' + context.step + ']');
+            assert.ok(
+                true,
+                'The polling instance triggers event when the action is validated in async mode [step ' +
+                    context.step +
+                    ']'
+            );
             ready2();
         });
 
@@ -169,12 +207,20 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
                 assert.equal(instance.is('processing'), false, 'The instance must not be in state processing');
                 assert.equal(instance.is('stopped'), true, 'The instance must be in state stopped');
             }
-            assert.ok(true, 'The polling instance triggers event when the action is canceled in async mode [step ' + context.step + ']');
+            assert.ok(
+                true,
+                'The polling instance triggers event when the action is canceled in async mode [step ' +
+                    context.step +
+                    ']'
+            );
             ready3();
         });
 
         instance.on('async', function(cb) {
-            assert.ok(true, 'The polling instance triggers event when the action is set to async mode [step ' + context.step + ']');
+            assert.ok(
+                true,
+                'The polling instance triggers event when the action is set to async mode [step ' + context.step + ']'
+            );
             assert.equal(typeof cb, 'object', 'The first parameter of the async event is the resolve object');
             assert.ok(cb.resolve, 'The first parameter of the async event has a resolve method');
             assert.ok(cb.reject, 'The first parameter of the async event has a reject method');
@@ -183,21 +229,32 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
 
         instance.on('next', function() {
             assert.equal(instance.is('stopped'), false, 'The instance must not be in state stopped');
-            assert.ok(true, 'The polling instance triggers event when the action is triggered immediately [step ' + context.step + ']');
+            assert.ok(
+                true,
+                'The polling instance triggers event when the action is triggered immediately [step ' +
+                    context.step +
+                    ']'
+            );
             ready5();
         });
 
         instance.on('start', function() {
             assert.equal(instance.is('pending'), true, 'The instance must be in state pending');
             assert.equal(instance.is('stopped'), false, 'The instance must not be in state stopped');
-            assert.ok(true, 'The polling instance triggers event when the polling is started [step ' + context.step + ']');
+            assert.ok(
+                true,
+                'The polling instance triggers event when the polling is started [step ' + context.step + ']'
+            );
             ready6();
         });
 
         instance.on('stop', function() {
             assert.equal(instance.is('pending'), false, 'The instance must not be in state pending');
             assert.equal(instance.is('stopped'), true, 'The instance must be in state stopped');
-            assert.ok(true, 'The polling instance triggers event when the polling is stopped [step ' + context.step + ']');
+            assert.ok(
+                true,
+                'The polling instance triggers event when the polling is stopped [step ' + context.step + ']'
+            );
             ready7();
 
             if (2 === context.step || 3 === context.step) {

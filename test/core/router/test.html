@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
+        <meta charset="utf-8" />
         <title>Test - Router</title>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
-            require(['/environment/config.js'], function(){
+            require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
                     requirejs.config({
-                        paths : {
-                            'taoItems/loader/taoItems.min' : 'test/core/router/data/taoItems.min',
-                            'controller/routes'            : 'test/core/router/data/taoRoute',
-                            'taoItems/controller/routes'   : 'test/core/router/data/taoItemsRoute',
-                            'taoTests/loader/taoTests.min' : 'test/core/router/data/taoTests.min'
+                        paths: {
+                            'taoItems/loader/taoItems.min': 'test/core/router/data/taoItems.min',
+                            'controller/routes': 'test/core/router/data/taoRoute',
+                            'taoItems/controller/routes': 'test/core/router/data/taoItemsRoute',
+                            'taoTests/loader/taoTests.min': 'test/core/router/data/taoTests.min'
                         }
                     });
                     require(['test/core/router/test'], function() {

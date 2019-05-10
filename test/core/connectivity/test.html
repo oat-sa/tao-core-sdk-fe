@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
+        <meta charset="utf-8" />
         <title>Test - Connectivity</title>
         <style>
             .external {
@@ -16,18 +16,18 @@
                 border: solid 1px grey;
                 transition: background-color 900ms ease-out;
             }
-            .visual.online{
+            .visual.online {
                 background-color: #499849;
                 transition: background-color 900ms ease-out;
             }
-            .visual.offline{
-                background-color: #B82D24;
+            .visual.offline {
+                background-color: #b82d24;
                 transition: background-color 900ms ease-out;
             }
         </style>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
-            require(['/environment/config.js'], function(){
+            require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
                     require(['test/core/connectivity/test'], function() {
                         QUnit.start();

@@ -32,15 +32,21 @@ define(['jquery', 'core/communicator', 'core/communicator/request'], function($,
         assert.equal(typeof requestProvider, 'object', 'The communicator/request module exposes an object');
     });
 
-    QUnit.cases.init([
-        {name: 'init', title: 'init'},
-        {name: 'destroy', title: 'destroy'},
-        {name: 'open', title: 'open'},
-        {name: 'close', title: 'close'},
-        {name: 'send', title: 'send'}
-    ]).test('communicator api', function(data, assert) {
-        assert.equal(typeof requestProvider[data.name], 'function', 'The communicator/request api exposes a "' + data.name + '" function');
-    });
+    QUnit.cases
+        .init([
+            { name: 'init', title: 'init' },
+            { name: 'destroy', title: 'destroy' },
+            { name: 'open', title: 'open' },
+            { name: 'close', title: 'close' },
+            { name: 'send', title: 'send' }
+        ])
+        .test('communicator api', function(data, assert) {
+            assert.equal(
+                typeof requestProvider[data.name],
+                'function',
+                'The communicator/request api exposes a "' + data.name + '" function'
+            );
+        });
 
     QUnit.module('provider');
 
@@ -64,7 +70,7 @@ define(['jquery', 'core/communicator', 'core/communicator/request'], function($,
 
         communicator.registerProvider('request', requestProvider);
 
-        var instance = communicator('request', {service: 'service.url'})
+        var instance = communicator('request', { service: 'service.url' })
             .on('init', function() {
                 assert.ok(true, 'The communicator has fired the "init" event');
             })
@@ -90,7 +96,8 @@ define(['jquery', 'core/communicator', 'core/communicator/request'], function($,
                 assert.ok(true, 'The communicator has fired the "destroyed" event');
             });
 
-        instance.init()
+        instance
+            .init()
             .then(function() {
                 return instance.open();
             })
@@ -102,7 +109,8 @@ define(['jquery', 'core/communicator', 'core/communicator/request'], function($,
             })
             .then(function() {
                 ready();
-            }).catch(function(err) {
+            })
+            .catch(function(err) {
                 assert.ok(false, err.message);
                 ready();
             });
@@ -114,13 +122,15 @@ define(['jquery', 'core/communicator', 'core/communicator/request'], function($,
 
         communicator.registerProvider('request', requestProvider);
 
-        var instance = communicator('request', {service: '/test/core/communicator/request/messages.json'})
-            .on('receive', function(data) {
-                assert.equal(typeof data, 'object', 'We got a response');
-                assert.equal(data.responses[0], 'ok', 'The correct response is received');
-            });
+        var instance = communicator('request', {
+            service: '/test/core/communicator/request/messages.json'
+        }).on('receive', function(data) {
+            assert.equal(typeof data, 'object', 'We got a response');
+            assert.equal(data.responses[0], 'ok', 'The correct response is received');
+        });
 
-        instance.init()
+        instance
+            .init()
             .then(function() {
                 return instance.open();
             })
@@ -134,15 +144,14 @@ define(['jquery', 'core/communicator', 'core/communicator/request'], function($,
                 return instance.destroy();
             })
             .then(function() {
-
                 //Ensure only on call is done in 1 second
                 setTimeout(function() {
                     ready();
                 }, 1000);
-            }).catch(function(err) {
+            })
+            .catch(function(err) {
                 assert.ok(false, err.message);
                 ready();
             });
     });
 });
-

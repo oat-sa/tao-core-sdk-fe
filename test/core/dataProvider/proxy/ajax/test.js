@@ -19,7 +19,6 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-
     'lodash',
     'core/promise',
     'core/dataProvider/request',
@@ -28,19 +27,18 @@ define([
 ], function(_, Promise, requestMock, proxyFactory, ajaxProvider) {
     'use strict';
 
-    var tokenCasesSuccess, tokenCasesFailure;
     var ajaxProviderApi = [
-        {title: 'init'},
-        {title: 'destroy'},
-        {title: 'create'},
-        {title: 'read'},
-        {title: 'write'},
-        {title: 'remove'},
-        {title: 'action'}
+        { title: 'init' },
+        { title: 'destroy' },
+        { title: 'create' },
+        { title: 'read' },
+        { title: 'write' },
+        { title: 'remove' },
+        { title: 'action' }
     ];
 
     QUnit.module('ajaxProvider', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             proxyFactory.clearProviders();
             proxyFactory.registerProvider('ajax', ajaxProvider);
             requestMock.api.removeAllListeners();
@@ -53,12 +51,14 @@ define([
         assert.equal(typeof ajaxProvider, 'object', 'The proxy/ajax module exposes an object');
     });
 
-    QUnit
-        .cases.init(ajaxProviderApi)
-        .test('instance API ', function(data, assert) {
-            assert.expect(1);
-            assert.equal(typeof ajaxProvider[data.title], 'function', 'The proxy/ajax provider exposes a "' + data.title + '" function');
-        });
+    QUnit.cases.init(ajaxProviderApi).test('instance API ', function(data, assert) {
+        assert.expect(1);
+        assert.equal(
+            typeof ajaxProvider[data.title],
+            'function',
+            'The proxy/ajax provider exposes a "' + data.title + '" function'
+        );
+    });
 
     QUnit.test('ajax.init()', function(assert) {
         var ready = assert.async();
@@ -76,8 +76,15 @@ define([
         result = proxy
             .on('init', function(promise, config) {
                 assert.ok(true, 'The proxyFactory has fired the "init" event');
-                assert.ok(promise instanceof Promise, 'The proxyFactory has provided the promise through the "init" event');
-                assert.deepEqual(config, expectedConfig, 'The proxyFactory has provided the config object through the "init" event');
+                assert.ok(
+                    promise instanceof Promise,
+                    'The proxyFactory has provided the promise through the "init" event'
+                );
+                assert.deepEqual(
+                    config,
+                    expectedConfig,
+                    'The proxyFactory has provided the config object through the "init" event'
+                );
             })
             .init(initConfig);
 
@@ -86,7 +93,11 @@ define([
         result
             .then(function() {
                 assert.ok(true, 'The promise should be resolved');
-                assert.deepEqual(proxy.getConfig(), expectedConfig, 'The proxyFactory has provided the config object through the "init" event');
+                assert.deepEqual(
+                    proxy.getConfig(),
+                    expectedConfig,
+                    'The proxyFactory has provided the config object through the "init" event'
+                );
 
                 assert.equal(typeof proxy.processRequest, 'function', 'Internal method should exist');
 
@@ -129,14 +140,21 @@ define([
 
         assert.expect(10);
 
-        proxy = proxyFactory('ajax')
-            .on('create', function(promise, params) {
-                assert.ok(true, 'The proxyFactory has fired the "create" event');
-                assert.ok(promise instanceof Promise, 'The proxyFactory has provided the promise through the "create" event');
-                assert.deepEqual(params, expectedParams, 'The proxyFactory has provided the params through the "create" event');
-            });
+        proxy = proxyFactory('ajax').on('create', function(promise, params) {
+            assert.ok(true, 'The proxyFactory has fired the "create" event');
+            assert.ok(
+                promise instanceof Promise,
+                'The proxyFactory has provided the promise through the "create" event'
+            );
+            assert.deepEqual(
+                params,
+                expectedParams,
+                'The proxyFactory has provided the params through the "create" event'
+            );
+        });
 
-        proxy.create()
+        proxy
+            .create()
             .then(function() {
                 assert.ok(false, 'The proxy must be initialized');
             })
@@ -152,7 +170,8 @@ define([
             requestMock.api.trigger('success', expectedResponse);
         });
 
-        proxy.init(initConfig)
+        proxy
+            .init(initConfig)
             .then(function() {
                 var result = proxy.create(expectedParams);
 
@@ -194,14 +213,18 @@ define([
 
         assert.expect(10);
 
-        proxy = proxyFactory('ajax')
-            .on('read', function(promise, params) {
-                assert.ok(true, 'The proxyFactory has fired the "read" event');
-                assert.ok(promise instanceof Promise, 'The proxyFactory has provided the promise through the "read" event');
-                assert.deepEqual(params, expectedParams, 'The proxyFactory has provided the params through the "read" event');
-            });
+        proxy = proxyFactory('ajax').on('read', function(promise, params) {
+            assert.ok(true, 'The proxyFactory has fired the "read" event');
+            assert.ok(promise instanceof Promise, 'The proxyFactory has provided the promise through the "read" event');
+            assert.deepEqual(
+                params,
+                expectedParams,
+                'The proxyFactory has provided the params through the "read" event'
+            );
+        });
 
-        proxy.read()
+        proxy
+            .read()
             .then(function() {
                 assert.ok(false, 'The proxy must be initialized');
             })
@@ -217,7 +240,8 @@ define([
             requestMock.api.trigger('success', expectedResponse);
         });
 
-        proxy.init(initConfig)
+        proxy
+            .init(initConfig)
             .then(function() {
                 var result = proxy.read(expectedParams);
 
@@ -274,18 +298,27 @@ define([
 
         assert.expect(13);
 
-        proxy = proxyFactory('ajax')
-            .on('write', function(promise, params) {
-                assert.ok(true, 'The proxyFactory has fired the "write" event');
-                assert.ok(promise instanceof Promise, 'The proxyFactory has provided the promise through the "write" event');
-                promise.then(function() {
-                    assert.deepEqual(params, expectedParams, 'The proxyFactory has provided the params through the "write" event');
-                }).catch(function() {
+        proxy = proxyFactory('ajax').on('write', function(promise, params) {
+            assert.ok(true, 'The proxyFactory has fired the "write" event');
+            assert.ok(
+                promise instanceof Promise,
+                'The proxyFactory has provided the promise through the "write" event'
+            );
+            promise
+                .then(function() {
+                    assert.deepEqual(
+                        params,
+                        expectedParams,
+                        'The proxyFactory has provided the params through the "write" event'
+                    );
+                })
+                .catch(function() {
                     assert.ok(true, 'The proxy must be initialized');
                 });
-            });
+        });
 
-        proxy.write()
+        proxy
+            .write()
             .then(function() {
                 assert.ok(false, 'The proxy must be initialized');
             })
@@ -301,9 +334,11 @@ define([
             requestMock.api.trigger('success', expectedResponse);
         });
 
-        proxy.init(initConfig)
+        proxy
+            .init(initConfig)
             .then(function() {
-                return proxy.write(wrongParams)
+                return proxy
+                    .write(wrongParams)
                     .then(function() {
                         assert.ok(false, 'The promise should be rejected');
                     })
@@ -323,7 +358,6 @@ define([
                 console.error(err);
                 ready();
             });
-
     });
 
     QUnit.test('ajax.remove()', function(assert) {
@@ -345,14 +379,21 @@ define([
 
         assert.expect(10);
 
-        proxy = proxyFactory('ajax')
-            .on('remove', function(promise, params) {
-                assert.ok(true, 'The proxyFactory has fired the  "remove" event');
-                assert.ok(promise instanceof Promise, 'The proxyFactory has provided the promise through the  "remove" event');
-                assert.deepEqual(params, expectedParams, 'The proxyFactory has provided the params through the  "remove" event');
-            });
+        proxy = proxyFactory('ajax').on('remove', function(promise, params) {
+            assert.ok(true, 'The proxyFactory has fired the  "remove" event');
+            assert.ok(
+                promise instanceof Promise,
+                'The proxyFactory has provided the promise through the  "remove" event'
+            );
+            assert.deepEqual(
+                params,
+                expectedParams,
+                'The proxyFactory has provided the params through the  "remove" event'
+            );
+        });
 
-        proxy.remove()
+        proxy
+            .remove()
             .then(function() {
                 assert.ok(false, 'The proxy must be initialized');
             })
@@ -368,7 +409,8 @@ define([
             requestMock.api.trigger('success', expectedResponse);
         });
 
-        proxy.init(initConfig)
+        proxy
+            .init(initConfig)
             .then(function() {
                 var result = proxy.remove(expectedParams);
 
@@ -417,21 +459,32 @@ define([
 
         assert.expect(14);
 
-        proxy = proxyFactory('ajax')
-            .on('action', function(promise, action, params) {
-                assert.ok(true, 'The proxyFactory has fired the "action" event');
-                assert.ok(promise instanceof Promise, 'The proxyFactory has provided the promise through the "action" event');
-                promise.then(function() {
-                    assert.equal(action, expectedAction, 'The proxyFactory has provided the action name through the "action" event');
-                    assert.deepEqual(params, expectedParams, 'The proxyFactory has provided the params through the "action" event');
+        proxy = proxyFactory('ajax').on('action', function(promise, action, params) {
+            assert.ok(true, 'The proxyFactory has fired the "action" event');
+            assert.ok(
+                promise instanceof Promise,
+                'The proxyFactory has provided the promise through the "action" event'
+            );
+            promise
+                .then(function() {
+                    assert.equal(
+                        action,
+                        expectedAction,
+                        'The proxyFactory has provided the action name through the "action" event'
+                    );
+                    assert.deepEqual(
+                        params,
+                        expectedParams,
+                        'The proxyFactory has provided the params through the "action" event'
+                    );
                 })
-                .catch(function(err) {
+                .catch(function() {
                     assert.ok(true, 'The promise should be rejected on wrong data');
-
                 });
-            });
+        });
 
-        proxy.action()
+        proxy
+            .action()
             .then(function() {
                 assert.ok(false, 'The proxy must be initialized');
             })
@@ -447,9 +500,11 @@ define([
             requestMock.api.trigger('success', expectedResponse);
         });
 
-        proxy.init(initConfig)
+        proxy
+            .init(initConfig)
             .then(function() {
-                return proxy.action('unknown')
+                return proxy
+                    .action('unknown')
                     .then(function() {
                         assert.ok(false, 'The promise should be rejected');
                     })
@@ -470,200 +525,4 @@ define([
                 ready();
             });
     });
-
-    tokenCasesSuccess = [{
-        title: 'send',
-        url: 'http://foo.bar/read',
-        method: 'GET',
-        token: 'foo#token1',
-        params: {
-            foo: 'bar'
-        },
-        response: {
-            success: true,
-            data: {
-                list: [1, 2, 3]
-            }
-        }
-    }, {
-        title: 'receive',
-        url: 'http://foo.bar/read',
-        method: 'GET',
-        token: 'foo#token1',
-        expectedToken: 'foo#token2',
-        params: {
-            foo: 'bar'
-        },
-        response: {
-            success: true,
-            data: {
-                token: 'foo#token2',
-                list: [1, 2, 3]
-            }
-        }
-    }];
-
-    QUnit
-        .cases.init(tokenCasesSuccess)
-        .test('token handling on success ', function(data, assert) {
-            var ready = assert.async();
-
-            var proxy;
-            var initConfig = {
-                actions: {
-                    read: data.url
-                }
-            };
-
-            assert.expect(12);
-
-            proxy = proxyFactory('ajax')
-                .on('read', function(promise, params) {
-                    assert.ok(true, 'The proxyFactory has fired the "read" event');
-                    assert.ok(promise instanceof Promise, 'The proxyFactory has provided the promise through the "read" event');
-                    assert.deepEqual(params, data.params, 'The proxyFactory has provided the params through the "read" event');
-                });
-
-            proxy.read()
-                .then(function() {
-                    assert.ok(false, 'The proxy must be initialized');
-                })
-                .catch(function() {
-                    assert.ok(true, 'The proxy must be initialized');
-                });
-
-            requestMock.api.on('request', function(url, params, method, headers) {
-                assert.equal(url, data.url, 'The url is correct');
-                assert.equal(method, data.method, 'The HTTP method is correct');
-                delete params._;
-                assert.deepEqual(params, data.params, 'The expected parameters have been provided');
-                assert.equal(headers['X-Auth-Token'], data.token, 'The expected security token have been provided');
-                requestMock.api.trigger('success', data.response.data);
-            });
-
-            proxy.init(initConfig)
-                .then(function() {
-                    proxy.getTokenHandler().setToken(data.token);
-                    return proxy.read(data.params);
-                })
-                .then(function(response) {
-                    assert.ok(true, 'The promise should be resolved');
-                    assert.deepEqual(response, data.response.data, 'The expected responses have been provided');
-                    assert.equal(response.token, data.expectedToken, 'A security token has been provided');
-                    assert.equal(proxy.getTokenHandler().getToken(), data.expectedToken, 'The right security token has been set');
-                    ready();
-                })
-                .catch(function(err) {
-                    assert.ok(false, 'The promise should not be rejected');
-                    console.error(err);
-                    ready();
-                });
-        });
-
-    tokenCasesFailure = [{
-        title: 'response',
-        url: 'http://foo.bar/read',
-        method: 'GET',
-        token: 'foo#token1',
-        expectedToken: 'foo#token2',
-        params: {
-            foo: 'bar'
-        },
-        response: {
-            success: false,
-            token: 'foo#token2',
-            data: {
-                list: [1, 2, 3]
-            }
-        }
-    }, {
-        title: 'response data',
-        url: 'http://foo.bar/read',
-        method: 'GET',
-        token: 'foo#token1',
-        expectedToken: 'foo#token2',
-        params: {
-            foo: 'bar'
-        },
-        response: {
-            success: false,
-            data: {
-                token: 'foo#token2',
-                list: [1, 2, 3]
-            }
-        }
-    }, {
-        title: 'no token',
-        url: 'http://foo.bar/read',
-        method: 'GET',
-        token: 'foo#token1',
-        expectedToken: 'foo#token1',
-        params: {
-            foo: 'bar'
-        },
-        response: {
-            success: false,
-            data: {
-                list: [1, 2, 3]
-            }
-        }
-    }];
-
-    QUnit
-        .cases.init(tokenCasesFailure)
-        .test('token handling on error ', function(data, assert) {
-            var ready = assert.async();
-            var proxy;
-            var initConfig = {
-                actions: {
-                    read: data.url
-                }
-            };
-
-            assert.expect(11);
-
-            proxy = proxyFactory('ajax')
-                .on('read', function(promise, params) {
-                    assert.ok(true, 'The proxyFactory has fired the "read" event');
-                    assert.ok(promise instanceof Promise, 'The proxyFactory has provided the promise through the "read" event');
-                    assert.deepEqual(params, data.params, 'The proxyFactory has provided the params through the "read" event');
-                });
-
-            proxy.read()
-                .then(function() {
-                    assert.ok(false, 'The proxy must be initialized');
-                })
-                .catch(function() {
-                    assert.ok(true, 'The proxy must be initialized');
-                });
-
-            requestMock.api.on('request', function(url, params, method, headers) {
-                var err = new Error('Failure');
-                err.response = data.response;
-
-                assert.equal(url, data.url, 'The url is correct');
-                assert.equal(method, data.method, 'The HTTP method is correct');
-                delete params._;
-                assert.deepEqual(params, data.params, 'The expected parameters have been provided');
-                assert.equal(headers['X-Auth-Token'], data.token, 'The expected security token have been provided');
-
-                requestMock.api.trigger('failure', err);
-            });
-
-            proxy.init(initConfig)
-                .then(function() {
-                    proxy.getTokenHandler().setToken(data.token);
-                    return proxy.read(data.params);
-                })
-                .then(function() {
-                    assert.ok(false, 'The promise should not be resolved');
-                    ready();
-                })
-                .catch(function(err) {
-                    assert.ok(true, 'The promise should be rejected');
-                    assert.deepEqual(err.response, data.response, 'The expected responses have been provided');
-                    assert.equal(proxy.getTokenHandler().getToken(), data.expectedToken, 'The right security token has been set');
-                    ready();
-                });
-        });
 });

@@ -18,7 +18,6 @@
  *
  */
 define(['jquery', 'util/adaptSize'], function($, adaptSize) {
-
     QUnit.test('API', function(assert) {
         assert.expect(4);
 
@@ -38,9 +37,7 @@ define(['jquery', 'util/adaptSize'], function($, adaptSize) {
 
         adaptSize.height($targets);
 
-        var assertion = $e1.height() === $e2.height() &&
-            $e1.height() === $e3.height() &&
-            $e1.height() > 0;
+        var assertion = $e1.height() === $e2.height() && $e1.height() === $e3.height() && $e1.height() > 0;
 
         assert.ok(assertion, 'Adapts height of several elements');
     });
@@ -55,9 +52,7 @@ define(['jquery', 'util/adaptSize'], function($, adaptSize) {
 
         adaptSize.height($targets, 2000);
 
-        var assertion = $e1.height() === $e2.height() &&
-            $e1.height() === $e3.height() &&
-            $e1.height() >= 2000;
+        var assertion = $e1.height() === $e2.height() && $e1.height() === $e3.height() && $e1.height() >= 2000;
 
         assert.ok(assertion, 'Adapts height of several elements when a minimal height is given');
     });
@@ -72,9 +67,7 @@ define(['jquery', 'util/adaptSize'], function($, adaptSize) {
 
         adaptSize.width($targets);
 
-        var assertion = $e1.width() === $e2.width() &&
-            $e1.width() === $e3.width() &&
-            $e1.width() > 0;
+        var assertion = $e1.width() === $e2.width() && $e1.width() === $e3.width() && $e1.width() > 0;
 
         assert.ok(assertion, 'Adapts width of several elements');
     });
@@ -89,9 +82,7 @@ define(['jquery', 'util/adaptSize'], function($, adaptSize) {
 
         adaptSize.width($targets, 2000);
 
-        var assertion = $e1.width() === $e2.width() &&
-            $e1.width() === $e3.width() &&
-            $e1.width() >= 2000;
+        var assertion = $e1.width() === $e2.width() && $e1.width() === $e3.width() && $e1.width() >= 2000;
 
         assert.ok(assertion, 'Adapts width of several elements when a minimal width is given');
     });
@@ -106,7 +97,8 @@ define(['jquery', 'util/adaptSize'], function($, adaptSize) {
 
         adaptSize.both($targets);
 
-        var assertion = $e1.width() === $e2.width() &&
+        var assertion =
+            $e1.width() === $e2.width() &&
             $e1.width() === $e3.width() &&
             $e1.width() > 0 &&
             $e1.height() === $e2.height() &&
@@ -126,7 +118,8 @@ define(['jquery', 'util/adaptSize'], function($, adaptSize) {
 
         adaptSize.both($targets, 2000);
 
-        var assertion = $e1.width() === $e2.width() &&
+        var assertion =
+            $e1.width() === $e2.width() &&
             $e1.width() === $e3.width() &&
             $e1.width() >= 2000 &&
             $e1.height() === $e2.height() &&
@@ -146,12 +139,13 @@ define(['jquery', 'util/adaptSize'], function($, adaptSize) {
 
         adaptSize.both($targets, null, 2000);
 
-        var assertion = $e1.width() === $e2.width() &&
+        var assertion =
+            $e1.width() === $e2.width() &&
             $e1.width() === $e3.width() &&
             $e1.width() > 0 &&
             $e1.height() === $e2.height() &&
             $e1.height() === $e3.height() &&
-            $e1.height() >= 2000 ;
+            $e1.height() >= 2000;
 
         assert.ok(assertion, 'Adapts height and width of several elements in one go when a minimal height is given');
     });
@@ -167,14 +161,17 @@ define(['jquery', 'util/adaptSize'], function($, adaptSize) {
         // Expect the adapter to set all other to the same height
         adaptSize.both($targets, 2000, 2000);
 
-        var assertion = $e1.width() === $e2.width() &&
+        var assertion =
+            $e1.width() === $e2.width() &&
             $e1.width() === $e3.width() &&
             $e1.width() >= 2000 &&
             $e1.height() === $e2.height() &&
             $e1.height() === $e3.height() &&
             $e1.height() >= 2000;
 
-        assert.ok(assertion, 'Adapts height and width of several elements in one go when a minimal width and a minimal height are given');
+        assert.ok(
+            assertion,
+            'Adapts height and width of several elements in one go when a minimal width and a minimal height are given'
+        );
     });
 });
-

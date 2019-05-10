@@ -24,7 +24,6 @@
  */
 
 export default {
-
     /**
      * Limit a string by word count
      *
@@ -32,19 +31,19 @@ export default {
      * @param {integer} maxWordCount
      * @returns {string}
      */
-    limitByWordCount : function limitByWordCount(str, maxWordCount) {
+    limitByWordCount: function limitByWordCount(str, maxWordCount) {
         // contains alternating a word and whitespace
         // to make sure the original whitespace is retained
-        var textArr  = str.match(/(([\S]+)|([\s]+))/g);
-        var newText  = /\s+/.test(textArr[0]) ? textArr.shift() : '';
-        while(maxWordCount && textArr.length) {
+        var textArr = str.match(/(([\S]+)|([\s]+))/g);
+        var newText = /\s+/.test(textArr[0]) ? textArr.shift() : '';
+        while (maxWordCount && textArr.length) {
             newText += textArr.shift(); // word
-            if(textArr.length){
+            if (textArr.length) {
                 newText += textArr.shift(); // white space
             }
             maxWordCount--;
         }
-        newText = newText.replace(/\s+$/,''); // remove trailing space
+        newText = newText.replace(/\s+$/, ''); // remove trailing space
         return newText;
     },
 
@@ -55,7 +54,7 @@ export default {
      * @param {integer} maxCharCount
      * @returns {string|*}
      */
-    limitByCharCount : function limitByCharCount(str, maxCharCount) {
+    limitByCharCount: function limitByCharCount(str, maxCharCount) {
         return str.substr(0, maxCharCount);
     }
 };

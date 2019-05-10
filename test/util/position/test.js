@@ -40,12 +40,19 @@ define(['util/position'], function(position) {
         assert.expect(3);
 
         assert.equal(typeof position.isInside(), 'undefined', 'The method returns undefined without valid elements');
-        assert.equal(typeof position.isInside(null, null), 'undefined', 'The method returns undefined without valid elements');
-        assert.equal(typeof position.isInside({}, {}), 'undefined', 'The method returns undefined without valid elements');
+        assert.equal(
+            typeof position.isInside(null, null),
+            'undefined',
+            'The method returns undefined without valid elements'
+        );
+        assert.equal(
+            typeof position.isInside({}, {}),
+            'undefined',
+            'The method returns undefined without valid elements'
+        );
     });
 
     QUnit.test('simple elements', function(assert) {
-
         var container = document.getElementById('qunit-fixture');
         var contentContainer = container.querySelector('.content');
         var volatileElt = container.querySelector('.volatile');
@@ -58,13 +65,17 @@ define(['util/position'], function(position) {
         assert.ok(volatileElt instanceof HTMLElement, 'The volatile element exists');
         assert.ok(externalElt instanceof HTMLElement, 'The external element exists');
 
-        assert.ok(position.isInside(contentContainer, volatileElt), 'The volatile element is inside the content element');
-        assert.ok(!position.isInside(contentContainer, externalElt), 'The external element is outside the content element');
-
+        assert.ok(
+            position.isInside(contentContainer, volatileElt),
+            'The volatile element is inside the content element'
+        );
+        assert.ok(
+            !position.isInside(contentContainer, externalElt),
+            'The external element is outside the content element'
+        );
     });
 
     QUnit.test('absolute elements', function(assert) {
-
         var container = document.getElementById('qunit-fixture');
         var contentContainer = container.querySelector('.content');
         var volatileElt = container.querySelector('.volatile');
@@ -85,12 +96,17 @@ define(['util/position'], function(position) {
         assert.ok(volatileElt instanceof HTMLElement, 'The volatile element exists');
         assert.ok(externalElt instanceof HTMLElement, 'The external element exists');
 
-        assert.ok(position.isInside(contentContainer, volatileElt), 'The volatile element is inside the content element');
-        assert.ok(!position.isInside(contentContainer, externalElt), 'The external element is outside the content element');
+        assert.ok(
+            position.isInside(contentContainer, volatileElt),
+            'The volatile element is inside the content element'
+        );
+        assert.ok(
+            !position.isInside(contentContainer, externalElt),
+            'The external element is outside the content element'
+        );
     });
 
     QUnit.test('translate elements', function(assert) {
-
         var container = document.getElementById('qunit-fixture');
         var contentContainer = container.querySelector('.content');
         var volatileElt = container.querySelector('.volatile');
@@ -105,15 +121,24 @@ define(['util/position'], function(position) {
         assert.ok(contentContainer instanceof HTMLElement, 'The content container exists');
         assert.ok(volatileElt instanceof HTMLElement, 'The volatile element exists');
 
-        assert.ok(position.isInside(contentContainer, volatileElt), 'The volatile element is inside the content element');
+        assert.ok(
+            position.isInside(contentContainer, volatileElt),
+            'The volatile element is inside the content element'
+        );
 
         volatileElt.classList.add('move-out');
 
-        assert.ok(!position.isInside(contentContainer, volatileElt), 'The volatile element is now outside the content element');
+        assert.ok(
+            !position.isInside(contentContainer, volatileElt),
+            'The volatile element is now outside the content element'
+        );
 
         volatileElt.classList.remove('move-out');
 
-        assert.ok(position.isInside(contentContainer, volatileElt), 'The volatile element is inside the content element');
+        assert.ok(
+            position.isInside(contentContainer, volatileElt),
+            'The volatile element is inside the content element'
+        );
     });
 
     QUnit.module('isOver');
@@ -122,12 +147,19 @@ define(['util/position'], function(position) {
         assert.expect(3);
 
         assert.equal(typeof position.isOver(), 'undefined', 'The method returns undefined without valid elements');
-        assert.equal(typeof position.isOver(null, null), 'undefined', 'The method returns undefined without valid elements');
-        assert.equal(typeof position.isOver({}, {}), 'undefined', 'The method returns undefined without valid elements');
+        assert.equal(
+            typeof position.isOver(null, null),
+            'undefined',
+            'The method returns undefined without valid elements'
+        );
+        assert.equal(
+            typeof position.isOver({}, {}),
+            'undefined',
+            'The method returns undefined without valid elements'
+        );
     });
 
     QUnit.test('simple elements', function(assert) {
-
         var container = document.getElementById('qunit-fixture');
         var contentContainer = container.querySelector('.content');
         var volatileElt = container.querySelector('.volatile');
@@ -141,12 +173,13 @@ define(['util/position'], function(position) {
         assert.ok(externalElt instanceof HTMLElement, 'The external element exists');
 
         assert.ok(position.isOver(contentContainer, volatileElt), 'The volatile element is inside the content element');
-        assert.ok(!position.isOver(contentContainer, externalElt), 'The external element is outside the content element');
-
+        assert.ok(
+            !position.isOver(contentContainer, externalElt),
+            'The external element is outside the content element'
+        );
     });
 
     QUnit.test('absolute elements', function(assert) {
-
         var container = document.getElementById('qunit-fixture');
         var contentContainer = container.querySelector('.content');
         var volatileElt = container.querySelector('.volatile');
@@ -170,12 +203,17 @@ define(['util/position'], function(position) {
         assert.ok(externalElt instanceof HTMLElement, 'The external element exists');
 
         assert.ok(position.isOver(contentContainer, volatileElt), 'The volatile element is inside the content element');
-        assert.ok(!position.isInside(contentContainer, volatileElt), 'The volatile element is over the content element but not inside');
-        assert.ok(!position.isOver(contentContainer, externalElt), 'The external element is outside the content element');
+        assert.ok(
+            !position.isInside(contentContainer, volatileElt),
+            'The volatile element is over the content element but not inside'
+        );
+        assert.ok(
+            !position.isOver(contentContainer, externalElt),
+            'The external element is outside the content element'
+        );
     });
 
     QUnit.test('translate elements', function(assert) {
-
         var container = document.getElementById('qunit-fixture');
         var contentContainer = container.querySelector('.content');
         var volatileElt = container.querySelector('.volatile');
@@ -194,7 +232,10 @@ define(['util/position'], function(position) {
 
         volatileElt.classList.add('move-out');
 
-        assert.ok(!position.isOver(contentContainer, volatileElt), 'The volatile element is now outside the content element');
+        assert.ok(
+            !position.isOver(contentContainer, volatileElt),
+            'The volatile element is now outside the content element'
+        );
 
         volatileElt.classList.remove('move-out');
 

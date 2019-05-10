@@ -32,7 +32,11 @@ define(['lodash', 'core/providerLoader', 'core/promise'], function(_, providerLo
 
         assert.equal(typeof providerLoader, 'function', 'The provider loader exposes a function');
         assert.equal(typeof providerLoader(), 'object', 'The provider loader produces an object');
-        assert.notStrictEqual(providerLoader(), providerLoader(), 'The provider loader provides a different object on each call');
+        assert.notStrictEqual(
+            providerLoader(),
+            providerLoader(),
+            'The provider loader provides a different object on each call'
+        );
     });
 
     QUnit.test('loader methods', function(assert) {
@@ -45,7 +49,6 @@ define(['lodash', 'core/providerLoader', 'core/promise'], function(_, providerLo
         assert.equal(typeof loader.addList, 'function', 'The loader exposes the addList method');
         assert.equal(typeof loader.load, 'function', 'The loader exposes the load method');
         assert.equal(typeof loader.getProviders, 'function', 'The loader exposes the getProviders method');
-
     });
 
     QUnit.module('required');
@@ -53,40 +56,64 @@ define(['lodash', 'core/providerLoader', 'core/promise'], function(_, providerLo
     QUnit.test('required provider format', function(assert) {
         assert.expect(6);
 
-        assert.throws(function() {
-            providerLoader([{name: 'foo', init: _.noop}]);
-        }, TypeError, 'Wrong category format');
+        assert.throws(
+            function() {
+                providerLoader([{ name: 'foo', init: _.noop }]);
+            },
+            TypeError,
+            'Wrong category format'
+        );
 
-        assert.throws(function() {
-            providerLoader({12: {name: 'foo', init: _.noop}});
-        }, TypeError, 'Wrong category format');
+        assert.throws(
+            function() {
+                providerLoader({ 12: { name: 'foo', init: _.noop } });
+            },
+            TypeError,
+            'Wrong category format'
+        );
 
-        assert.throws(function() {
-            providerLoader({'foo': true});
-        }, TypeError, 'The provider list must be an array');
+        assert.throws(
+            function() {
+                providerLoader({ foo: true });
+            },
+            TypeError,
+            'The provider list must be an array'
+        );
 
-        assert.throws(function() {
-            providerLoader({'foo': [true]});
-        }, TypeError, 'The provider list must be an array of objects');
+        assert.throws(
+            function() {
+                providerLoader({ foo: [true] });
+            },
+            TypeError,
+            'The provider list must be an array of objects'
+        );
 
-        assert.throws(function() {
-            providerLoader({'foo': ['true', {name: 'foo', init: _.noop}]});
-        }, TypeError, 'The provider list must be an array with only objects');
+        assert.throws(
+            function() {
+                providerLoader({ foo: ['true', { name: 'foo', init: _.noop }] });
+            },
+            TypeError,
+            'The provider list must be an array with only objects'
+        );
 
-        assert.throws(function() {
-            providerLoader({'foo': [{init: _.noop}]});
-        }, TypeError, 'The providers must be named');
+        assert.throws(
+            function() {
+                providerLoader({ foo: [{ init: _.noop }] });
+            },
+            TypeError,
+            'The providers must be named'
+        );
 
         providerLoader({
-            foo: [{name: 'foo1', init: _.noop}],
-            bar: [{name: 'bar1', init: _.noop}, {name: 'bar2', init: _.noop}]
+            foo: [{ name: 'foo1', init: _.noop }],
+            bar: [{ name: 'bar1', init: _.noop }, { name: 'bar2', init: _.noop }]
         });
     });
 
     QUnit.test('required provider loading', function(assert) {
-        var a = {name: 'a', init: _.noop};
-        var b = {name: 'b', init: _.noop};
-        var c = {name: 'c', init: _.noop};
+        var a = { name: 'a', init: _.noop };
+        var b = { name: 'b', init: _.noop };
+        var c = { name: 'c', init: _.noop };
         var providers = {
             foo: [a],
             bar: [b, c]
@@ -99,8 +126,16 @@ define(['lodash', 'core/providerLoader', 'core/promise'], function(_, providerLo
         assert.equal(typeof loader, 'object', 'The loader is an object');
         assert.deepEqual(loader.getCategories(), ['foo', 'bar'], 'The providers categories are correct');
         assert.deepEqual(loader.getProviders(), [a, b, c], 'The providers have been registered');
-        assert.deepEqual(loader.getProviders('foo'), providers.foo, 'The providers are registered under the right category');
-        assert.deepEqual(loader.getProviders('bar'), providers.bar, 'The providers are registered under the right category');
+        assert.deepEqual(
+            loader.getProviders('foo'),
+            providers.foo,
+            'The providers are registered under the right category'
+        );
+        assert.deepEqual(
+            loader.getProviders('bar'),
+            providers.bar,
+            'The providers are registered under the right category'
+        );
     });
 
     QUnit.module('dynamic');
@@ -112,28 +147,44 @@ define(['lodash', 'core/providerLoader', 'core/promise'], function(_, providerLo
 
         assert.equal(typeof loader, 'object', 'The loader is an object');
 
-        assert.throws(function() {
-            loader.add(12);
-        }, TypeError, 'Add requires an object');
+        assert.throws(
+            function() {
+                loader.add(12);
+            },
+            TypeError,
+            'Add requires an object'
+        );
 
-        assert.throws(function() {
-            loader.add({
-                foo: '12',
-                bar: true
-            });
-        }, TypeError, 'Add requires an object with a module and a category');
+        assert.throws(
+            function() {
+                loader.add({
+                    foo: '12',
+                    bar: true
+                });
+            },
+            TypeError,
+            'Add requires an object with a module and a category'
+        );
 
-        assert.throws(function() {
-            loader.add({
-                module: 'foo'
-            });
-        }, TypeError, 'Add requires an object with a category');
+        assert.throws(
+            function() {
+                loader.add({
+                    module: 'foo'
+                });
+            },
+            TypeError,
+            'Add requires an object with a category'
+        );
 
-        assert.throws(function() {
-            loader.add({
-                category: 'foo'
-            });
-        }, TypeError, 'Add requires an object with a module');
+        assert.throws(
+            function() {
+                loader.add({
+                    category: 'foo'
+                });
+            },
+            TypeError,
+            'Add requires an object with a module'
+        );
 
         loader.add({
             module: 'foo',
@@ -162,50 +213,59 @@ define(['lodash', 'core/providerLoader', 'core/promise'], function(_, providerLo
         assert.ok(promise instanceof Promise, 'The load method returns a Promise');
         assert.deepEqual(loader.getProviders('mock'), [], 'The loader mock category is empty');
 
-        promise.then(function() {
-            assert.equal(loader.getProviders('mock').length, 1, 'The mock category contains now a provider');
-            ready();
-        }).catch(function(e) {
-            assert.ok(false, e);
-            ready();
-        });
+        promise
+            .then(function() {
+                assert.equal(loader.getProviders('mock').length, 1, 'The mock category contains now a provider');
+                ready();
+            })
+            .catch(function(e) {
+                assert.ok(false, e);
+                ready();
+            });
     });
 
-    QUnit.cases.init([{
-        title: 'missing name',
-        module: 'test/core/providerLoader/mockProviderMissingName'
-    }, {
-        title: 'missing init',
-        module: 'test/core/providerLoader/mockProviderMissingInit'
-    }]).test('load a wrong provider ', function(data, assert) {
-        var ready = assert.async();
-        var provider = {
-            module: data.module,
-            category: 'mock'
-        };
-        var loader, promise;
+    QUnit.cases
+        .init([
+            {
+                title: 'missing name',
+                module: 'test/core/providerLoader/mockProviderMissingName'
+            },
+            {
+                title: 'missing init',
+                module: 'test/core/providerLoader/mockProviderMissingInit'
+            }
+        ])
+        .test('load a wrong provider ', function(data, assert) {
+            var ready = assert.async();
+            var provider = {
+                module: data.module,
+                category: 'mock'
+            };
+            var loader, promise;
 
-        assert.expect(5);
+            assert.expect(5);
 
-        loader = providerLoader();
+            loader = providerLoader();
 
-        assert.equal(typeof loader, 'object', 'The loader is an object');
+            assert.equal(typeof loader, 'object', 'The loader is an object');
 
-        assert.deepEqual(loader.add(provider), loader, 'The loader chains');
+            assert.deepEqual(loader.add(provider), loader, 'The loader chains');
 
-        promise = loader.load();
+            promise = loader.load();
 
-        assert.ok(promise instanceof Promise, 'The load method returns a Promise');
-        assert.deepEqual(loader.getProviders('mock'), [], 'The loader mock category is empty');
+            assert.ok(promise instanceof Promise, 'The load method returns a Promise');
+            assert.deepEqual(loader.getProviders('mock'), [], 'The loader mock category is empty');
 
-        promise.then(function() {
-            assert.ok(false, 'The promise should fail since the loaded provider is wrong');
-            ready();
-        }).catch(function(e) {
-            assert.ok(true, e);
-            ready();
+            promise
+                .then(function() {
+                    assert.ok(false, 'The promise should fail since the loaded provider is wrong');
+                    ready();
+                })
+                .catch(function(e) {
+                    assert.ok(true, e);
+                    ready();
+                });
         });
-    });
 
     QUnit.test('load a bundle', function(assert) {
         var ready = assert.async();
@@ -228,29 +288,34 @@ define(['lodash', 'core/providerLoader', 'core/promise'], function(_, providerLo
         assert.ok(promise instanceof Promise, 'The load method returns a Promise');
         assert.deepEqual(loader.getProviders('mock'), [], 'The loader mock category is empty');
 
-        promise.then(function() {
-            assert.equal(loader.getProviders('mock').length, 1, 'The mock category contains now one provider');
+        promise
+            .then(function() {
+                assert.equal(loader.getProviders('mock').length, 1, 'The mock category contains now one provider');
 
-            ready();
-        }).catch(function(e) {
-            assert.ok(false, e);
-            ready();
-        });
+                ready();
+            })
+            .catch(function(e) {
+                assert.ok(false, e);
+                ready();
+            });
     });
 
     QUnit.test('load multiple providers from a bundle', function(assert) {
         var ready = assert.async();
-        var providers = [{
-            module: 'test/core/providerLoader/mockAProvider',
-            bundle: 'test/core/providerLoader/mockBundle.min',
-            category: 'mock',
-            position: 1
-        }, {
-            module: 'test/core/providerLoader/mockBProvider',
-            bundle: 'test/core/providerLoader/mockBundle.min',
-            category: 'mock',
-            position: 0
-        }];
+        var providers = [
+            {
+                module: 'test/core/providerLoader/mockAProvider',
+                bundle: 'test/core/providerLoader/mockBundle.min',
+                category: 'mock',
+                position: 1
+            },
+            {
+                module: 'test/core/providerLoader/mockBProvider',
+                bundle: 'test/core/providerLoader/mockBundle.min',
+                category: 'mock',
+                position: 0
+            }
+        ];
         var loader, promise;
 
         assert.expect(5);
@@ -265,14 +330,16 @@ define(['lodash', 'core/providerLoader', 'core/promise'], function(_, providerLo
         assert.ok(promise instanceof Promise, 'The load method returns a Promise');
         assert.deepEqual(loader.getProviders('mock'), [], 'The loader mock category is empty');
 
-        promise.then(function() {
-            assert.equal(loader.getProviders('mock').length, 2, 'The mock category contains now one provider');
+        promise
+            .then(function() {
+                assert.equal(loader.getProviders('mock').length, 2, 'The mock category contains now one provider');
 
-            ready();
-        }).catch(function(e) {
-            assert.ok(false, e);
-            ready();
-        });
+                ready();
+            })
+            .catch(function(e) {
+                assert.ok(false, e);
+                ready();
+            });
     });
 
     QUnit.test('remove a provider', function(assert) {
@@ -292,12 +359,19 @@ define(['lodash', 'core/providerLoader', 'core/promise'], function(_, providerLo
 
         assert.deepEqual(loader.remove('mock'), loader, 'The loader chains');
 
-        loader.load().then(function() {
-            assert.equal(loader.getProviders('test/core/providerLoader/mockProvider').length, 0, 'The mock provider has been removed');
-            ready();
-        }).catch(function(e) {
-            assert.ok(false, e);
-            ready();
-        });
+        loader
+            .load()
+            .then(function() {
+                assert.equal(
+                    loader.getProviders('test/core/providerLoader/mockProvider').length,
+                    0,
+                    'The mock provider has been removed'
+                );
+                ready();
+            })
+            .catch(function(e) {
+                assert.ok(false, e);
+                ready();
+            });
     });
 });

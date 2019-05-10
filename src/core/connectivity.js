@@ -22,7 +22,6 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import eventifier from 'core/eventifier';
 
 /**
@@ -35,19 +34,17 @@ var status = navigator.onLine;
  * @typedef {connectivity}
  */
 var connectivity = eventifier({
-
     /**
      * Set manually as online
      * @returns {connectivity} chains
      * @fires {connectivity#online}
      * @fires {connectivity#change}
      */
-    setOnline : function setOnline(){
-        if(this.isOffline()){
+    setOnline: function setOnline() {
+        if (this.isOffline()) {
             status = true;
 
-            this.trigger('online')
-                .trigger('change', status);
+            this.trigger('online').trigger('change', status);
         }
         return this;
     },
@@ -58,12 +55,11 @@ var connectivity = eventifier({
      * @fires {connectivity#offline}
      * @fires {connectivity#change}
      */
-    setOffline : function setOffline(){
-        if(this.isOnline()){
+    setOffline: function setOffline() {
+        if (this.isOnline()) {
             status = false;
 
-            this.trigger('offline')
-                .trigger('change', status);
+            this.trigger('offline').trigger('change', status);
         }
         return this;
     },
@@ -72,7 +68,7 @@ var connectivity = eventifier({
      * Are we online ?
      * @returns {Boolean}
      */
-    isOnline : function isOnline(){
+    isOnline: function isOnline() {
         return status;
     },
 
@@ -80,17 +76,16 @@ var connectivity = eventifier({
      * Are we offline
      * @returns {Boolean}
      */
-    isOffline : function isOffline(){
+    isOffline: function isOffline() {
         return !status;
     }
-
 });
 
 //DOM Events : online/offline
-window.addEventListener('online',  function(){
+window.addEventListener('online', function() {
     connectivity.setOnline();
 });
-window.addEventListener('offline', function(){
+window.addEventListener('offline', function() {
     connectivity.setOffline();
 });
 

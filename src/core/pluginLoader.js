@@ -15,6 +15,7 @@
  *
  * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
  */
+
 /**
  * Loads plugins
  *
@@ -24,7 +25,6 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import moduleLoaderFactory from 'core/moduleLoader';
 
@@ -46,4 +46,4 @@ export default function pluginLoaderFactory(requiredPlugins) {
             return this.getModules(category);
         }
     });
-};
+}

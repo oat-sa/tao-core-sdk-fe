@@ -47,7 +47,7 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.module('basic logging', {
-        afterEach: function(assert) {
+        afterEach: function() {
             window.console.error = cerr;
             window.console.warn = cwarn;
             window.console.info = cinfo;

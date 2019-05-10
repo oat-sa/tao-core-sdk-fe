@@ -18,7 +18,6 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-
 import _ from 'lodash';
 import Promise from 'core/promise';
 import providerRegistry from 'core/providerRegistry';
@@ -51,12 +50,13 @@ var defaults = {
  * @returns {communicator}
  */
 function communicatorFactory(providerName, config) {
-
     /**
      * The communicator config set
      * @type {Object}
      */
-    var extendedConfig = _(config || {}).defaults(defaults).value();
+    var extendedConfig = _(config || {})
+        .defaults(defaults)
+        .value();
 
     /**
      * The communicator implementation
@@ -98,11 +98,9 @@ function communicatorFactory(providerName, config) {
                 return Promise.resolve();
             }
 
-            return delegate('init')
-                .then(function () {
-                    self.setState('ready')
-                        .trigger('ready');
-                });
+            return delegate('init').then(function() {
+                self.setState('ready').trigger('ready');
+            });
         },
 
         /**
@@ -122,14 +120,12 @@ function communicatorFactory(providerName, config) {
                 stepPromise = Promise.resolve();
             }
 
-            return stepPromise
-                .then(function () {
-                    return delegate('destroy')
-                        .then(function () {
-                            self.trigger('destroyed');
-                            states = {};
-                        })
+            return stepPromise.then(function() {
+                return delegate('destroy').then(function() {
+                    self.trigger('destroyed');
+                    states = {};
                 });
+            });
         },
 
         /**
@@ -146,11 +142,9 @@ function communicatorFactory(providerName, config) {
                 return Promise.resolve();
             }
 
-            return delegate('open')
-                .then(function () {
-                    self.setState('open')
-                        .trigger('opened');
-                });
+            return delegate('open').then(function() {
+                self.setState('open').trigger('opened');
+            });
         },
 
         /**
@@ -162,11 +156,9 @@ function communicatorFactory(providerName, config) {
          */
         close: function close() {
             var self = this;
-            return delegate('close')
-                .then(function () {
-                    self.setState('open', false)
-                        .trigger('closed');
-                });
+            return delegate('close').then(function() {
+                self.setState('open', false).trigger('closed');
+            });
         },
 
         /**
@@ -184,11 +176,10 @@ function communicatorFactory(providerName, config) {
                 return Promise.reject();
             }
 
-            return delegate('send', channel, message)
-                .then(function (response) {
-                    self.trigger('sent', channel, message, response);
-                    return Promise.resolve(response);
-                });
+            return delegate('send', channel, message).then(function(response) {
+                self.trigger('sent', channel, message, response);
+                return Promise.resolve(response);
+            });
         },
 
         /**
@@ -245,12 +236,12 @@ function communicatorFactory(providerName, config) {
     });
 
     // all messages comes through a message event, then each is dispatched to the right channel
-    communicator.on('message', function (channel, message) {
+    communicator.on('message', function(channel, message) {
         this.trigger('channel-' + channel, message);
     });
 
     // use a delegate function to make a bridge between API and provider
-    delegate = delegator(communicator, provider, {name: 'communicator'});
+    delegate = delegator(communicator, provider, { name: 'communicator' });
 
     return communicator;
 }

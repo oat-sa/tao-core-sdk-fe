@@ -1,9 +1,7 @@
-define([], function () {
+define([], function() {
     'use strict';
 
     return {
-        init: function () {
-
-        }
+        init: function() {}
     };
 });

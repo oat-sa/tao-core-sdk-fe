@@ -28,7 +28,6 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 
 var urlParts = ['hash', 'host', 'hostname', 'pathname', 'port', 'protocol', 'search'];
@@ -107,7 +106,6 @@ UrlParser.prototype.addParam = function(key, value) {
     }
 };
 
-
 /**
  * Get each paths chunk
  * @memberOf UrlParser
@@ -159,7 +157,6 @@ UrlParser.prototype.getUrl = function(exclude) {
  * @returns {String} the url
  */
 UrlParser.prototype.getBaseUrl = function() {
-
     var baseUrl = this.getUrl(['params', 'hash']);
     var paths = this.getPaths();
     var lastPart = paths[paths.length - 1];
@@ -182,22 +179,24 @@ UrlParser.prototype.getBaseUrl = function() {
  */
 UrlParser.prototype.sameDomain = function(url) {
     var parsedUrl;
-    if(typeof url === 'undefined'){
+    if (typeof url === 'undefined') {
         parsedUrl = new UrlParser(window.location);
     }
-    if(typeof url === 'string'){
+    if (typeof url === 'string') {
         parsedUrl = new UrlParser(url);
     }
-    if(url instanceof UrlParser){
+    if (url instanceof UrlParser) {
         parsedUrl = url;
     }
-    if( !(parsedUrl instanceof UrlParser) ){
+    if (!(parsedUrl instanceof UrlParser)) {
         throw new TypeError('Invalid url format');
     }
-    return this.get('protocol') === 'data:' || parsedUrl.get('protocol') === 'data:' ||  (
-        this.get('protocol') === parsedUrl.get('protocol') &&
-        this.get('hostname') === parsedUrl.get('hostname') &&
-        this.get('port') === parsedUrl.get('port')
+    return (
+        this.get('protocol') === 'data:' ||
+        parsedUrl.get('protocol') === 'data:' ||
+        (this.get('protocol') === parsedUrl.get('protocol') &&
+            this.get('hostname') === parsedUrl.get('hostname') &&
+            this.get('port') === parsedUrl.get('port'))
     );
 };
 

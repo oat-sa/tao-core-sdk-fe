@@ -16,13 +16,12 @@
  * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
  */
 
-define([
-
-    'lodash',
-    'core/eventifier',
-    'core/promise',
-    'test/core/logger/testLogger'
-], function(_, eventifier, Promise, testLogger) {
+define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogger'], function(
+    _,
+    eventifier,
+    Promise,
+    testLogger
+) {
     'use strict';
 
     QUnit.module('eventifier');
@@ -35,13 +34,12 @@ define([
     });
 
     QUnit.module('eventification', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             testLogger.reset();
         }
     });
 
     QUnit.test('delegates', function(assert) {
-
         var emitter = eventifier();
 
         assert.expect(8);
@@ -51,13 +49,15 @@ define([
         assert.ok(typeof emitter.before === 'function', 'the emitter defintion holds the method before');
         assert.ok(typeof emitter.after === 'function', 'the emitter defintion holds the method after');
         assert.ok(typeof emitter.off === 'function', 'the emitter defintion holds the method off');
-        assert.ok(typeof emitter.removeAllListeners === 'function', 'the emitter defintion holds the method removeAllListeners');
+        assert.ok(
+            typeof emitter.removeAllListeners === 'function',
+            'the emitter defintion holds the method removeAllListeners'
+        );
         assert.ok(typeof emitter.trigger === 'function', 'the emitter defintion holds the method trigger');
         assert.ok(typeof emitter.spread === 'function', 'the emitter defintion holds the method spread');
     });
 
     QUnit.test('warn when overwriting', function(assert) {
-
         assert.expect(4);
 
         assert.equal(testLogger.getMessages().warn.length, 0, 'No warning');
@@ -82,7 +82,6 @@ define([
 
         assert.equal(testLogger.getMessages().warn.length, 3, 'Warnings are created because 3 methods exist');
         testLogger.reset();
-
     });
 
     QUnit.test('listen and trigger with params', function(assert) {
@@ -104,7 +103,6 @@ define([
     });
 
     QUnit.test('on context', function(assert) {
-
         var emitter1 = eventifier();
         var emitter2 = eventifier();
 
@@ -141,7 +139,7 @@ define([
         assert.expect(1);
 
         emitter.on('foo', function() {
-            assert.ok(false, 'The foo event shouldn\'t be triggered');
+            assert.ok(false, "The foo event shouldn't be triggered");
         });
         emitter.on('bar', function() {
             assert.ok(true, 'The bar event should be triggered');
@@ -183,10 +181,10 @@ define([
         assert.expect(0);
 
         emitter.on('foo', function() {
-            assert.ok(false, 'The foo event shouldn\'t be triggered');
+            assert.ok(false, "The foo event shouldn't be triggered");
         });
         emitter.on('bar', function() {
-            assert.ok(true, 'The bar event shouldn\'t be triggered');
+            assert.ok(true, "The bar event shouldn't be triggered");
         });
 
         emitter.removeAllListeners();
@@ -220,7 +218,7 @@ define([
     });
 
     QUnit.module('namespaces', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             testLogger.reset();
         }
     });
@@ -332,7 +330,6 @@ define([
         });
         emitter.on('foo.bar', function() {
             assert.ok(false, 'the foo.bar handler should not be called');
-
         });
         emitter.on('norz.bar', function() {
             assert.ok(false, 'the norz.bar handler should not be called');
@@ -358,7 +355,6 @@ define([
         });
         emitter.on('foo.bar', function() {
             assert.ok(false, 'the foo.bar handler should not be called');
-
         });
         emitter.on('norz.bar', function() {
             assert.ok(false, 'the norz.bar handler should not be called');
@@ -1016,8 +1012,7 @@ define([
                 ready();
             }
         });
-        emitter.trigger('foo')
-               .trigger('bar');
+        emitter.trigger('foo').trigger('bar');
     });
 
     QUnit.test('listen multiple, trigger multiples with params', function(assert) {
@@ -1052,8 +1047,7 @@ define([
         });
         emitter.off('foo bar');
 
-        emitter.trigger('foo')
-               .trigger('bar');
+        emitter.trigger('foo').trigger('bar');
 
         setTimeout(function() {
             assert.ok(true, 'control');
@@ -1479,7 +1473,7 @@ define([
         var emitter = eventifier();
         var destination = eventifier();
         var param1 = ['a', 'b'];
-        var param2 = {'a': 'b'};
+        var param2 = { a: 'b' };
 
         assert.expect(6);
 
@@ -1506,7 +1500,7 @@ define([
         var emitter = eventifier();
         var destination = eventifier();
         var param1 = ['a', 'b'];
-        var param2 = {'a': 'b'};
+        var param2 = { a: 'b' };
 
         assert.expect(14);
 
@@ -1664,7 +1658,6 @@ define([
 
         emitter
             .before('foo', function() {
-
                 return new Promise(function(resolve, reject) {
                     setTimeout(function() {
                         assert.ok(true, 'The foo handler is called');
@@ -1698,7 +1691,6 @@ define([
 
         emitter
             .before('foo', function() {
-
                 return new Promise(function(resolve, reject) {
                     setTimeout(function() {
                         assert.ok(true, 'The foo handler is called');

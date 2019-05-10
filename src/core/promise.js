@@ -1,4 +1,3 @@
-
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,8 +21,7 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
-import 'lib/polyfill/es6-promise';
+import es6Promise from 'lib/polyfill/es6-promise';
 
 /**
  * @exports core/promise

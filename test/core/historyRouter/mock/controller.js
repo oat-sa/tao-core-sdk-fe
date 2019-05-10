@@ -18,14 +18,12 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define([
-    'core/eventifier'
-], function (eventifier) {
+define(['core/eventifier'], function(eventifier) {
     'use strict';
 
     return eventifier({
         start: function start() {
-            this.trigger("started");
+            this.trigger('started');
         }
     });
 });

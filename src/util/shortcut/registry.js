@@ -33,7 +33,6 @@
  *
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-
 import $ from 'jquery';
 import _ from 'lodash';
 import namespaceHelper from 'util/namespace';
@@ -62,11 +61,11 @@ var modifiers = {
  * @type {Object}
  */
 var translateKeys = {
-    'escape': 'esc',
-    'arrowdown': 'down',
-    'arrowleft': 'left',
-    'arrowright': 'right',
-    'arrowup': 'up'
+    escape: 'esc',
+    arrowdown: 'down',
+    arrowleft: 'left',
+    arrowright: 'right',
+    arrowup: 'up'
 };
 
 /**
@@ -309,7 +308,7 @@ function parseCommand(shortcut) {
         clickForward: null
     };
 
-    _.forEach(parts, function (part) {
+    _.forEach(parts, function(part) {
         if (modifiers[part]) {
             descriptor[modifiers[part]] = true;
         } else if (part.indexOf('mouse') >= 0) {
@@ -387,12 +386,16 @@ export default function shortcutFactory(root, defaultOptions) {
      * @returns {Function[]} the handlers
      */
     function getCommandHandlers(command) {
-        return _.reduce(handlers, function (acc, nsHandlers) {
-            if (nsHandlers[command]) {
-                acc = acc.concat(nsHandlers[command]);
-            }
-            return acc;
-        }, []);
+        return _.reduce(
+            handlers,
+            function(acc, nsHandlers) {
+                if (nsHandlers[command]) {
+                    acc = acc.concat(nsHandlers[command]);
+                }
+                return acc;
+            },
+            []
+        );
     }
 
     /**
@@ -404,7 +407,7 @@ export default function shortcutFactory(root, defaultOptions) {
         if (namespace && !command) {
             handlers[namespace] = {};
         } else {
-            _.forEach(handlers, function (nsHandlers, ns) {
+            _.forEach(handlers, function(nsHandlers, ns) {
                 if (nsHandlers[command] && (namespace === defaultNs || namespace === ns)) {
                     nsHandlers[command] = [];
                 }
@@ -565,13 +568,19 @@ export default function shortcutFactory(root, defaultOptions) {
      * @param {MouseEvent} event
      */
     function onMouseClick(event) {
-        processShortcut(event, _.merge({
-            mouseClickInvolved: true,
-            ctrlKey: event.ctrlKey,
-            altKey: event.altKey,
-            shiftKey: event.shiftKey,
-            metaKey: event.metaKey
-        }, getActualButton(event)));
+        processShortcut(
+            event,
+            _.merge(
+                {
+                    mouseClickInvolved: true,
+                    ctrlKey: event.ctrlKey,
+                    altKey: event.altKey,
+                    shiftKey: event.shiftKey,
+                    metaKey: event.metaKey
+                },
+                getActualButton(event)
+            )
+        );
     }
 
     /**
@@ -579,13 +588,19 @@ export default function shortcutFactory(root, defaultOptions) {
      * @param {WheelEvent} event
      */
     function onMouseWheel(event) {
-        processShortcut(event, _.merge({
-            mouseClickInvolved: true,
-            ctrlKey: event.ctrlKey,
-            altKey: event.altKey,
-            shiftKey: event.shiftKey,
-            metaKey: event.metaKey
-        }, getActualScroll(event)));
+        processShortcut(
+            event,
+            _.merge(
+                {
+                    mouseClickInvolved: true,
+                    ctrlKey: event.ctrlKey,
+                    altKey: event.altKey,
+                    shiftKey: event.shiftKey,
+                    metaKey: event.metaKey
+                },
+                getActualScroll(event)
+            )
+        );
     }
 
     /**
@@ -618,7 +633,7 @@ export default function shortcutFactory(root, defaultOptions) {
             shortcutHandlers = getCommandHandlers(command);
 
             if (shortcutHandlers) {
-                _.forEach(shortcutHandlers, function (handler) {
+                _.forEach(shortcutHandlers, function(handler) {
                     handler(event, command);
                 });
             }
@@ -647,7 +662,7 @@ export default function shortcutFactory(root, defaultOptions) {
          * @returns {shortcut} this
          */
         set: function set(shortcut, options) {
-            _.forEach(namespaceHelper.split(shortcut, true), function (normalized) {
+            _.forEach(namespaceHelper.split(shortcut, true), function(normalized) {
                 var descriptor = parseCommand(normalized);
                 var command = normalizeCommand(descriptor);
 
@@ -672,7 +687,7 @@ export default function shortcutFactory(root, defaultOptions) {
          */
         add: function add(shortcut, handler, options) {
             if (_.isFunction(handler)) {
-                _.forEach(namespaceHelper.split(shortcut, true), function (normalized) {
+                _.forEach(namespaceHelper.split(shortcut, true), function(normalized) {
                     var namespace = namespaceHelper.getNamespace(normalized, defaultNs);
                     var descriptor = parseCommand(normalized);
                     var command = normalizeCommand(descriptor);
@@ -692,7 +707,7 @@ export default function shortcutFactory(root, defaultOptions) {
          * @returns {shortcut} this
          */
         remove: function remove(shortcut) {
-            _.forEach(namespaceHelper.split(shortcut, true), function (normalized) {
+            _.forEach(namespaceHelper.split(shortcut, true), function(normalized) {
                 var namespace = namespaceHelper.getNamespace(normalized, defaultNs);
                 var descriptor = parseCommand(normalized);
                 var command = normalizeCommand(descriptor);
@@ -713,7 +728,9 @@ export default function shortcutFactory(root, defaultOptions) {
          * @returns {Boolean}
          */
         exists: function exists(shortcut) {
-            var normalized = String(shortcut).trim().toLowerCase();
+            var normalized = String(shortcut)
+                .trim()
+                .toLowerCase();
             var namespace = namespaceHelper.getNamespace(normalized, defaultNs);
             var descriptor = parseCommand(normalized);
             var command = normalizeCommand(descriptor);
@@ -721,7 +738,7 @@ export default function shortcutFactory(root, defaultOptions) {
 
             if (shortcuts[command]) {
                 shortcutExists = namespace === defaultNs || !!getHandlers(command, namespace).length;
-            } else if (!command){
+            } else if (!command) {
                 shortcutExists = !_.isEmpty(handlers[namespace]);
             }
 
@@ -784,4 +801,4 @@ export default function shortcutFactory(root, defaultOptions) {
             return this;
         }
     };
-};
+}

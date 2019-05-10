@@ -22,29 +22,27 @@
  *
  * @author Betrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 
 export default {
-
     /**
-    * Encode the modelValue to a string, using the glue as separator
-    * @param {String[]} modelValue - the value to encode
-    * @param {String} [glue = ','] - the join glue
-    * @returns {String} the encoded string
-    */
-    encode : function encode (modelValue, glue){
+     * Encode the modelValue to a string, using the glue as separator
+     * @param {String[]} modelValue - the value to encode
+     * @param {String} [glue = ','] - the join glue
+     * @returns {String} the encoded string
+     */
+    encode: function encode(modelValue, glue) {
         glue = glue || ',';
-        return  _.isArray(modelValue) ? modelValue.join(glue) : modelValue;
+        return _.isArray(modelValue) ? modelValue.join(glue) : modelValue;
     },
 
     /**
-    * Encode the nodeValue to an array, using the glue as separator
-    * @param {String} nodeValue - the value to encode
-    * @param {String} [glue = ','] - the split glue
-    * @returns {String[]} the encoded array
-    */
-    decode : function decode(nodeValue, glue){
+     * Encode the nodeValue to an array, using the glue as separator
+     * @param {String} nodeValue - the value to encode
+     * @param {String} [glue = ','] - the split glue
+     * @returns {String[]} the encoded array
+     */
+    decode: function decode(nodeValue, glue) {
         glue = glue || ',';
         var input = _.isString(nodeValue) ? nodeValue.trim() : nodeValue;
         return _.isEmpty(input) ? [] : input.split(glue);

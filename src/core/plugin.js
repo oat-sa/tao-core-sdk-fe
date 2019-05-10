@@ -46,7 +46,6 @@
  * @author Sam <sam@taotesting.com>
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import delegator from 'core/delegator';
 import Promise from 'core/promise';
@@ -69,10 +68,15 @@ import Promise from 'core/promise';
  * @param {String} [defaults.hostName] - the name of the host, used to alias the getHost method to getHostName
  * @returns {Function} - the generated plugin factory
  */
-function pluginFactory(provider, defaults){
+function pluginFactory(provider, defaults) {
     var pluginName;
 
-    if(!_.isPlainObject(provider) || !_.isString(provider.name) || _.isEmpty(provider.name) || !_.isFunction(provider.init)){
+    if (
+        !_.isPlainObject(provider) ||
+        !_.isString(provider.name) ||
+        _.isEmpty(provider.name) ||
+        !_.isFunction(provider.init)
+    ) {
         throw new TypeError('A plugin should be defined at least by a name property and an init method');
     }
 
@@ -88,7 +92,7 @@ function pluginFactory(provider, defaults){
      * @param {Object} [config] - plugin configuration
      * @returns {plugin} the plugin instance
      */
-    return function instanciatePlugin(host, areaBroker, config){
+    return function instanciatePlugin(host, areaBroker, config) {
         var plugin, delegate;
 
         var states = {};
@@ -96,7 +100,7 @@ function pluginFactory(provider, defaults){
         var pluginContent = {};
 
         //basic checking for the host
-        if(!_.isObject(host) || !_.isFunction(host.on) || !_.isFunction(host.trigger)){
+        if (!_.isObject(host) || !_.isFunction(host.on) || !_.isFunction(host.trigger)) {
             throw new TypeError('A plugin host should be a valid eventified object');
         }
 
@@ -107,15 +111,14 @@ function pluginFactory(provider, defaults){
          * @typedef {plugin}
          */
         plugin = {
-
             /**
              * Called when the host is installing the plugins
              * @returns {Promise} to resolve async delegation
              */
-            install : function install(){
+            install: function install() {
                 var self = this;
 
-                return delegate('install').then(function(){
+                return delegate('install').then(function() {
                     self.trigger('install');
                 });
             },
@@ -125,17 +128,16 @@ function pluginFactory(provider, defaults){
              * @param {Object|*} [content] the plugin content
              * @returns {Promise} to resolve async delegation
              */
-            init : function init(content){
+            init: function init(content) {
                 var self = this;
                 states = {};
 
-                if(content){
+                if (content) {
                     pluginContent = content;
                 }
 
-                return delegate('init', content).then(function(){
-                    self.setState('init', true)
-                        .trigger('init');
+                return delegate('init', content).then(function() {
+                    self.setState('init', true).trigger('init');
                 });
             },
 
@@ -143,10 +145,10 @@ function pluginFactory(provider, defaults){
              * Called when the host is rendering
              * @returns {Promise} to resolve async delegation
              */
-            render : function render(){
+            render: function render() {
                 var self = this;
 
-                return delegate('render').then(function(){
+                return delegate('render').then(function() {
                     self.setState('ready', true)
                         .trigger('render')
                         .trigger('ready');
@@ -157,12 +159,11 @@ function pluginFactory(provider, defaults){
              * Called when the host is finishing
              * @returns {Promise} to resolve async delegation
              */
-            finish : function finish(){
+            finish: function finish() {
                 var self = this;
 
-                return delegate('finish').then(function(){
-                    self.setState('finish', true)
-                        .trigger('finish');
+                return delegate('finish').then(function() {
+                    self.setState('finish', true).trigger('finish');
                 });
             },
 
@@ -170,11 +171,10 @@ function pluginFactory(provider, defaults){
              * Called when the host is destroying
              * @returns {Promise} to resolve async delegation
              */
-            destroy : function destroy(){
+            destroy: function destroy() {
                 var self = this;
 
-                return delegate('destroy').then(function(){
-
+                return delegate('destroy').then(function() {
                     config = {};
                     states = {};
 
@@ -192,7 +192,7 @@ function pluginFactory(provider, defaults){
              * @param {...} args - additional args are given to the event
              * @returns {plugin} chains
              */
-            trigger : function trigger(name){
+            trigger: function trigger(name) {
                 var args = [].slice.call(arguments, 1);
                 host.trigger.apply(host, ['plugin-' + name + '.' + pluginName, plugin].concat(args));
                 return this;
@@ -202,7 +202,7 @@ function pluginFactory(provider, defaults){
              * Get the plugin host
              * @returns {host} the plugins's host
              */
-            getHost : function getHost(){
+            getHost: function getHost() {
                 return host;
             },
 
@@ -210,7 +210,7 @@ function pluginFactory(provider, defaults){
              * Get the host's areaBroker
              * @returns {areaBroker} the areaBroker
              */
-            getAreaBroker : function getAreaBroker(){
+            getAreaBroker: function getAreaBroker() {
                 return areaBroker;
             },
 
@@ -218,7 +218,7 @@ function pluginFactory(provider, defaults){
              * Get the config
              * @returns {Object} config
              */
-            getConfig : function getConfig(){
+            getConfig: function getConfig() {
                 return config;
             },
 
@@ -228,10 +228,10 @@ function pluginFactory(provider, defaults){
              * @param {*} [value] - the config value if name is an entry
              * @returns {plugin} chains
              */
-            setConfig : function setConfig(name, value){
-                if(_.isPlainObject(name)){
+            setConfig: function setConfig(name, value) {
+                if (_.isPlainObject(name)) {
                     config = _.defaults(name, config);
-                }else{
+                } else {
                     config[name] = value;
                 }
                 return this;
@@ -243,7 +243,7 @@ function pluginFactory(provider, defaults){
              * @param {String} name - the state name
              * @returns {Boolean} if active, false if not set
              */
-            getState : function getState(name){
+            getState: function getState(name) {
                 return !!states[name];
             },
 
@@ -255,8 +255,8 @@ function pluginFactory(provider, defaults){
              * @returns {plugin} chains
              * @throws {TypeError} if the state name is not a valid string
              */
-            setState : function setState(name, active){
-                if(!_.isString(name) || _.isEmpty(name)){
+            setState: function setState(name, active) {
+                if (!_.isString(name) || _.isEmpty(name)) {
                     throw new TypeError('The state must have a name');
                 }
                 states[name] = !!active;
@@ -269,10 +269,9 @@ function pluginFactory(provider, defaults){
              *
              * @returns {Object|*} the content
              */
-            getContent : function getContent(){
+            getContent: function getContent() {
                 return pluginContent;
             },
-
 
             /**
              * Set the plugin content
@@ -280,7 +279,7 @@ function pluginFactory(provider, defaults){
              * @param {Object|*} [content] - the plugin content
              * @returns {plugin} chains
              */
-            setContent : function setContent(content){
+            setContent: function setContent(content) {
                 pluginContent = content;
 
                 return this;
@@ -291,7 +290,7 @@ function pluginFactory(provider, defaults){
              *
              * @returns {String} the name
              */
-            getName : function getName(){
+            getName: function getName() {
                 return pluginName;
             },
 
@@ -299,12 +298,11 @@ function pluginFactory(provider, defaults){
              * Shows the component related to this plugin
              * @returns {Promise} to resolve async delegation
              */
-            show : function show(){
+            show: function show() {
                 var self = this;
 
-                return delegate('show').then(function(){
-                    self.setState('visible', true)
-                        .trigger('show');
+                return delegate('show').then(function() {
+                    self.setState('visible', true).trigger('show');
                 });
             },
 
@@ -312,12 +310,11 @@ function pluginFactory(provider, defaults){
              * Hides the component related to this plugin
              * @returns {Promise} to resolve async delegation
              */
-            hide : function hide(){
+            hide: function hide() {
                 var self = this;
 
-                return delegate('hide').then(function(){
-                    self.setState('visible', false)
-                        .trigger('hide');
+                return delegate('hide').then(function() {
+                    self.setState('visible', false).trigger('hide');
                 });
             },
 
@@ -325,12 +322,11 @@ function pluginFactory(provider, defaults){
              * Enables the plugin
              * @returns {Promise} to resolve async delegation
              */
-            enable : function enable(){
+            enable: function enable() {
                 var self = this;
 
-                return delegate('enable').then(function(){
-                    self.setState('enabled', true)
-                        .trigger('enable');
+                return delegate('enable').then(function() {
+                    self.setState('enabled', true).trigger('enable');
                 });
             },
 
@@ -338,12 +334,11 @@ function pluginFactory(provider, defaults){
              * Disables the plugin
              * @returns {Promise} to resolve async delegation
              */
-            disable : function disable(){
+            disable: function disable() {
                 var self = this;
 
-                return delegate('disable').then(function(){
-                    self.setState('enabled', false)
-                        .trigger('disable');
+                return delegate('disable').then(function() {
+                    self.setState('enabled', false).trigger('disable');
                 });
             }
         };
@@ -357,13 +352,13 @@ function pluginFactory(provider, defaults){
          */
         delegate = delegator(plugin, provider, {
             eventifier: false,
-            wrapper: function pluginWrapper(response){
+            wrapper: function pluginWrapper(response) {
                 return Promise.resolve(response);
             }
         });
 
         //add a convenience method that alias getHost using the hostName
-        if(_.isString(defaults.hostName) && !_.isEmpty(defaults.hostName)){
+        if (_.isString(defaults.hostName) && !_.isEmpty(defaults.hostName)) {
             plugin['get' + defaults.hostName.charAt(0).toUpperCase() + defaults.hostName.slice(1)] = plugin.getHost;
         }
 

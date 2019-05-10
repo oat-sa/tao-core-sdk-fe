@@ -201,7 +201,7 @@ var pollingFactory = function pollingFactory(config) {
          * However if the reject method is called, the polling is then stopped!
          * @returns {Object} Returns a promise resolver that provides resolve() and reject() methods
          */
-        async : function async() {
+        async: function async() {
             var resolver = {};
 
             // create a promise and extract the control callbacks
@@ -258,7 +258,7 @@ var pollingFactory = function pollingFactory(config) {
          * If the polling has been stopped, start it again.
          * @returns {polling}
          */
-        next : function next() {
+        next: function next() {
             var _next;
 
             // reset the counter if the polling is stopped
@@ -299,7 +299,7 @@ var pollingFactory = function pollingFactory(config) {
          * Starts the polling if it is not currently running
          * @returns {polling}
          */
-        start : function start() {
+        start: function start() {
             if (!timer) {
                 iter = 0;
                 startTimer();
@@ -317,7 +317,7 @@ var pollingFactory = function pollingFactory(config) {
          * Stops the polling if it is currently running
          * @returns {polling}
          */
-        stop : function stop() {
+        stop: function stop() {
             stopTimer();
 
             /**
@@ -334,7 +334,7 @@ var pollingFactory = function pollingFactory(config) {
          * @param {Number|String} value
          * @returns {polling}
          */
-        setInterval : function setInterval(value) {
+        setInterval: function setInterval(value) {
             interval = Math.abs(parseInt(value, 10) || _defaultInterval);
 
             /**
@@ -351,7 +351,7 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the minimum time interval between two actions
          * @returns {Number}
          */
-        getInterval : function getInterval() {
+        getInterval: function getInterval() {
             return interval;
         },
 
@@ -360,7 +360,7 @@ var pollingFactory = function pollingFactory(config) {
          * @param {Function} fn
          * @returns {polling}
          */
-        setAction : function setAction(fn) {
+        setAction: function setAction(fn) {
             action = fn;
 
             /**
@@ -377,7 +377,7 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the polling action
          * @returns {Function}
          */
-        getAction : function getAction() {
+        getAction: function getAction() {
             return action;
         },
 
@@ -386,7 +386,7 @@ var pollingFactory = function pollingFactory(config) {
          * @param {Object} ctx
          * @returns {polling}
          */
-        setContext : function setContext(ctx) {
+        setContext: function setContext(ctx) {
             context = ctx || this;
 
             /**
@@ -403,17 +403,16 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the context applied on each action call
          * @returns {Object}
          */
-        getContext : function getContext() {
+        getContext: function getContext() {
             return context;
         },
-
 
         /**
          * Sets the max number of polling occurrences
          * @param {Number} value
          * @returns {polling}
          */
-        setMax : function setMax(value) {
+        setMax: function setMax(value) {
             max = Math.abs(parseInt(value, 10) || 0);
             return this;
         },
@@ -422,7 +421,7 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the max number of polling occurrences
          * @returns {Number}
          */
-        getMax : function getMax() {
+        getMax: function getMax() {
             return max;
         },
 
@@ -430,7 +429,7 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the number of ran iterations
          * @returns {Number}
          */
-        getIteration : function getIteration() {
+        getIteration: function getIteration() {
             return iter || 0;
         },
 
@@ -442,7 +441,7 @@ var pollingFactory = function pollingFactory(config) {
          * - processing: the polling manager is currently processing an action and wait for its completion
          * @returns {Boolean}
          */
-        is : function is(stateName) {
+        is: function is(stateName) {
             return !!state[stateName];
         }
     };

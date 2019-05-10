@@ -21,7 +21,6 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import Promise from 'core/promise';
 import IDBStore from 'lib/store/idbstore';
@@ -131,16 +130,22 @@ var getEntry = function getEntry(store, key) {
 var getEntries = function getEntries(store) {
     return new Promise(function(resolve, reject) {
         var success = function success(entries) {
-            if (! _.isArray(entries)) {
+            if (!_.isArray(entries)) {
                 return resolve({});
             }
 
-            resolve(_.reduce(entries, function(acc, entry){
-                if(entry.key && entry.value){
-                    acc[entry.key] = entry.value;
-                }
-                return acc;
-            }, {}));
+            resolve(
+                _.reduce(
+                    entries,
+                    function(acc, entry) {
+                        if (entry.key && entry.value) {
+                            acc[entry.key] = entry.value;
+                        }
+                        return acc;
+                    },
+                    {}
+                )
+            );
         };
         store.getAll(success, reject);
     });
@@ -181,8 +186,8 @@ var getKnownStores = function getKnownStores() {
 var registerStore = function registerStore(storeName) {
     return getKnownStores().then(function(store) {
         return setEntry(store, storeName, {
-            name : storeName,
-            lastOpen : Date.now()
+            name: storeName,
+            lastOpen: Date.now()
         });
     });
 };
@@ -215,7 +220,7 @@ var deleteStore = function deleteStore(store, storeName) {
         };
         //with old implementation, deleting a store is
         //either unsupported or buggy
-        if(isIndexedDB2){
+        if (isIndexedDB2) {
             store.deleteDatabase(success, reject);
         } else {
             store.clear(success, reject);
@@ -230,7 +235,6 @@ var deleteStore = function deleteStore(store, storeName) {
  * @throws {TypeError} without a storeName
  */
 var indexDbBackend = function indexDbBackend(storeName) {
-
     //keep a ref of the running store
     var innerStore;
 
@@ -258,7 +262,6 @@ var indexDbBackend = function indexDbBackend(storeName) {
      * @returns {Promise} the original one
      */
     var ensureSerie = function ensureSerie(getWritingPromise) {
-
         //first promise, keep the ref
         if (!writePromise) {
             writePromise = getWritingPromise();
@@ -287,7 +290,6 @@ var indexDbBackend = function indexDbBackend(storeName) {
      * The store
      */
     return {
-
         /**
          * Get an item with the given key
          * @param {String} key
@@ -388,15 +390,19 @@ indexDbBackend.removeAll = function removeAll(validate) {
                 _.forEach(entries, function(entry) {
                     var storeName = entry && entry.key;
                     if (storeName) {
-                        all.push(openStore(storeName).then(function(storeToRemove) {
-                            if (!validate || validate(storeName, entry.value)) {
-                                return deleteStore(storeToRemove, storeName);
-                            }
-                        }));
+                        all.push(
+                            openStore(storeName).then(function(storeToRemove) {
+                                if (!validate || validate(storeName, entry.value)) {
+                                    return deleteStore(storeToRemove, storeName);
+                                }
+                            })
+                        );
                     }
                 });
 
-                Promise.all(all).then(resolve).catch(reject);
+                Promise.all(all)
+                    .then(resolve)
+                    .catch(reject);
             }
             store.getAll(cleanUp, reject);
         });
@@ -418,12 +424,11 @@ indexDbBackend.getAll = function getAll(validate) {
     return getKnownStores().then(function(store) {
         return new Promise(function(resolve, reject) {
             store.getAll(function(entries) {
-
                 var storeNames = _(entries)
                     .filter(function(entry) {
                         return entry && entry.key && validate(entry.key, entry.value);
                     })
-                    .map(function(entry){
+                    .map(function(entry) {
                         return entry.key;
                     })
                     .value();
@@ -439,20 +444,18 @@ indexDbBackend.getAll = function getAll(validate) {
  * @returns {Promise} that resolves with the store identifier
  */
 indexDbBackend.getStoreIdentifier = function getStoreIdentifier() {
+    return openStore(idStoreName).then(function(store) {
+        return getEntry(store, idStoreName).then(function(id) {
+            if (!_.isEmpty(id)) {
+                return id;
+            }
+            id = uuid();
 
-    return openStore(idStoreName)
-        .then(function(store) {
-            return getEntry(store, idStoreName).then(function(id) {
-                if (!_.isEmpty(id)) {
-                    return id;
-                }
-                id = uuid();
-
-                return setEntry(store, idStoreName, id).then(function() {
-                    return id;
-                });
+            return setEntry(store, idStoreName, id).then(function() {
+                return id;
             });
         });
+    });
 };
 
 export default indexDbBackend;

@@ -21,12 +21,11 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import Promise from 'core/promise';
 import promiseQueue from 'core/promiseQueue';
 import uuid from 'lib/uuid';
-    
+
 /**
  * Prefix all databases
  * @type {String}

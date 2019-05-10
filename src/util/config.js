@@ -20,7 +20,6 @@
  * Some config related helpers
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-
 import _ from 'lodash';
 
 export default {
@@ -47,7 +46,7 @@ export default {
      */
     from: function from(source, entries, defaults) {
         var config = {};
-        _.forEach(entries, function (value, name) {
+        _.forEach(entries, function(value, name) {
             if ('undefined' !== typeof source[name]) {
                 config[name] = source[name];
             } else if (value) {

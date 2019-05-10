@@ -1,8 +1,8 @@
 //mock controller module
-define([], function(){
+define([], function() {
     'use strict';
     return {
-        start : function start(){
+        start: function start() {
             window.controllerStarted = window.controllerStarted || {};
             window.controllerStarted.tao = true;
         }

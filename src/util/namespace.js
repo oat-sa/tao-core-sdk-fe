@@ -18,8 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-
-import _ from 'lodash'; 
+import _ from 'lodash';
 
 /**
  * RegExp that split strings separated by spaces
@@ -57,7 +56,10 @@ var namespaceHelper = {
         if (normalize) {
             names = names.toLowerCase();
         }
-        return _(names.trim().split(reSplit)).compact().uniq().value();
+        return _(names.trim().split(reSplit))
+            .compact()
+            .uniq()
+            .value();
     },
 
     /**
@@ -107,12 +109,17 @@ var namespaceHelper = {
             namespace = namespace.toLowerCase();
         }
         suffix = namespace ? namespaceSep + namespace : '';
-        return _(names).map(function (sh) {
-            if (sh.indexOf(namespaceSep) < 0) {
-                return sh + suffix;
-            }
-            return sh;
-        }).compact().uniq().value().join(' ');
+        return _(names)
+            .map(function(sh) {
+                if (sh.indexOf(namespaceSep) < 0) {
+                    return sh + suffix;
+                }
+                return sh;
+            })
+            .compact()
+            .uniq()
+            .value()
+            .join(' ');
     }
 };
 

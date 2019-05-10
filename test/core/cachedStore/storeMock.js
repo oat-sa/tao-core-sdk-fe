@@ -18,9 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define([
-    'core/promise'
-], function (Promise) {
+define(['core/promise'], function(Promise) {
     'use strict';
 
     var _stores = {};
@@ -42,14 +40,14 @@ define([
                 reject(new Error('Cannot access storage!'));
             } else {
                 resolve({
-                    getItem : function getItem(key){
+                    getItem: function getItem(key) {
                         if (config.failedGet) {
                             return Promise.reject(new Error('Cannot access storage!'));
                         }
 
                         return Promise.resolve(data[key]);
                     },
-                    setItem : function setItem(key, value){
+                    setItem: function setItem(key, value) {
                         if (config.failedSet) {
                             return Promise.reject(new Error('Cannot access storage!'));
                         }
@@ -57,7 +55,7 @@ define([
                         data[key] = value;
                         return Promise.resolve(true);
                     },
-                    removeItem : function removeItem(key){
+                    removeItem: function removeItem(key) {
                         if (config.failedRemove) {
                             return Promise.reject(new Error('Cannot access storage!'));
                         }
@@ -65,7 +63,7 @@ define([
                         delete data[key];
                         return Promise.resolve(true);
                     },
-                    clear : function clear(){
+                    clear: function clear() {
                         if (config.failedClear) {
                             return Promise.reject(new Error('Cannot access storage!'));
                         }
@@ -73,7 +71,7 @@ define([
                         _stores[name] = data = {};
                         return Promise.resolve(true);
                     },
-                    removeStore : function removeStore(){
+                    removeStore: function removeStore() {
                         if (config.failedRemoveStore) {
                             return Promise.reject(new Error('Cannot access storage!'));
                         }

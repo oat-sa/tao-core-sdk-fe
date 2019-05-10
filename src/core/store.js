@@ -33,7 +33,6 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import moment from 'moment';
 import module from 'module';
@@ -44,8 +43,8 @@ import indexedDBBackend from 'core/store/indexeddb';
 import memoryBackend from 'core/store/memory';
 
 var supportsIndexedDB = false;
-var dectectionDone    = false;
-var quotaChecked      = false;
+var dectectionDone = false;
+var quotaChecked = false;
 
 /**
  * The exported store module, can be used as a function to get one store
@@ -76,25 +75,24 @@ var logger = loggerFactory('core/store');
  * Main config
  */
 var config = _.defaults(module.config() || {}, {
-
     /**
      * Percent of used space (ie. 80% used)
      * to consider the browser as having low space
      * @type {Number}
      */
-    lowSpaceRatio : 80,
+    lowSpaceRatio: 80,
 
     /**
      * Default duration thresholds to invalidate stores
      *
      * @type {Object<String>} ISO 8601  duration
      */
-    invalidation : {
+    invalidation: {
         //candidate for invalidation if we're going over quota
-        staled : 'P2W',
+        staled: 'P2W',
 
         //candidate for upfront invalidation if estimates are low
-        oldster : 'P2M'
+        oldster: 'P2M'
     }
 });
 
@@ -103,29 +101,32 @@ var config = _.defaults(module.config() || {}, {
  * Due to a bug in Firefox private mode, we need to try to open a database to be sure it's available.
  * @returns {Promise} that resolve the result
  */
-var isIndexDBSupported = function isIndexDBSupported(){
-    if(dectectionDone){
+var isIndexDBSupported = function isIndexDBSupported() {
+    if (dectectionDone) {
         return Promise.resolve(supportsIndexedDB);
     }
-    return new Promise(function(resolve){
+    return new Promise(function(resolve) {
         var test, indexedDB;
-        var done = function done(result){
+        var done = function done(result) {
             supportsIndexedDB = !!result;
             dectectionDone = true;
             return resolve(supportsIndexedDB);
         };
         try {
-            indexedDB = window.indexedDB || window.webkitIndexedDB ||
-                        window.mozIndexedDB || window.OIndexedDB ||
-                        window.msIndexedDB;
-            if(!indexedDB){
+            indexedDB =
+                window.indexedDB ||
+                window.webkitIndexedDB ||
+                window.mozIndexedDB ||
+                window.OIndexedDB ||
+                window.msIndexedDB;
+            if (!indexedDB) {
                 return done(false);
             }
 
             //we need to try to open a db, for example FF in private browsing will fail.
             test = indexedDB.open('__feature_test', 1);
-            test.onsuccess = function(){
-                if(test.result){
+            test.onsuccess = function() {
+                if (test.result) {
                     test.result.close();
                     return done(true);
                 }
@@ -136,7 +137,7 @@ var isIndexDBSupported = function isIndexDBSupported(){
                 done(false);
                 return false;
             };
-        } catch(err) {
+        } catch (err) {
             //a sync err, we fallback
             done(false);
         }
@@ -148,29 +149,27 @@ var isIndexDBSupported = function isIndexDBSupported(){
  * Estimates aren't widely supported,
  * but that worth to try it (progressive enhancement)
  */
-var checkQuotas = function checkQuotas(){
-    if(!quotaChecked && 'storage' in window.navigator && window.navigator.storage.estimate){
-        window.navigator.storage.estimate()
-            .then(function(estimate){
+var checkQuotas = function checkQuotas() {
+    if (!quotaChecked && 'storage' in window.navigator && window.navigator.storage.estimate) {
+        window.navigator.storage
+            .estimate()
+            .then(function(estimate) {
                 var usedRatio = 0;
-                if (_.isNumber(estimate.usage) &&
-                    _.isNumber(estimate.quota) &&
-                    estimate.quota > 0){
-
-                    usedRatio = (estimate.usage / estimate.quota);
-                    if(usedRatio > config.lowSpaceRatio){
+                if (_.isNumber(estimate.usage) && _.isNumber(estimate.quota) && estimate.quota > 0) {
+                    usedRatio = estimate.usage / estimate.quota;
+                    if (usedRatio > config.lowSpaceRatio) {
                         logger.warn('The browser storage is getting low ' + usedRatio.toFixed(2) + '% used', estimate);
                         logger.warn('We will attempt to clean oldster databases in persistent backends');
                         store.cleanUpSpace(config.invalidation.oldster, [], localStorageBackend);
-                        if(isIndexDBSupported){
-                            store.cleanUpSpace(config.invalidation.oldster, [],indexedDBBackend);
+                        if (isIndexDBSupported) {
+                            store.cleanUpSpace(config.invalidation.oldster, [], indexedDBBackend);
                         }
                     } else {
                         logger.debug('Browser storage estimate : ' + usedRatio.toFixed(2) + '% used', estimate);
                     }
                 }
             })
-            .catch(function(err){
+            .catch(function(err) {
                 logger.warn('Unable to retrieve quotas : ' + err.message);
             });
     }
@@ -183,7 +182,7 @@ var checkQuotas = function checkQuotas(){
  * @returns {Boolean} true if valid
  */
 var isBackendApiValid = function isBackendApiValid(backend) {
-    return _.all(backendApi, function methodExists(method){
+    return _.all(backendApi, function methodExists(method) {
         return _.isFunction(backend[method]);
     });
 };
@@ -194,7 +193,7 @@ var isBackendApiValid = function isBackendApiValid(backend) {
  * @returns {Boolean} true if valid
  */
 var isStorageApiValid = function isStorageApiValid(storage) {
-    return _.all(storeApi, function methodExists(method){
+    return _.all(storeApi, function methodExists(method) {
         return _.isFunction(storage[method]);
     });
 };
@@ -205,17 +204,17 @@ var isStorageApiValid = function isStorageApiValid(storage) {
  * @returns {Promise} that resolves with the backend
  */
 var loadBackend = function loadBackend(preselectedBackend) {
-    return isIndexDBSupported().then(function(){
+    return isIndexDBSupported().then(function() {
         var backend = preselectedBackend || (supportsIndexedDB ? indexedDBBackend : localStorageBackend);
-        if(!_.isFunction(backend)){
+        if (!_.isFunction(backend)) {
             return Promise.reject(new TypeError('No backend, no storage!'));
         }
-        if(!isBackendApiValid(backend)){
-            return Promise.reject(new TypeError('This backend doesn\'t comply with the store backend API'));
+        if (!isBackendApiValid(backend)) {
+            return Promise.reject(new TypeError("This backend doesn't comply with the store backend API"));
         }
 
         //attempt to check the quotas
-        if(backend !== memoryBackend){
+        if (backend !== memoryBackend) {
             checkQuotas();
         }
 
@@ -231,15 +230,12 @@ var loadBackend = function loadBackend(preselectedBackend) {
  * @returns {Promise} that resolves with the Storage a Storage Like instance
  */
 store = function storeLoader(storeName, preselectedBackend) {
-
-    return loadBackend(preselectedBackend).then(function(backend){
-
+    return loadBackend(preselectedBackend).then(function(backend) {
         var storeInstance = backend(storeName);
 
-        if(!isStorageApiValid(storeInstance)){
-            return Promise.reject(new TypeError('The store doesn\'t comply with the Storage interface'));
+        if (!isStorageApiValid(storeInstance)) {
+            return Promise.reject(new TypeError("The store doesn't comply with the Storage interface"));
         }
-
 
         return storeInstance;
     });
@@ -250,9 +246,9 @@ store = function storeLoader(storeName, preselectedBackend) {
  * exposed.
  */
 store.backends = {
-    localStorage : localStorageBackend,
-    indexedDB    : indexedDBBackend,
-    memory       : memoryBackend
+    localStorage: localStorageBackend,
+    indexedDB: indexedDBBackend,
+    memory: memoryBackend
 };
 
 /**
@@ -262,8 +258,7 @@ store.backends = {
  * @returns {Promise} with true in resolve once cleaned
  */
 store.removeAll = function removeAll(validate, preselectedBackend) {
-    return loadBackend(preselectedBackend).then(function(backend){
-
+    return loadBackend(preselectedBackend).then(function(backend) {
         /**
          * @callback validateStore
          * @param {String} storeName - the name of the store
@@ -287,30 +282,27 @@ store.cleanUpSpace = function cleanUpSpace(since, storeNamePattern, preselectedB
      * Create the invalidation callback
      * @type {validateStore}
      */
-    var invalidate = function invalidate(storeName, storeEntry){
-
-        if(!storeName || !storeEntry){
+    var invalidate = function invalidate(storeName, storeEntry) {
+        if (!storeName || !storeEntry) {
             return false;
         }
 
         //storeName matches ?
-        if ( storeNamePattern instanceof RegExp &&
-            ! storeNamePattern.test(storeName) ){
-
+        if (storeNamePattern instanceof RegExp && !storeNamePattern.test(storeName)) {
             return false;
         }
-        return  _.isNumber(storeEntry.lastOpen) &&
-                _.isNumber(tsThreshold) &&
-                storeEntry.lastOpen <= tsThreshold;
+        return _.isNumber(storeEntry.lastOpen) && _.isNumber(tsThreshold) && storeEntry.lastOpen <= tsThreshold;
     };
 
-    if(_.isNumber(since) && since > 0){
+    if (_.isNumber(since) && since > 0) {
         tsThreshold = since;
     } else {
-        if(!_.isString(since)){
+        if (!_.isString(since)) {
             since = config.invalidation.oldster;
         }
-        tsThreshold = moment().subtract(moment.duration(since)).valueOf();
+        tsThreshold = moment()
+            .subtract(moment.duration(since))
+            .valueOf();
     }
 
     logger.info('Trying to remove stores lastly opened before ' + tsThreshold + '(' + since + ')');
@@ -325,7 +317,7 @@ store.cleanUpSpace = function cleanUpSpace(since, storeNamePattern, preselectedB
  * @returns {Promise<String[]>} resolves with the names of the stores
  */
 store.getAll = function getAll(validate, preselectedBackend) {
-    return loadBackend(preselectedBackend).then(function(backend){
+    return loadBackend(preselectedBackend).then(function(backend) {
         return backend.getAll(validate);
     });
 };
@@ -336,7 +328,7 @@ store.getAll = function getAll(validate, preselectedBackend) {
  * @returns {Promise} that resolves with the identifier
  */
 store.getIdentifier = function getIdentifier(preselectedBackend) {
-    return loadBackend(preselectedBackend).then(function(backend){
+    return loadBackend(preselectedBackend).then(function(backend) {
         return backend.getStoreIdentifier();
     });
 };

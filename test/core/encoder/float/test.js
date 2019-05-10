@@ -41,4 +41,3 @@ define(['jquery', 'core/encoder/float'], function($, FloatEncoder) {
         assert.equal(FloatEncoder.decode('  -5,4   '), -5.4);
     });
 });
-

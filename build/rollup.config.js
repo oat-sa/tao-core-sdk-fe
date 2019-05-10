@@ -27,7 +27,7 @@ const { srcDir, outputDir } = require('./path');
 const inputs = glob.sync(path.join(srcDir, '!(lib)', '**', '*.js'));
 const inputGlobalNames = inputs.reduce((memo, input) => {
     const moduleName = path.relative(srcDir, input).replace(/\.js$/, '');
-    return {...memo, [moduleName]: moduleName};
+    return { ...memo, [moduleName]: moduleName };
 }, {});
 
 const localExternals = inputs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
@@ -46,18 +46,19 @@ export default inputs.map(input => {
             format: 'umd',
             name,
             globals: {
-                'jquery': '$',
-                'lodash': '_',
-                'context': 'context',
-                'module': 'module',
-                'moment': 'moment',
-                'i18n': '__',
-                'async': 'async',
-                'handlebars': 'handlebars',
+                jquery: '$',
+                lodash: '_',
+                context: 'context',
+                module: 'module',
+                moment: 'moment',
+                i18n: '__',
+                async: 'async',
+                handlebars: 'handlebars',
                 'lib/uuid': 'lib/uuid',
                 'lib/store/idbstore': 'lib/store/idbstore',
                 'lib/decimal/decimal': 'lib/decimal/decimal',
                 'lib/expr-eval/expr-eval': 'lib/expr-eval/expr-eval',
+                'lib/polyfill/es6-promise': 'lib/polyfill/es6-promise',
                 ...inputGlobalNames
             }
         },
@@ -76,7 +77,7 @@ export default inputs.map(input => {
             'lib/uuid',
             'lib/store/idbstore',
             'lib/decimal/decimal',
-            'lib/expr-eval/expr-eval',
+            'lib/expr-eval/expr-eval'
         ],
         plugins: [
             alias({

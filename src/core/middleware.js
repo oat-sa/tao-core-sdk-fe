@@ -18,7 +18,6 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-
 import _ from 'lodash';
 import eventifier from 'core/eventifier';
 import Promise from 'core/promise';
@@ -52,7 +51,7 @@ function middlewareFactory() {
             var list = middlewares[queue] || [];
             middlewares[queue] = list;
 
-            _.forEach(arguments, function (cb) {
+            _.forEach(arguments, function(cb) {
                 if (_.isFunction(cb)) {
                     list.push(cb);
 
@@ -82,9 +81,9 @@ function middlewareFactory() {
             var pointer = 0;
 
             // apply each middleware in series, then resolve or reject the promise
-            return new Promise(function (resolve, reject) {
+            return new Promise(function(resolve, reject) {
                 function next() {
-                    var middleware = stack[pointer ++];
+                    var middleware = stack[pointer++];
                     if (middleware) {
                         Promise.resolve(middleware.call(context, request, response))
                             .then(function(res) {
@@ -101,34 +100,35 @@ function middlewareFactory() {
                 }
 
                 next();
-            }).then(function() {
-                // handle implicit error from response descriptor
-                if (response.success === false) {
-                    return Promise.reject(response);
-                }
+            })
+                .then(function() {
+                    // handle implicit error from response descriptor
+                    if (response.success === false) {
+                        return Promise.reject(response);
+                    }
 
-                /**
-                 * @event applied
-                 * @param {Object} request - The request descriptor
-                 * @param {Object} response The response descriptor
-                 * @param {Object} context - The call context
-                 */
-                middlewareHandler.trigger('applied', request, response, context);
+                    /**
+                     * @event applied
+                     * @param {Object} request - The request descriptor
+                     * @param {Object} response The response descriptor
+                     * @param {Object} context - The call context
+                     */
+                    middlewareHandler.trigger('applied', request, response, context);
 
-                return response;
-            }).catch(function(err) {
-                /**
-                 * @event failed
-                 * @param {Object} request - The request descriptor
-                 * @param {Object} response The response descriptor
-                 * @param {Object} context - The call context
-                 */
-                middlewareHandler.trigger('failed', request, response, context);
+                    return response;
+                })
+                .catch(function(err) {
+                    /**
+                     * @event failed
+                     * @param {Object} request - The request descriptor
+                     * @param {Object} response The response descriptor
+                     * @param {Object} context - The call context
+                     */
+                    middlewareHandler.trigger('failed', request, response, context);
 
-                return Promise.reject(err);
-            });
+                    return Promise.reject(err);
+                });
         }
-
     });
 
     /**

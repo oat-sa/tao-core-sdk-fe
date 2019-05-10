@@ -18,15 +18,15 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define(function(){
+define(function() {
     'use strict';
 
     return {
-        'Test': {
-            'actions' : {
-                'index' : 'test/core/historyRouter/mock/controller',
-                'user' : 'test/core/historyRouter/mock/controller',
-                'delivery' : 'test/core/historyRouter/mock/controller'
+        Test: {
+            actions: {
+                index: 'test/core/historyRouter/mock/controller',
+                user: 'test/core/historyRouter/mock/controller',
+                delivery: 'test/core/historyRouter/mock/controller'
             }
         }
     };

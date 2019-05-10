@@ -18,7 +18,7 @@
 /**
  * @author Christophe Noël <christophe@taotesting.com>
  */
-define(['lodash', 'test/core/logger/testLogger'], function(_, testLogger) {
+define(['lodash', '/test/core/logger/testLogger.js'], function(_, testLogger) {
     'use strict';
 
     QUnit.module('API');
@@ -32,12 +32,12 @@ define(['lodash', 'test/core/logger/testLogger'], function(_, testLogger) {
     QUnit.module('TestLogger');
 
     QUnit.test('can log and retrieve messages', function(assert) {
-        var trace = {level: 'trace', msg: 'trace'},
-            debug = {level: 'debug', msg: 'debug'},
-            info = {level: 'info', msg: 'info'},
-            warn = {level: 'warn', msg: 'warn'},
-            error = {level: 'error', msg: 'error'},
-            fatal = {level: 'fatal', msg: 'fatal'},
+        var trace = { level: 'trace', msg: 'trace' },
+            debug = { level: 'debug', msg: 'debug' },
+            info = { level: 'info', msg: 'info' },
+            warn = { level: 'warn', msg: 'warn' },
+            error = { level: 'error', msg: 'error' },
+            fatal = { level: 'fatal', msg: 'fatal' },
             messages;
 
         assert.expect(24);
@@ -85,5 +85,4 @@ define(['lodash', 'test/core/logger/testLogger'], function(_, testLogger) {
         assert.equal(messages.error.length, 0, 'error records have been reseted');
         assert.equal(messages.fatal.length, 0, 'fatal records have been reseted');
     });
-
 });

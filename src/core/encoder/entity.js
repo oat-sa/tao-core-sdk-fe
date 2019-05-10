@@ -22,7 +22,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 
-
 /**
  * The list of chars to be encoded
  * @type {String[]}
@@ -30,7 +29,6 @@
 var guiltyChars = ['&', '<', '>', '"'];
 
 export default {
-
     /**
      * Encode a string with guilty chars to the matching html entity codes
      * @param {String} input
@@ -39,9 +37,12 @@ export default {
     encode: function encode(input) {
         input = input + '';
 
-        return input.split('').map(function(character){
-            return guiltyChars.indexOf(character) > -1 ? '&#' + character.charCodeAt() + ';' : character;
-        }).join('');
+        return input
+            .split('')
+            .map(function(character) {
+                return guiltyChars.indexOf(character) > -1 ? '&#' + character.charCodeAt() + ';' : character;
+            })
+            .join('');
     },
 
     /**

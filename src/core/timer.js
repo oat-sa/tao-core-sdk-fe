@@ -44,7 +44,7 @@ function timerFactory(config) {
          * @param {Number} [startDuration] - Initial duration (default: 0)
          * @returns {timer}
          */
-        start : function start(startDuration) {
+        start: function start(startDuration) {
             begin = now();
             last = begin;
             duration = startDuration || 0;
@@ -58,10 +58,10 @@ function timerFactory(config) {
          * Gets the time elapsed since the last tick
          * @returns {number}
          */
-        tick : function tick() {
+        tick: function tick() {
             var timestamp = now();
             var elapsed;
-            if(state.running){
+            if (state.running) {
                 elapsed = timestamp - last;
                 last = timestamp;
             }
@@ -72,7 +72,7 @@ function timerFactory(config) {
          * Pause the timer
          * @returns {timer}
          */
-        pause : function pause() {
+        pause: function pause() {
             if (state.running) {
                 duration += now() - begin;
                 state.running = false;
@@ -85,7 +85,7 @@ function timerFactory(config) {
          * Resume the timer
          * @returns {timer}
          */
-        resume : function resume() {
+        resume: function resume() {
             if (!state.running) {
                 begin = now();
                 last = begin;
@@ -100,7 +100,7 @@ function timerFactory(config) {
          * Stops the timer
          * @returns {timer}
          */
-        stop : function stop() {
+        stop: function stop() {
             if (state.running) {
                 duration += now() - begin;
             }
@@ -116,7 +116,7 @@ function timerFactory(config) {
          * If the timer is stopped, gets the total duration between start and stop.
          * @returns {number}
          */
-        getDuration : function getDuration() {
+        getDuration: function getDuration() {
             if (state.running) {
                 return duration + (now() - begin);
             }
@@ -128,7 +128,7 @@ function timerFactory(config) {
          * @param {String} stateName
          * @returns {Boolean}
          */
-        is : function is(stateName) {
+        is: function is(stateName) {
             return !!state[stateName];
         },
 
@@ -137,7 +137,7 @@ function timerFactory(config) {
          * @param {Number} time
          * @returns {timer}
          */
-        add : function add(time) {
+        add: function add(time) {
             time = parseFloat(time);
             duration += time;
             last -= time;
@@ -149,7 +149,7 @@ function timerFactory(config) {
          * @param {Number} time
          * @returns {timer}
          */
-        sub : function sub(time) {
+        sub: function sub(time) {
             time = parseFloat(time);
             duration -= time;
             last += time;

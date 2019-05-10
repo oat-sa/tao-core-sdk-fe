@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
+        <meta charset="utf-8" />
         <title>Test - HistoryRouter</title>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
-            require(['/environment/config.js'], function(){
+            require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
                     //some mocks
                     requirejs.config({
                         paths: {
-                            "controller/routes" : "test/core/historyRouter/mock/routes"
+                            'controller/routes': 'test/core/historyRouter/mock/routes'
                         }
                     });
                     require(['test/core/historyRouter/test'], function() {
@@ -21,7 +21,7 @@
         </script>
     </head>
     <body>
-    <div id="qunit"></div>
-    <div id="qunit-fixture"></div>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
     </body>
 </html>

@@ -30,7 +30,7 @@ const TESTNAME = process.argv[2] || '*';
 let hasFailed = false;
 const limit = promiseLimit(5);
 
-webServer.then(({host, port}) =>
+webServer.then(({ host, port }) =>
     Promise.all(
         glob.sync(path.join(testDir, '**', TESTNAME, '**', '*.html')).map(testFile => {
             const test = path.relative(testDir, testFile);
@@ -53,7 +53,6 @@ webServer.then(({host, port}) =>
                             printResultSummary(result, console);
                             console.log();
                         }
-                        
 
                         if (result.stats.failed > 0) {
                             console.log(`\n${testFile}`);

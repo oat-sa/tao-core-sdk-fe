@@ -33,8 +33,7 @@ var _reApos = /'/g;
  */
 var encodeHTML = function encodeHTML(html) {
     // @see http://tinyurl.com/ko75kph
-    return document.createElement('a').appendChild(
-        document.createTextNode(html)).parentNode.innerHTML;
+    return document.createElement('a').appendChild(document.createTextNode(html)).parentNode.innerHTML;
 };
 
 /**
@@ -46,7 +45,9 @@ var encodeHTML = function encodeHTML(html) {
 var encodeAttribute = function encodeAttribute(html) {
     // use replaces chain instead of unified replace with map for performances reasons
     // @see http://jsperf.com/htmlencoderegex/68
-    return encodeHTML(html).replace(_reQuot, '&quot;').replace(_reApos, '&apos;');
+    return encodeHTML(html)
+        .replace(_reQuot, '&quot;')
+        .replace(_reApos, '&apos;');
 };
 
 /**
@@ -59,9 +60,11 @@ function encodeBase64(str) {
     // first we use encodeURIComponent to get percent-encoded UTF-8,
     // then we convert the percent encodings into raw bytes which
     // can be fed into btoa.
-    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function toSolidBytes(match, p1) {
-        return String.fromCharCode('0x' + p1);
-    }));
+    return btoa(
+        encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function toSolidBytes(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        })
+    );
 }
 
 /**
@@ -72,9 +75,13 @@ function encodeBase64(str) {
  */
 function decodeBase64(str) {
     // Going backwards: from bytestream, to percent-encoding, to original string.
-    return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    return decodeURIComponent(
+        Array.prototype.map
+            .call(atob(str), function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join('')
+    );
 }
 
 export default {

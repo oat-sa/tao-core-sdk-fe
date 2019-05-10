@@ -1,4 +1,3 @@
-
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,29 +31,27 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 
 /**
  * The error handler
  */
 var errorHandler = {
-
     /**
      * Keep contexts
      */
-    _contexts : {},
+    _contexts: {},
 
     /**
      * Get a context by it's name and create it if it doesn't exists
      * @param {String} name - the context name
      * @returns {Object} the handling context
      */
-    getContext : function getContext(name){
-        if(_.isString(name) && name.length){
+    getContext: function getContext(name) {
+        if (_.isString(name) && name.length) {
             this._contexts[name] = this._contexts[name] || {
-                typedHandlers : {},
-                globalHandler : null
+                typedHandlers: {},
+                globalHandler: null
             };
             return this._contexts[name];
         }
@@ -66,15 +63,14 @@ var errorHandler = {
      * @param {String} [type] - to listen by type of errors (it uses Error.name)
      * @param {Function} handler - the error handler, it has the error in parameter
      */
-    listen : function listen(name, type, handler){
+    listen: function listen(name, type, handler) {
         var context = this.getContext(name);
-        if(context){
-
-            if(_.isFunction(type) && !handler){
+        if (context) {
+            if (_.isFunction(type) && !handler) {
                 handler = type;
             }
-            if(_.isFunction(handler)){
-                if(_.isString(type) && !_.isEmpty(type)){
+            if (_.isFunction(handler)) {
+                if (_.isString(type) && !_.isEmpty(type)) {
                     context.typedHandlers[type] = handler;
                 } else {
                     context.globalHandler = handler;
@@ -88,16 +84,16 @@ var errorHandler = {
      * @param {String} name - the context name
      * @param {Error} err - the error with a message
      */
-    'throw' : function throwError(name, err){
+    throw: function throwError(name, err) {
         var context = this.getContext(name);
-        if(context){
-            if(_.isString(err)){
+        if (context) {
+            if (_.isString(err)) {
                 err = new Error(err);
             }
-            if(_.isFunction(context.typedHandlers[err.name])){
+            if (_.isFunction(context.typedHandlers[err.name])) {
                 context.typedHandlers[err.name](err);
             }
-            if(_.isFunction(context.globalHandler)){
+            if (_.isFunction(context.globalHandler)) {
                 context.globalHandler(err);
             }
             return false;
@@ -108,12 +104,11 @@ var errorHandler = {
      * Reset an error context
      * @param {String} name - the context name
      */
-    reset : function reset(name){
-        if(this._contexts[name]){
+    reset: function reset(name) {
+        if (this._contexts[name]) {
             this._contexts = _.omit(this._contexts, name);
         }
     }
-
 };
 
 /**

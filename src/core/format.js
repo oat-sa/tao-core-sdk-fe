@@ -3,22 +3,22 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
  * of the License (non-upgradable).
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * Copyright (c) 2013-2019 (original work) Open Assessment Technologies SA ;
  */
+
 /**
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 
 var pattern = /(%[sdj])/g;
@@ -35,25 +35,30 @@ var pattern = /(%[sdj])/g;
  * @param {...String|Number|Object} [replacements] -  the replacements arguments in the order defined in the message
  * @returns {String} the formatted message
  */
-export default function(message){
+export default function(message) {
     var replacements = Array.prototype.slice.call(arguments, 1);
     return _.reduce(
         message.match(pattern),
-        function(acc, match, index){
+        function(acc, match, index) {
             var replacement = '';
-            if(undefined !== replacements[index]){
-                    switch(match){
-                    case '%d': replacement = Number(replacements[index]); break;
-                    case '%j': try{
-                            replacement = JSON.stringify(replacements[index]).replace(/"/g, '');
-                        } catch(e){}
+            if (undefined !== replacements[index]) {
+                switch (match) {
+                    case '%d':
+                        replacement = Number(replacements[index]);
                         break;
-                    default : replacement = replacements[index]; break;
-                    }
-                    message = message.replace(match, replacement);
+                    case '%j':
+                        try {
+                            replacement = JSON.stringify(replacements[index]).replace(/"/g, '');
+                        } catch (e) {}
+                        break;
+                    default:
+                        replacement = replacements[index];
+                        break;
+                }
+                message = message.replace(match, replacement);
             }
             return message;
         },
         message
     );
-};
+}

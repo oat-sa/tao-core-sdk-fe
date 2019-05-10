@@ -18,7 +18,6 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-
 import _ from 'lodash';
 import delegator from 'core/delegator';
 import eventifier from 'core/eventifier';
@@ -44,7 +43,6 @@ var _defaults = {};
  * @returns {proxy} - The proxy instance, bound to the selected proxy adapter
  */
 function crudProxyFactory(proxyName, middlewares) {
-
     var proxyAdapter = crudProxyFactory.getProvider(proxyName);
     var tokenHandler = tokenHandlerFactory();
     var extraParams = {};
@@ -72,7 +70,7 @@ function crudProxyFactory(proxyName, middlewares) {
              * @param {Promise} promise
              * @param {Object} params
              */
-            return delegate('init', initConfig).then(function () {
+            return delegate('init', initConfig).then(function() {
                 // If the delegate call succeed the proxy is initialized.
                 initialized = true;
                 return proxy;
@@ -90,7 +88,7 @@ function crudProxyFactory(proxyName, middlewares) {
              * @event destroy
              * @param {Promise} promise
              */
-            return delegate('destroy').then(function () {
+            return delegate('destroy').then(function() {
                 // The proxy is now destroyed. A call to init() is mandatory to be able to use it again.
                 initialized = false;
                 initConfig = null;
@@ -255,23 +253,23 @@ function crudProxyFactory(proxyName, middlewares) {
      * @throws Error
      */
     function delegate(fnName) {
-        var request = {command: fnName, params: Array.prototype.slice.call(arguments, 1)};
+        var request = { command: fnName, params: Array.prototype.slice.call(arguments, 1) };
         if (!initialized && fnName !== 'init') {
             return Promise.reject(new Error('Proxy is not properly initialized or has been destroyed!'));
         }
-        return delegateProxy.apply(null, arguments)
-            .then(function (data) {
+        return delegateProxy
+            .apply(null, arguments)
+            .then(function(data) {
                 if (middlewares) {
                     return middlewares.apply(request, data);
                 }
                 return data;
             })
-            .catch(function (err) {
+            .catch(function(err) {
                 proxy.trigger('error', err);
                 return Promise.reject(err);
             });
     }
-
 
     return proxy;
 }

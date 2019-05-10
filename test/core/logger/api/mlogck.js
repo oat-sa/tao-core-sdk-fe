@@ -21,11 +21,10 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([], function(){
+define([], function() {
     'use strict';
 
     return {
-        log : function log(){
-        }
+        log: function log() {}
     };
 });

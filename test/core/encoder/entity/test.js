@@ -34,30 +34,39 @@ define(['core/encoder/entity'], function(entity) {
 
     QUnit.module('encode');
 
-    QUnit.cases.init([{
-        title: 'no special chars',
-        input: 'Hello Foo bar world !',
-        output: 'Hello Foo bar world !'
-    }, {
-        title: 'xss',
-        input: 'Hello Foo<script>alert("foo")</script>bar world !',
-        output: 'Hello Foo&#60;script&#62;alert(&#34;foo&#34;)&#60;/script&#62;bar world !'
-    }]).test('encode ', function(data, assert) {
-        assert.equal(entity.encode(data.input), data.output);
-    });
+    QUnit.cases
+        .init([
+            {
+                title: 'no special chars',
+                input: 'Hello Foo bar world !',
+                output: 'Hello Foo bar world !'
+            },
+            {
+                title: 'xss',
+                input: 'Hello Foo<script>alert("foo")</script>bar world !',
+                output: 'Hello Foo&#60;script&#62;alert(&#34;foo&#34;)&#60;/script&#62;bar world !'
+            }
+        ])
+        .test('encode ', function(data, assert) {
+            assert.equal(entity.encode(data.input), data.output);
+        });
 
     QUnit.module('decode');
 
-    QUnit.cases.init([{
-        title: 'no special chars',
-        input: 'Hello Foo bar world !',
-        output: 'Hello Foo bar world !'
-    }, {
-        title: 'xss',
-        input: 'Hello Foo&#60;script&#62;alert(&#34;foo&#34;)&#60;/script&#62;bar world !',
-        output: 'Hello Foo<script>alert("foo")</script>bar world !'
-    }]).test('decode ', function(data, assert) {
-        assert.equal(entity.decode(data.input), data.output);
-    });
+    QUnit.cases
+        .init([
+            {
+                title: 'no special chars',
+                input: 'Hello Foo bar world !',
+                output: 'Hello Foo bar world !'
+            },
+            {
+                title: 'xss',
+                input: 'Hello Foo&#60;script&#62;alert(&#34;foo&#34;)&#60;/script&#62;bar world !',
+                output: 'Hello Foo<script>alert("foo")</script>bar world !'
+            }
+        ])
+        .test('decode ', function(data, assert) {
+            assert.equal(entity.decode(data.input), data.output);
+        });
 });
-

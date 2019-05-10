@@ -20,10 +20,8 @@
 /**
  * @author Ivan Klimchuk <klimchuk@1pt.com>
  */
-
 import module from 'module';
 import moment from 'moment';
-    
 
 var configuration = module.config();
 
@@ -32,7 +30,6 @@ var configuration = module.config();
  * @exports util/locale
  */
 export default {
-
     /**
      * Returns config of component
      * @returns {*}
@@ -69,8 +66,10 @@ export default {
      * Returns datetime format
      * @return {string}
      */
-    getDateTimeFormat : function getDateTimeFormat() {
-        return this.getConfig() && this.getConfig().dateTimeFormat ? this.getConfig().dateTimeFormat : 'DD/MM/YYYY HH:mm:ss';
+    getDateTimeFormat: function getDateTimeFormat() {
+        return this.getConfig() && this.getConfig().dateTimeFormat
+            ? this.getConfig().dateTimeFormat
+            : 'DD/MM/YYYY HH:mm:ss';
     },
 
     /**
@@ -78,7 +77,7 @@ export default {
      * @param numStr
      * @returns {Number}
      */
-    parseFloat: function (numStr) {
+    parseFloat: function(numStr) {
         var thousandsSeparator = this.getThousandsSeparator(),
             decimalSeparator = this.getDecimalSeparator();
 
@@ -89,8 +88,9 @@ export default {
 
         // standardise the decimal separator as '.':
         if (decimalSeparator !== '.') {
-            numStr = numStr.replace(new RegExp('\\' + '.', 'g'), '_')
-                            .replace(new RegExp('\\' + decimalSeparator, 'g'), '.');
+            numStr = numStr
+                .replace(new RegExp('\\' + '.', 'g'), '_')
+                .replace(new RegExp('\\' + decimalSeparator, 'g'), '.');
         }
 
         // now the numeric string can be correctly parsed with the native parseFloat:
@@ -103,7 +103,7 @@ export default {
      * @param numericBase
      * @returns {Number}
      */
-    parseInt: function (number, numericBase) {
+    parseInt: function(number, numericBase) {
         var thousandsSeparator = this.getThousandsSeparator();
 
         if (thousandsSeparator.length) {
@@ -119,7 +119,7 @@ export default {
      * @param {Number} timestamp
      * @return string
      */
-    formatDateTime: function (timestamp) {
+    formatDateTime: function(timestamp) {
         return moment(timestamp, 'X').format(this.getDateTimeFormat());
-    },
+    }
 };

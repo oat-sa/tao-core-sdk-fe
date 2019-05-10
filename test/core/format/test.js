@@ -7,7 +7,11 @@ define(['core/format'], function(format) {
 
     QUnit.test('formating', function(assert) {
         assert.equal(format('give me a %s', 'string'), 'give me a string', 'Format with a string replacement');
-        assert.equal(format('give me two %s %s', 'awesome', 'strings'), 'give me two awesome strings', 'Format with 2 string replacements');
+        assert.equal(
+            format('give me two %s %s', 'awesome', 'strings'),
+            'give me two awesome strings',
+            'Format with 2 string replacements'
+        );
 
         assert.equal(format('give me an %d', 11), 'give me an 11', 'Format with 1 an int');
         assert.equal(format('give me an %d', '11'), 'give me an 11', 'Format with 1 an string as number');
@@ -18,6 +22,10 @@ define(['core/format'], function(format) {
         assert.equal(format('give me a %j', 100), 'give me a 100', 'Format with a json number');
         assert.equal(format('give me a %j', 'kiss'), 'give me a kiss', 'Format with a json string');
         assert.equal(format('give me an %j', ['A', 'rr', 'ay']), 'give me an [A,rr,ay]', 'Format with a json array');
-        assert.equal(format('give me %j', {a: 1, b: true, c: null, d: 'test'}), 'give me {a:1,b:true,c:null,d:test}', 'Format with a json object');
+        assert.equal(
+            format('give me %j', { a: 1, b: true, c: null, d: 'test' }),
+            'give me {a:1,b:true,c:null,d:test}',
+            'Format with a json object'
+        );
     });
 });

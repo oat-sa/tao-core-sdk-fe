@@ -22,15 +22,14 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import context from 'context';
 
 var parsers = {
     absolute: /^(?:[a-z]+:)?\/\//i,
-    base64:   /^data:[^\/]+\/[^;]+(;charset=[\w]+)?;base64,/,
-    query:    /(?:^|&)([^&=]*)=?([^&]*)/g,
-    url:      /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+    base64: /^data:[^\/]+\/[^;]+(;charset=[\w]+)?;base64,/,
+    query: /(?:^|&)([^&=]*)=?([^&]*)/g,
+    url: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/
 };
 
 /**
@@ -38,11 +37,10 @@ var parsers = {
  * @exports util/url
  */
 var urlUtil = {
-
     /*
-        * The parse method is a adaptation of parseUri from
-        * Steven Levithan <stevenlevithan.com> under the MIT License
-        */
+     * The parse method is a adaptation of parseUri from
+     * Steven Levithan <stevenlevithan.com> under the MIT License
+     */
 
     /**
      * Parse the given URL and create an object with each URL chunks.
@@ -54,28 +52,42 @@ var urlUtil = {
      * @param {String} url - the URL to parse
      * @returns {Object} parsedUrl with the properties available in key below and query that contains query string key/values.
      */
-    parse : function parse (url) {
+    parse: function parse(url) {
         var matches;
-        var	keys    = ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","queryString","hash"];
-        var i       = keys.length;
-        var parsed  = Object.create({
-            toString : function(){
+        var keys = [
+            'source',
+            'protocol',
+            'authority',
+            'userInfo',
+            'user',
+            'password',
+            'host',
+            'port',
+            'relative',
+            'path',
+            'directory',
+            'file',
+            'queryString',
+            'hash'
+        ];
+        var i = keys.length;
+        var parsed = Object.create({
+            toString: function() {
                 return this.source;
             }
         });
 
         parsed.base64 = parsers.base64.test(url);
 
-        if(parsed.base64){
+        if (parsed.base64) {
             parsed.source = url;
         } else {
-
             matches = parsers.url.exec(url);
             while (i--) {
-                parsed[keys[i]] = matches[i] || "";
+                parsed[keys[i]] = matches[i] || '';
             }
             parsed.query = {};
-            parsed.queryString.replace(parsers.query, function ($0, $1, $2) {
+            parsed.queryString.replace(parsers.query, function($0, $1, $2) {
                 if ($1) {
                     parsed.query[$1] = $2;
                 }
@@ -89,14 +101,12 @@ var urlUtil = {
      * @param {String|Object} url - the url to check. It can be a parsed URL (result of {@link util/url#parse})
      * @returns {Boolean|undefined} true if the url is absolute, or undefined if the URL cannot be checked
      */
-    isAbsolute : function isAbsolute(url){
-
-
+    isAbsolute: function isAbsolute(url) {
         //url from parse
-        if(typeof url === 'object' && url.hasOwnProperty('source')){
+        if (typeof url === 'object' && url.hasOwnProperty('source')) {
             return url.source !== url.relative;
         }
-        if(typeof url === 'string'){
+        if (typeof url === 'string') {
             return parsers.absolute.test(url);
         }
     },
@@ -106,9 +116,9 @@ var urlUtil = {
      * @param {String|Object} url - the url to check. It can be a parsed URL (result of {@link util/url#parse})
      * @returns {Boolean|undefined} true if the url is relative, or undefined if the URL cannot be checked
      */
-    isRelative : function isRelative(url) {
+    isRelative: function isRelative(url) {
         var absolute = this.isAbsolute(url);
-        if(typeof absolute === 'boolean'){
+        if (typeof absolute === 'boolean') {
             return !absolute;
         }
     },
@@ -118,12 +128,11 @@ var urlUtil = {
      * @param {String|Object} url - the url to check. It can be a parsed URL (result of {@link util/url#parse})
      * @returns {Boolean|undefined} true if the url is base64, or undefined if the URL cannot be checked
      */
-    isBase64 : function isBase64(url){
-
-        if(typeof url === 'object' && url.hasOwnProperty('source')){
+    isBase64: function isBase64(url) {
+        if (typeof url === 'object' && url.hasOwnProperty('source')) {
             return url.base64;
         }
-        if(typeof url === 'string'){
+        if (typeof url === 'string') {
             return parsers.base64.test(url);
         }
     },
@@ -133,8 +142,8 @@ var urlUtil = {
      * @param {String} url
      * @returns {String}
      */
-    encodeAsXmlAttr : function encodeAsXmlAttr(uri) {
-        return (/[<>&']+/.test(uri)) ? encodeURIComponent(uri) : uri;
+    encodeAsXmlAttr: function encodeAsXmlAttr(uri) {
+        return /[<>&']+/.test(uri) ? encodeURIComponent(uri) : uri;
     },
 
     /**
@@ -145,45 +154,54 @@ var urlUtil = {
      * @param {Object} [params] - params to add to the URL
      * @returns {String} the URL
      */
-    build : function build(path, params){
-
+    build: function build(path, params) {
         var url,
             queryString = '',
             hasQueryString;
 
-        if(path){
-            if(_.isString(path)){
+        if (path) {
+            if (_.isString(path)) {
                 url = path;
             }
-            if(_.isArray(path)){
+            if (_.isArray(path)) {
                 url = '';
-                _.forEach(path, function(chunk){
-                    if(/\/$/.test(url) && /^\//.test(chunk)){
+                _.forEach(path, function(chunk) {
+                    if (/\/$/.test(url) && /^\//.test(chunk)) {
                         url += chunk.substr(1);
-                    } else if (url !== '' && !/\/$/.test(url) && !/^\//.test(chunk)){
-                        url += '/' +  chunk;
+                    } else if (url !== '' && !/\/$/.test(url) && !/^\//.test(chunk)) {
+                        url += '/' + chunk;
                     } else {
                         url += chunk;
                     }
                 });
             }
-            if(_.isPlainObject(params)){
+            if (_.isPlainObject(params)) {
                 hasQueryString = url.indexOf('?') > -1;
-                queryString = _.reduce(params, function(acc, value, key){
-                    if(!_.isEmpty(acc) || hasQueryString){
-                        acc += '&';
-                    }
-                    if (typeof value === "object" && !_.isArray(value)) {
-                        _.forOwn(value, function(parameterValue, parameterName) {
-                            acc += encodeURIComponent(key) + "[" + encodeURIComponent(parameterName) + "]=" + encodeURIComponent(parameterValue) + "&";
-                        });
-                    } else {
-                        acc += encodeURIComponent(key) + '=' + encodeURIComponent(value);
-                    }
-                    return acc;
-                }, queryString);
-                if(!_.isEmpty(queryString)){
-                    if(!hasQueryString){
+                queryString = _.reduce(
+                    params,
+                    function(acc, value, key) {
+                        if (!_.isEmpty(acc) || hasQueryString) {
+                            acc += '&';
+                        }
+                        if (typeof value === 'object' && !_.isArray(value)) {
+                            _.forOwn(value, function(parameterValue, parameterName) {
+                                acc +=
+                                    encodeURIComponent(key) +
+                                    '[' +
+                                    encodeURIComponent(parameterName) +
+                                    ']=' +
+                                    encodeURIComponent(parameterValue) +
+                                    '&';
+                            });
+                        } else {
+                            acc += encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                        }
+                        return acc;
+                    },
+                    queryString
+                );
+                if (!_.isEmpty(queryString)) {
+                    if (!hasQueryString) {
                         url += '?';
                     }
                     url += queryString;
@@ -205,17 +223,18 @@ var urlUtil = {
      *
      * @throws {TypeError} if one of the required parameter is missing or empty
      */
-    route : function route(action, controller, extension, params, rootUrl){
-
+    route: function route(action, controller, extension, params, rootUrl) {
         var routeParts = [extension, controller, action];
 
-        if(_.some(routeParts, function(value){
-            return _.isEmpty(value) || !_.isString(value);
-        })){
+        if (
+            _.some(routeParts, function(value) {
+                return _.isEmpty(value) || !_.isString(value);
+            })
+        ) {
             throw new TypeError('All parts are required to build an URL');
         }
 
-        rootUrl = rootUrl || context && context['root_url'];
+        rootUrl = rootUrl || (context && context['root_url']);
 
         return this.build([rootUrl].concat(routeParts), params);
     }

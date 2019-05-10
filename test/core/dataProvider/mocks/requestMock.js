@@ -18,10 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define([
-    'core/eventifier',
-    'core/promise'
-], function (eventifier, Promise) {
+define(['core/eventifier', 'core/promise'], function(eventifier, Promise) {
     'use strict';
 
     /**
@@ -33,7 +30,7 @@ define([
      * @returns {Promise} that resolves with data or reject if something went wrong
      */
     function requestMock(url, params, method, headers) {
-        return new Promise(function(resolve, reject){
+        return new Promise(function(resolve, reject) {
             requestMock.api
                 .on('success', resolve)
                 .on('failure', reject)

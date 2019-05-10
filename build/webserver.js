@@ -20,13 +20,14 @@ const HttpServer = require('http-server');
 const fs = require('fs');
 const path = require('path');
 
-const HOST = '127.0.0.1' || process.env.HOST;
-const PORT = '8082' || process.env.PORT;
+const HOST = process.env.HOST || '127.0.0.1';
+const PORT = process.env.PORT || '8082';
 const ROOT = path.resolve(__dirname, '..');
 
 module.exports = new Promise(resolve =>
     new HttpServer.createServer({
         root: ROOT,
+        cache: -1,
         before: [
             (req, res) => {
                 if (req.method === 'POST') {

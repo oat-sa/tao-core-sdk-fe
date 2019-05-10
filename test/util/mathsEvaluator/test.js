@@ -18,12 +18,12 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define([
-    'jquery',
-    'lodash',
-    'util/mathsEvaluator',
-    'json!test/util/mathsEvaluator/testCases.json'
-], function ($, _, mathsEvaluatorFactory, testCases) {
+define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluator/testCases.json'], function(
+    $,
+    _,
+    mathsEvaluatorFactory,
+    testCases
+) {
     'use strict';
 
     QUnit.module('API');
@@ -33,26 +33,32 @@ define([
 
         assert.equal(typeof mathsEvaluatorFactory, 'function', 'The module exposes a function');
         assert.equal(typeof mathsEvaluatorFactory(), 'function', 'The factory produces a function');
-        assert.notStrictEqual(mathsEvaluatorFactory(), mathsEvaluatorFactory(), 'The factory provides a different function on each call');
+        assert.notStrictEqual(
+            mathsEvaluatorFactory(),
+            mathsEvaluatorFactory(),
+            'The factory provides a different function on each call'
+        );
     });
 
     QUnit.module('Behavior');
 
-    QUnit
-        .cases.init(testCases)
-        .test('expression ', function (data, assert) {
-            var evaluate = mathsEvaluatorFactory(data.config);
-            var output = evaluate(data.expression, data.variables);
+    QUnit.cases.init(testCases).test('expression ', function(data, assert) {
+        var evaluate = mathsEvaluatorFactory(data.config);
+        var output = evaluate(data.expression, data.variables);
 
-            assert.expect(4);
-            if (!_.isBoolean(output.value)) {
-                output.value = String(output.value);
-            }
-            assert.equal(output.value, data.expected, 'The expression ' + data.expression + ' is correctly computed to ' + data.expected);
-            assert.equal(output.expression, data.expression, 'The expression is provided in the output');
-            assert.equal(output.variables, data.variables, 'The variables are provided in the output');
-            assert.notEqual(typeof output.result, 'undefined', 'The internal result is provided in the output');
-        });
+        assert.expect(4);
+        if (!_.isBoolean(output.value)) {
+            output.value = String(output.value);
+        }
+        assert.equal(
+            output.value,
+            data.expected,
+            'The expression ' + data.expression + ' is correctly computed to ' + data.expected
+        );
+        assert.equal(output.expression, data.expression, 'The expression is provided in the output');
+        assert.equal(output.variables, data.variables, 'The variables are provided in the output');
+        assert.notEqual(typeof output.result, 'undefined', 'The internal result is provided in the output');
+    });
 
     QUnit.test('expression as object', function(assert) {
         var evaluate = mathsEvaluatorFactory();
@@ -77,7 +83,11 @@ define([
 
         output = evaluate(mathsExpression, variables);
 
-        assert.equal(output.value, '10', 'The expression ' + mathsExpression.expression + ' is correctly computed to 10');
+        assert.equal(
+            output.value,
+            '10',
+            'The expression ' + mathsExpression.expression + ' is correctly computed to 10'
+        );
         assert.equal(output.expression, mathsExpression.expression, 'The expression is provided in the output');
         assert.equal(output.variables, variables, 'The variables are provided in the output');
         assert.notEqual(typeof output.result, 'undefined', 'The internal result is provided in the output');
@@ -96,19 +106,18 @@ define([
             return this.each(function() {
                 var sel, startPos, endPos, scrollTop;
                 if (document.selection) {
-
                     //For browsers like Internet Explorer
                     this.focus();
                     sel = document.selection.createRange();
                     sel.text = myValue;
                     this.focus();
                 } else if (this.selectionStart || this.selectionStart === '0') {
-
                     //For browsers like Firefox and Webkit based
                     startPos = this.selectionStart;
                     endPos = this.selectionEnd;
                     scrollTop = this.scrollTop;
-                    this.value = this.value.substring(0, startPos) + myValue + this.value.substring(endPos, this.value.length);
+                    this.value =
+                        this.value.substring(0, startPos) + myValue + this.value.substring(endPos, this.value.length);
                     this.focus();
                     this.selectionStart = startPos + myValue.length;
                     this.selectionEnd = startPos + myValue.length;
@@ -145,8 +154,8 @@ define([
         }
 
         function showResult(expression, result) {
-            var $expr = $('<p class="expression">' + expression + "</p>");
-            var $res = $('<p class="result">' + result + "</p>");
+            var $expr = $('<p class="expression">' + expression + '</p>');
+            var $res = $('<p class="result">' + result + '</p>');
             var currentScrollTop, scrollTop;
             $screen.append($expr);
             $screen.append($res);
@@ -164,17 +173,21 @@ define([
             var parts = input.split('$');
             var expression = (parts.shift() || '').trim();
             var lines = [];
-            var variables = _.reduce(parts, function(acc, part) {
-                var s = part.split('=');
-                var name = (s[0] || '').trim();
-                var value = (s[1] || '').trim();
-                if (name && value) {
-                    value = processExpression(value);
-                    acc[name] = value;
-                    lines.push(name + '=' + value);
-                }
-                return acc;
-            }, {});
+            var variables = _.reduce(
+                parts,
+                function(acc, part) {
+                    var s = part.split('=');
+                    var name = (s[0] || '').trim();
+                    var value = (s[1] || '').trim();
+                    if (name && value) {
+                        value = processExpression(value);
+                        acc[name] = value;
+                        lines.push(name + '=' + value);
+                    }
+                    return acc;
+                },
+                {}
+            );
             lines.push(expression);
             showResult(lines.join('<br >'), processExpression(expression, variables));
         }
@@ -222,5 +235,4 @@ define([
         assert.expect(1);
         assert.ok(true, 'Visual test ready');
     });
-
 });

@@ -18,20 +18,15 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define([
-    'jquery',
-    'core/promise',
-    'util/shortcut/registry',
-    'jquery.simulate'
-], function($, Promise, shortcutRegistry) {
+define(['jquery', 'core/promise', 'util/shortcut/registry', 'jquery.simulate'], function($, Promise, shortcutRegistry) {
     'use strict';
 
     var shortcutApi = [
-        {name: 'set', title: 'set'},
-        {name: 'add', title: 'add'},
-        {name: 'remove', title: 'remove'},
-        {name: 'exists', title: 'exists'},
-        {name: 'clear', title: 'clear'}
+        { name: 'set', title: 'set' },
+        { name: 'add', title: 'add' },
+        { name: 'remove', title: 'remove' },
+        { name: 'exists', title: 'exists' },
+        { name: 'clear', title: 'clear' }
     ];
 
     QUnit.module('shortcut');
@@ -42,18 +37,27 @@ define([
         assert.expect(3);
 
         assert.equal(typeof shortcutRegistry, 'function', 'The shortcutRegistry module exposes a function');
-        assert.equal(typeof shortcutRegistry($target.get(0)), 'object', 'The shortcutRegistry factory produces an object');
-        assert.notEqual(shortcutRegistry($target.get(0)), shortcutRegistry($target.get(0)), 'The shortcutRegistry factory produces a different object at each call');
-
+        assert.equal(
+            typeof shortcutRegistry($target.get(0)),
+            'object',
+            'The shortcutRegistry factory produces an object'
+        );
+        assert.notEqual(
+            shortcutRegistry($target.get(0)),
+            shortcutRegistry($target.get(0)),
+            'The shortcutRegistry factory produces a different object at each call'
+        );
     });
 
-    QUnit
-        .cases.init(shortcutApi)
-        .test('has API ', function(data, assert) {
-            var $target = $('#qunit-fixture');
-            var instance = shortcutRegistry($target.get(0));
-            assert.equal(typeof instance[data.name], 'function', 'The shortcutRegistry instance exposes a "' + data.name + '" function');
-        });
+    QUnit.cases.init(shortcutApi).test('has API ', function(data, assert) {
+        var $target = $('#qunit-fixture');
+        var instance = shortcutRegistry($target.get(0));
+        assert.equal(
+            typeof instance[data.name],
+            'function',
+            'The shortcutRegistry instance exposes a "' + data.name + '" function'
+        );
+    });
 
     QUnit.module('Keyboard');
 
@@ -246,15 +250,19 @@ define([
             event.preventDefault();
         });
 
-        shortcuts.add('Enter', function() {
-            assert.ok(true, 'The Enter shortcut has been caught');
-            shortcuts.remove('Enter');
-            ready();
-        }, {
-            prevent: true
-        });
+        shortcuts.add(
+            'Enter',
+            function() {
+                assert.ok(true, 'The Enter shortcut has been caught');
+                shortcuts.remove('Enter');
+                ready();
+            },
+            {
+                prevent: true
+            }
+        );
 
-        $('input[type="text"]', $fixture).simulate("keydown", {
+        $('input[type="text"]', $fixture).simulate('keydown', {
             charCode: 0,
             keyCode: $.simulate.keyCode.ENTER,
             which: $.simulate.keyCode.ENTER,
@@ -276,13 +284,17 @@ define([
 
         assert.expect(1);
 
-        shortcuts.add('Alt+C', function() {
-            assert.ok(true, 'The Alt+C shortcut has been caught');
-            shortcuts.remove('Alt+C');
-            ready();
-        }, {
-            propagate: false
-        });
+        shortcuts.add(
+            'Alt+C',
+            function() {
+                assert.ok(true, 'The Alt+C shortcut has been caught');
+                shortcuts.remove('Alt+C');
+                ready();
+            },
+            {
+                propagate: false
+            }
+        );
 
         $container.on('keydown', function() {
             assert.ok(false, 'The event should not be propagated!');
@@ -308,16 +320,20 @@ define([
 
         assert.expect(2);
 
-        shortcuts.add('Alt+C', function(event) {
-            assert.ok(true, 'The Alt+C shortcut has been caught');
-            assert.ok(!$(event.target).closest(':input').length, 'The shortcut does not come from an input');
-            shortcuts.remove('Alt+C');
-            ready();
-        }, {
-            avoidInput: true
-        });
+        shortcuts.add(
+            'Alt+C',
+            function(event) {
+                assert.ok(true, 'The Alt+C shortcut has been caught');
+                assert.ok(!$(event.target).closest(':input').length, 'The shortcut does not come from an input');
+                shortcuts.remove('Alt+C');
+                ready();
+            },
+            {
+                avoidInput: true
+            }
+        );
 
-        $('input[type="text"]', $fixture).simulate("keydown", {
+        $('input[type="text"]', $fixture).simulate('keydown', {
             charCode: 0,
             keyCode: 67,
             which: 67,
@@ -364,18 +380,22 @@ define([
 
         $('form', $fixture).addClass('openbar');
 
-        shortcuts.add('Alt+C', function() {
-            assert.ok(true, 'The Alt+C shortcut has been caught');
-            if (!--expected) {
-                shortcuts.remove('Alt+C');
-                ready();
+        shortcuts.add(
+            'Alt+C',
+            function() {
+                assert.ok(true, 'The Alt+C shortcut has been caught');
+                if (!--expected) {
+                    shortcuts.remove('Alt+C');
+                    ready();
+                }
+            },
+            {
+                avoidInput: true,
+                allowIn: '.openbar'
             }
-        }, {
-            avoidInput: true,
-            allowIn: '.openbar'
-        });
+        );
 
-        $('input[type="text"]', $fixture).simulate("keydown", {
+        $('input[type="text"]', $fixture).simulate('keydown', {
             charCode: 0,
             keyCode: 67,
             which: 67,
@@ -579,14 +599,16 @@ define([
                     resolve();
                 });
             })
-        ]).then(function() {
-            shortcuts.clear();
-            assert.ok(true, 'All done!');
-            ready();
-        }).catch(function() {
-            assert.ok(false, 'The promise should not fail!');
-            ready();
-        });
+        ])
+            .then(function() {
+                shortcuts.clear();
+                assert.ok(true, 'All done!');
+                ready();
+            })
+            .catch(function() {
+                assert.ok(false, 'The promise should not fail!');
+                ready();
+            });
 
         $target.simulate('click', {
             button: 0,
@@ -681,25 +703,27 @@ define([
                     }
                 });
             })
-        ]).then(function() {
-            resolved = true;
-            shortcuts.remove('Meta+C.first');
+        ])
+            .then(function() {
+                resolved = true;
+                shortcuts.remove('Meta+C.first');
 
-            $target.simulate('keydown', {
-                charCode: 0,
-                keyCode: 67,
-                which: 67,
-                code: 'KeyC',
-                key: 'c',
-                ctrlKey: false,
-                shiftKey: false,
-                altKey: false,
-                metaKey: true
+                $target.simulate('keydown', {
+                    charCode: 0,
+                    keyCode: 67,
+                    which: 67,
+                    code: 'KeyC',
+                    key: 'c',
+                    ctrlKey: false,
+                    shiftKey: false,
+                    altKey: false,
+                    metaKey: true
+                });
+            })
+            .catch(function() {
+                assert.ok(false, 'The promise should not fail!');
+                ready();
             });
-        }).catch(function() {
-            assert.ok(false, 'The promise should not fail!');
-            ready();
-        });
 
         $target.simulate('keydown', {
             charCode: 0,
@@ -751,25 +775,27 @@ define([
                     }
                 });
             })
-        ]).then(function() {
-            resolved = true;
-            shortcuts.remove('.first');
+        ])
+            .then(function() {
+                resolved = true;
+                shortcuts.remove('.first');
 
-            $target.simulate('keydown', {
-                charCode: 0,
-                keyCode: 67,
-                which: 67,
-                code: 'KeyC',
-                key: 'c',
-                ctrlKey: false,
-                shiftKey: false,
-                altKey: false,
-                metaKey: true
+                $target.simulate('keydown', {
+                    charCode: 0,
+                    keyCode: 67,
+                    which: 67,
+                    code: 'KeyC',
+                    key: 'c',
+                    ctrlKey: false,
+                    shiftKey: false,
+                    altKey: false,
+                    metaKey: true
+                });
+            })
+            .catch(function() {
+                assert.ok(false, 'The promise should not fail!');
+                ready();
             });
-        }).catch(function() {
-            assert.ok(false, 'The promise should not fail!');
-            ready();
-        });
 
         $target.simulate('keydown', {
             charCode: 0,
@@ -793,7 +819,10 @@ define([
         shortcuts.add('Meta+C.myShortcut', $.noop);
 
         assert.ok(shortcuts.exists('meta+c'), 'Check the registered shortcut without namespace');
-        assert.ok(shortcuts.exists('meta+c.myShortcut'), 'Check the registered shortcut with its full name and namespace');
+        assert.ok(
+            shortcuts.exists('meta+c.myShortcut'),
+            'Check the registered shortcut with its full name and namespace'
+        );
         assert.ok(shortcuts.exists('.myShortcut'), 'Check the registered shortcut only by the namespace');
         assert.ok(!shortcuts.exists('meta+c.not'), 'Check a shortcut with an unknown namespace');
         assert.ok(!shortcuts.exists('shift+c'), 'Check an unknown shortcut');

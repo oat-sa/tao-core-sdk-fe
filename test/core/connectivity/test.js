@@ -32,22 +32,22 @@ define(['core/connectivity'], function(connectivity) {
     QUnit.test('eventifier', function(assert) {
         assert.expect(3);
 
-        assert.equal(typeof connectivity.on, 'function', 'The module has the eventifier\'s on method');
-        assert.equal(typeof connectivity.off, 'function', 'The module has the eventifier\'s off method');
-        assert.equal(typeof connectivity.trigger, 'function', 'The module has the eventifier\'s trigger method');
+        assert.equal(typeof connectivity.on, 'function', "The module has the eventifier's on method");
+        assert.equal(typeof connectivity.off, 'function', "The module has the eventifier's off method");
+        assert.equal(typeof connectivity.trigger, 'function', "The module has the eventifier's trigger method");
     });
 
-    QUnit.cases.init([
-        {title: 'isOnline'},
-        {title: 'isOffline'},
-        {title: 'setOnline'},
-        {title: 'setOffline'}
-    ])
-    .test(' method ', function(data, assert) {
-        assert.expect(1);
+    QUnit.cases
+        .init([{ title: 'isOnline' }, { title: 'isOffline' }, { title: 'setOnline' }, { title: 'setOffline' }])
+        .test(' method ', function(data, assert) {
+            assert.expect(1);
 
-        assert.equal(typeof connectivity[data.title], 'function', 'The tokenHandler instanceexposes a "' + data.name + '" function');
-    });
+            assert.equal(
+                typeof connectivity[data.title],
+                'function',
+                'The tokenHandler instanceexposes a "' + data.name + '" function'
+            );
+        });
 
     QUnit.module('Behavior', {
         beforeEach: function setup(assert) {

@@ -18,8 +18,7 @@
  *
  */
 define(['util/image'], function(imageUtil) {
-
-    var imageUrl = '/test/util/image/img/tao_icon.png';
+    var imageUrl = 'img/tao_icon.png';
     var width = 53;
     var height = 40;
 
@@ -64,4 +63,3 @@ define(['util/image'], function(imageUtil) {
         });
     });
 });
-

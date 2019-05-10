@@ -18,7 +18,6 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-
 import _ from 'lodash';
 import request from 'core/dataProvider/request';
 import Promise from 'core/promise';
@@ -108,7 +107,7 @@ export default {
             }
 
             if (config.noCache) {
-                params = _.merge({_: (new Date).getTime()}, params);
+                params = _.merge({ _: new Date().getTime() }, params);
             }
 
             if (!config.noToken) {

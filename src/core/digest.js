@@ -24,7 +24,6 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import 'lib/polyfill/webcrypto-shim';
 
@@ -43,9 +42,11 @@ var supportedAlgorithms = [
  * @returns {String} the hex representation of the buffer
  */
 var bufferToHexString = function bufferToHexString(buffer) {
-    return [].map.call(new Uint8Array(buffer), function(val){
-        return  ('00' + val.toString(16)).slice(-2);
-    }).join('');
+    return [].map
+        .call(new Uint8Array(buffer), function(val) {
+            return ('00' + val.toString(16)).slice(-2);
+        })
+        .join('');
 };
 
 /**
@@ -57,20 +58,17 @@ var bufferToHexString = function bufferToHexString(buffer) {
  */
 export default function digest(utf8String, selectedAlgorithm) {
     var algorithm;
-    if(!_.isString(selectedAlgorithm)){
+    if (!_.isString(selectedAlgorithm)) {
         selectedAlgorithm = 'SHA-256';
     }
     algorithm = selectedAlgorithm.toUpperCase();
-    if(!_.contains(supportedAlgorithms, algorithm)){
+    if (!_.contains(supportedAlgorithms, algorithm)) {
         throw new TypeError('Unsupported digest algorithm : ' + algorithm);
     }
-    if(!_.isString(utf8String)){
-        throw new TypeError('Please encode a string, not a ' + (typeof utf8String) );
+    if (!_.isString(utf8String)) {
+        throw new TypeError('Please encode a string, not a ' + typeof utf8String);
     }
-    return subtle
-        .digest(algorithm, new TextEncoder('utf-8').encode(utf8String))
-        .then(function(buffer){
-            return bufferToHexString(buffer);
-        });
-
-};
+    return subtle.digest(algorithm, new TextEncoder('utf-8').encode(utf8String)).then(function(buffer) {
+        return bufferToHexString(buffer);
+    });
+}

@@ -22,12 +22,11 @@
  * @param pad_type
  * @returns {*}
  */
-var strPad = function (input, pad_length, pad_string, pad_type) {
-
+var strPad = function(input, pad_length, pad_string, pad_type) {
     var half = '',
         pad_to_go;
 
-    var str_pad_repeater = function (s, len) {
+    var str_pad_repeater = function(s, len) {
         var collect = '';
 
         while (collect.length < len) {

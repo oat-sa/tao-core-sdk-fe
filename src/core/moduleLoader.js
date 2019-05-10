@@ -26,7 +26,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-
 import _ from 'lodash';
 import Promise from 'core/promise';
 
@@ -75,7 +74,6 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
      * @typedef {loader}
      */
     var loader = {
-
         /**
          * Adds a list of dynamic modules to load
          * @param {moduleDefinition[]} moduleList - the modules to add
@@ -86,7 +84,6 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
             _.forEach(moduleList, this.add, this);
             return this;
         },
-
 
         /**
          * Adds a dynamic module to load
@@ -106,8 +103,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
 
             if (_.isNumber(def.position)) {
                 modules[def.category][def.position] = def.module;
-            }
-            else if (def.position === 'prepend' || def.position === 'before') {
+            } else if (def.position === 'prepend' || def.position === 'before') {
                 modules[def.category].unshift(def.module);
             } else {
                 modules[def.category].push(def.module);
@@ -126,7 +122,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
          * @throws {TypeError} misuse
          */
         append: function append(def) {
-            return this.add(_.merge({position: 'append'}, def));
+            return this.add(_.merge({ position: 'append' }, def));
         },
 
         /**
@@ -136,7 +132,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
          * @throws {TypeError} misuse
          */
         prepend: function prepend(def) {
-            return this.add(_.merge({position: 'prepend'}, def));
+            return this.add(_.merge({ position: 'prepend' }, def));
         },
 
         /**
@@ -159,7 +155,12 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
             var self = this;
 
             //compute the providers dependencies
-            var dependencies = _(modules).values().flatten().uniq().difference(excludes).value();
+            var dependencies = _(modules)
+                .values()
+                .flatten()
+                .uniq()
+                .difference(excludes)
+                .value();
 
             /**
              * Loads AMD modules and wrap then into a Promise
@@ -168,8 +169,8 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
              */
             var loadModules = function loadModules(amdModules) {
                 if (_.isArray(amdModules) && amdModules.length) {
-                    return new Promise(function (resolve, reject) {
-                        require(amdModules, function () {
+                    return new Promise(function(resolve, reject) {
+                        require(amdModules, function() {
                             //resolve with an array of loaded modules
                             resolve([].slice.call(arguments));
                         }, reject);
@@ -182,13 +183,13 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
             // 2. load dependencies
             // 3. add them to the modules list
             return loadModules(loadBundles ? bundles : [])
-                .then(function () {
+                .then(function() {
                     return loadModules(dependencies);
                 })
-                .then(function (loadedModules) {
-                    _.forEach(dependencies, function (dependency, index) {
+                .then(function(loadedModules) {
+                    _.forEach(dependencies, function(dependency, index) {
                         var module = loadedModules[index];
-                        var category = _.findKey(modules, function (val) {
+                        var category = _.findKey(modules, function(val) {
                             return _.contains(val, dependency);
                         });
 
@@ -216,7 +217,11 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
                 return loaded[category] || [];
             }
 
-            return _(loaded).values().flatten().uniq().value();
+            return _(loaded)
+                .values()
+                .flatten()
+                .uniq()
+                .value();
         },
 
         /**
@@ -231,7 +236,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
     validate = _.isFunction(validate) ? validate : _.isPlainObject;
 
     //verify and add the required modules
-    _.forEach(requiredModules, function (moduleList, category) {
+    _.forEach(requiredModules, function(moduleList, category) {
         if (_.isEmpty(category) || !_.isString(category)) {
             throw new TypeError('Modules must belong to a category');
         }
@@ -253,12 +258,14 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
 
     // let's extend the instance with extra methods
     if (specs) {
-        _(specs).functions().forEach(function (method) {
-            loader[method] = function delegate() {
-                return specs[method].apply(loader, [].slice.call(arguments));
-            };
-        });
+        _(specs)
+            .functions()
+            .forEach(function(method) {
+                loader[method] = function delegate() {
+                    return specs[method].apply(loader, [].slice.call(arguments));
+                };
+            });
     }
 
     return loader;
-};
+}

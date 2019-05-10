@@ -22,21 +22,19 @@
  *
  * @author Christophe Noël <christophe@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
+define(['lodash'], function(_) {
     'use strict';
 
     var messages;
 
     function resetMessages() {
         messages = {
-            trace : [],
-            debug : [],
-            info  : [],
-            warn  : [],
-            error : [],
-            fatal : []
+            trace: [],
+            debug: [],
+            info: [],
+            warn: [],
+            error: [],
+            fatal: []
         };
     }
 
@@ -47,7 +45,7 @@ define([
      * @returns {logger} the logger
      */
     return {
-        log: function log(record){
+        log: function log(record) {
             if (_.isArray(messages[record.level])) {
                 messages[record.level].push(record);
             }

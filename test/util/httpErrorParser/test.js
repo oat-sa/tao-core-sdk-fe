@@ -19,7 +19,6 @@
  */
 
 define(['util/httpErrorParser'], function(httpErrorParser) {
-
     'use strict';
 
     QUnit.test('Helper API', function(assert) {
@@ -55,4 +54,3 @@ define(['util/httpErrorParser'], function(httpErrorParser) {
         assert.equal(err.message, 'Bad request');
     });
 });
-

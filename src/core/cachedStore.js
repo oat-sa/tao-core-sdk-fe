@@ -18,9 +18,8 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-
 import store from 'core/store';
-    
+
 /**
  * The default name of the key storage indexing the persisted data
  * @type {String}
@@ -37,69 +36,66 @@ var defaultKey = 'cachedData';
  * @returns {Promise} Returns a promise that will be resolved with a data accessor
  */
 function cachedStoreFactory(storageName, storageKey) {
-
     storageKey = storageKey || defaultKey;
 
     return store(storageName).then(function(storage) {
+        return storage.getItem(storageKey).then(function(data) {
+            // the persisted data set is always an object
+            data = data || {};
 
-        return storage.getItem(storageKey)
-            .then(function(data) {
-                // the persisted data set is always an object
-                data = data || {};
+            // just provide a data accessor that:
+            // - immediately gets the values
+            // - stores the changes through a promise.
+            return {
+                /**
+                 * Gets a value from the data
+                 * @param {String} name
+                 * @returns {Object}
+                 */
+                getItem: function getItem(name) {
+                    return data[name];
+                },
 
-                // just provide a data accessor that:
-                // - immediately gets the values
-                // - stores the changes through a promise.
-                return {
-                    /**
-                     * Gets a value from the data
-                     * @param {String} name
-                     * @returns {Object}
-                     */
-                    getItem : function getItem(name) {
-                        return data[name];
-                    },
+                /**
+                 * Sets a value in the data, then ensure the data will persist
+                 * @param {String} name
+                 * @param {Object} value
+                 * @returns {Promise} Returns a promise that will be resolved if the data have been successfully stored
+                 */
+                setItem: function setItem(name, value) {
+                    data[name] = value;
+                    return storage.setItem(storageKey, data);
+                },
 
-                    /**
-                     * Sets a value in the data, then ensure the data will persist
-                     * @param {String} name
-                     * @param {Object} value
-                     * @returns {Promise} Returns a promise that will be resolved if the data have been successfully stored
-                     */
-                    setItem : function setItem(name, value) {
-                        data[name] = value;
-                        return storage.setItem(storageKey, data);
-                    },
+                /**
+                 * Removes a value from the data, then synchronise the data set with the storage
+                 * @param {String} name
+                 * @returns {Promise} Returns a promise that will be resolved if the data have been successfully stored
+                 */
+                removeItem: function removeItem(name) {
+                    data[name] = undefined;
+                    return storage.setItem(storageKey, data);
+                },
 
-                    /**
-                     * Removes a value from the data, then synchronise the data set with the storage
-                     * @param {String} name
-                     * @returns {Promise} Returns a promise that will be resolved if the data have been successfully stored
-                     */
-                    removeItem : function removeItem(name) {
-                        data[name] = undefined;
-                        return storage.setItem(storageKey, data);
-                    },
+                /**
+                 * Clears the full data set
+                 * @returns {Promise} Returns a promise that will be resolved if the data have been successfully erased
+                 */
+                clear: function clear() {
+                    data = {};
+                    return storage.removeItem(storageKey);
+                },
 
-                    /**
-                     * Clears the full data set
-                     * @returns {Promise} Returns a promise that will be resolved if the data have been successfully erased
-                     */
-                    clear : function clear() {
-                        data = {};
-                        return storage.removeItem(storageKey);
-                    },
-
-                    /**
-                     * Delete the database related to the current store
-                     * @returns {Promise} with true in resolve once cleared
-                     */
-                    removeStore : function removeStore() {
-                        data = {};
-                        return storage.removeStore();
-                    }
-                };
-            });
+                /**
+                 * Delete the database related to the current store
+                 * @returns {Promise} with true in resolve once cleared
+                 */
+                removeStore: function removeStore() {
+                    data = {};
+                    return storage.removeStore();
+                }
+            };
+        });
     });
 }
 

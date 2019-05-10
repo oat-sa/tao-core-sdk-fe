@@ -21,7 +21,6 @@
  * @author Sam <sam@taotesting.com>
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 
 /**
@@ -34,10 +33,8 @@ import _ from 'lodash';
  * @returns {Object} the target itself
  */
 function providerRegistry(target, validator) {
-
     var _providers = {};
     target = target || {};
-
 
     /**
      * Registers a <i>provider</i> into the provider registry.
@@ -53,14 +50,13 @@ function providerRegistry(target, validator) {
      * @throws TypeError when a wrong provider is given or an empty name.
      */
     function registerProvider(name, provider) {
-
         var valid = true;
 
         //type checking
         if (!_.isString(name) || name.length <= 0) {
             throw new TypeError('It is required to give a name to your provider.');
         }
-        if (!_.isPlainObject(provider) || (!_.isFunction(provider.init))) {
+        if (!_.isPlainObject(provider) || !_.isFunction(provider.init)) {
             throw new TypeError('A provider is an object that contains at least an init function.');
         }
         valid = validator && _.isFunction(validator) ? validator(provider) : valid;
@@ -80,7 +76,6 @@ function providerRegistry(target, validator) {
      * @returns {Object} provider
      */
     function getProvider(providerName) {
-
         var provider;
 
         //check a provider is available
@@ -91,7 +86,6 @@ function providerRegistry(target, validator) {
         if (_.isString(providerName) && providerName.length > 0) {
             provider = _providers[providerName];
         } else if (_.size(_providers) === 1) {
-
             //if there is only one provider, then we take this one
             providerName = _.keys(_providers)[0];
             provider = _providers[providerName];
@@ -109,7 +103,7 @@ function providerRegistry(target, validator) {
      * Expose the list of registered providers
      * @return {String[]} the list of provider names
      */
-    function getAvailableProviders(){
+    function getAvailableProviders() {
         return _.keys(_providers);
     }
 

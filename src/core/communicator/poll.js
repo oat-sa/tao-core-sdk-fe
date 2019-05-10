@@ -18,7 +18,6 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-
 import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
@@ -66,7 +65,7 @@ var defaults = {
  * }
  * ```
  *
- * A security token can be added, in the header `X-Auth-Token` for the request and in the `token` field for the response.
+ * A security token can be added, in the header `X-CSRF-Token` for the request and response.
  *
  * Business logic errors can be implemented using the `error` *channel*.
  * Network errors are handled by the AJAX implementation, and are forwarded to the `error` *event*.
@@ -89,7 +88,9 @@ var pollProvider = {
     init: function init() {
         var self = this;
         var config = _.defaults(this.getConfig(), defaults);
-        var tokenHandler = tokenHandlerFactory(config.token);
+        var tokenHandler = tokenHandlerFactory({
+            initialToken: config.token
+        });
 
         // validate the config
         if (!config.service) {
@@ -100,15 +101,14 @@ var pollProvider = {
         // there is no message in the queue at this moment
         this.messagesQueue = [];
 
-        this.request = function request(){
-            return new Promise(function(resolve){
+        this.request = function request() {
+            return new Promise(function(resolve) {
                 var headers = {};
-                var token = tokenHandler.getToken();
 
                 // split promises and their related messages
                 // then reset the list of pending messages
                 var promises = [];
-                var request = _.map(self.messagesQueue, function (msg) {
+                var req = _.map(self.messagesQueue, function(msg) {
                     promises.push(msg.promise);
                     return {
                         channel: msg.channel,
@@ -117,79 +117,85 @@ var pollProvider = {
                 });
                 self.messagesQueue = [];
 
-                if (token) {
-                    headers['X-Auth-Token'] = token;
-                }
-
-                // send messages to the remote service
-                $.ajax({
-                    url: config.service,
-                    type: 'POST',
-                    cache: false,
-                    headers: headers,
-                    data: JSON.stringify(request),
-                    async: true,
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    timeout: config.timeout
-                })
-                // when the request succeeds...
-                .done(function (response) {
-                    response = response || {};
-
-                    // receive optional security token
-                    if (response.token) {
-                        tokenHandler.setToken(response.token);
-                    }
-
-
-                    // resolve each message promises
-                    _.forEach(promises, function (promise, idx) {
-                        promise.resolve(response.responses && response.responses[idx]);
-                    });
-
-                    if (!self.polling.is('stopped')) {
-                        // receive server messages
-                        _.forEach(response.messages, function (msg) {
-                            if (msg.channel) {
-                                self.trigger('message', msg.channel, msg.message);
-                            } else {
-                                self.trigger('message', 'malformed', msg);
-                            }
-                        });
-                    }
-
-                    self.trigger('receive', response);
-
-                    resolve();
-                })
-
-                // when the request fails...
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                    var error = {
-                        source: 'network',
-                        purpose: 'communicator',
-                        context: this,
-                        sent: jqXHR.readyState > 0,
-                        code: jqXHR.status,
-                        type: textStatus || 'error',
-                        message: errorThrown || __('An error occurred!')
-                    };
-
-                    // reset the security token on error
+                tokenHandler.getToken().then(function(token) {
                     if (token) {
-                        tokenHandler.setToken(token);
+                        headers['X-CSRF-Token'] = token;
                     }
 
-                    // reject all message promises
-                    _.forEach(promises, function (promise) {
-                        promise.reject(error);
-                    });
+                    // send messages to the remote service
+                    $.ajax({
+                        url: config.service,
+                        type: 'POST',
+                        cache: false,
+                        headers: headers,
+                        data: JSON.stringify(req),
+                        async: true,
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        timeout: config.timeout
+                    })
+                        // when the request succeeds...
+                        .done(function(response, status, xhr) {
+                            response = response || {};
 
-                    self.trigger('error', error);
+                            // resolve each message promises
+                            _.forEach(promises, function(promise, idx) {
+                                promise.resolve(response.responses && response.responses[idx]);
+                            });
 
-                    // the request promise must be resolved, even if failed, to continue the polling
-                    resolve();
+                            if (!self.polling.is('stopped')) {
+                                // receive server messages
+                                _.forEach(response.messages, function(msg) {
+                                    if (msg.channel) {
+                                        self.trigger('message', msg.channel, msg.message);
+                                    } else {
+                                        self.trigger('message', 'malformed', msg);
+                                    }
+                                });
+                            }
+
+                            self.trigger('receive', response);
+
+                            // receive optional security token
+                            if (xhr && _.isFunction(xhr.getResponseHeader)) {
+                                response.token = xhr.getResponseHeader('X-CSRF-Token');
+                                if (response.token) {
+                                    tokenHandler.setToken(response.token).then(function() {
+                                        resolve();
+                                    });
+                                }
+                            }
+                            resolve();
+                        })
+
+                        // when the request fails...
+                        .fail(function(jqXHR, textStatus, errorThrown) {
+                            var error = {
+                                source: 'network',
+                                purpose: 'communicator',
+                                context: this,
+                                sent: jqXHR.readyState > 0,
+                                code: jqXHR.status,
+                                type: textStatus || 'error',
+                                message: errorThrown || __('An error occurred!')
+                            };
+
+                            // reject all message promises
+                            _.forEach(promises, function(promise) {
+                                promise.reject(error);
+                            });
+
+                            self.trigger('error', error);
+
+                            // the request promise must be resolved, even if failed, to continue the polling
+                            // reset the security token on error
+                            if (token) {
+                                tokenHandler.setToken(token).then(function() {
+                                    resolve();
+                                });
+                            }
+                            resolve();
+                        });
                 });
             });
         };
@@ -201,14 +207,14 @@ var pollProvider = {
             autoStart: false,
             action: function communicatorPoll() {
                 var async = this.async();
-                self.request().then(function(){
+                self.request().then(function() {
                     async.resolve();
                 });
             }
         });
 
         // adjust the message sending by throttle periods
-        this.throttledSend = _.throttle(function () {
+        this.throttledSend = _.throttle(function() {
             self.polling.next();
         }, config.throttle);
 
@@ -225,7 +231,10 @@ var pollProvider = {
 
         if (this.polling) {
             stopped = new Promise(function(resolve) {
-                self.polling.off('stop.api').on('stop.api', resolve).stop();
+                self.polling
+                    .off('stop.api')
+                    .on('stop.api', resolve)
+                    .stop();
             });
         } else {
             stopped = Promise.resolve();
@@ -246,7 +255,11 @@ var pollProvider = {
 
         if (this.polling) {
             started = new Promise(function(resolve) {
-                self.polling.off('next.api').on('next.api', resolve).start().next();
+                self.polling
+                    .off('next.api')
+                    .on('next.api', resolve)
+                    .start()
+                    .next();
             });
         } else {
             started = Promise.reject(new Error('The communicator has not been properly initialized'));
@@ -265,7 +278,10 @@ var pollProvider = {
 
         if (this.polling) {
             stopped = new Promise(function(resolve) {
-                self.polling.off('stop.api').on('stop.api', resolve).stop();
+                self.polling
+                    .off('stop.api')
+                    .on('stop.api', resolve)
+                    .stop();
             });
         } else {
             stopped = Promise.reject(new Error('The communicator has not been properly initialized'));

@@ -28,26 +28,31 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
     var testerUrl = location.href;
 
     var historyRouterApi = [
-        {title: 'redirect'},
-        {title: 'forward'},
-        {title: 'replace'},
-        {title: 'dispatch'},
-        {title: 'pushState'}
+        { title: 'redirect' },
+        { title: 'forward' },
+        { title: 'replace' },
+        { title: 'dispatch' },
+        { title: 'pushState' }
     ];
 
-    var errorsProvider = [{
-        title: 'Null',
-        state: null
-    }, {
-        title: 'Empty state',
-        state: {}
-    }, {
-        title: 'Empty url',
-        state: ''
-    }, {
-        title: 'Empty url in state',
-        state: {url: ''}
-    }];
+    var errorsProvider = [
+        {
+            title: 'Null',
+            state: null
+        },
+        {
+            title: 'Empty state',
+            state: {}
+        },
+        {
+            title: 'Empty url',
+            state: ''
+        },
+        {
+            title: 'Empty url in state',
+            state: { url: '' }
+        }
+    ];
 
     var pagesProvider;
 
@@ -55,23 +60,27 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
         domain += ':' + port;
     }
 
-    pagesProvider = [{
-        title: 'Index page',
-        state: '/tao/Test/index',
-        expected: domain + '/tao/Test/index'
-    }, {
-        title: 'User page',
-        state: {
-            url: '/tao/Test/user?id=foo#bar'
+    pagesProvider = [
+        {
+            title: 'Index page',
+            state: '/tao/Test/index',
+            expected: domain + '/tao/Test/index'
         },
-        expected: domain + '/tao/Test/user?id=foo#bar'
-    }, {
-        title: 'Delivery page',
-        state: {
-            url: '/tao/Test/delivery?delivery=bar'
+        {
+            title: 'User page',
+            state: {
+                url: '/tao/Test/user?id=foo#bar'
+            },
+            expected: domain + '/tao/Test/user?id=foo#bar'
         },
-        expected: domain + '/tao/Test/delivery?delivery=bar'
-    }];
+        {
+            title: 'Delivery page',
+            state: {
+                url: '/tao/Test/delivery?delivery=bar'
+            },
+            expected: domain + '/tao/Test/delivery?delivery=bar'
+        }
+    ];
 
     QUnit.module('API', {
         beforeEach: function(assert) {
@@ -87,16 +96,22 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
 
         assert.equal(typeof historyRouterFactory, 'function', 'The historyRouter module exposes a function');
         assert.equal(typeof historyRouterFactory(), 'object', 'The historyRouter factory produces an object');
-        assert.equal(historyRouterFactory(), historyRouterFactory(), 'The historyRouter factory provides the same object on each call');
+        assert.equal(
+            historyRouterFactory(),
+            historyRouterFactory(),
+            'The historyRouter factory provides the same object on each call'
+        );
     });
 
-    QUnit
-        .cases.init(historyRouterApi)
-        .test('instance API ', function(data, assert) {
-            var instance = historyRouterFactory();
-            assert.expect(1);
-            assert.equal(typeof instance[data.title], 'function', 'The historyRouter instance exposes a "' + data.title + '" function');
-        });
+    QUnit.cases.init(historyRouterApi).test('instance API ', function(data, assert) {
+        var instance = historyRouterFactory();
+        assert.expect(1);
+        assert.equal(
+            typeof instance[data.title],
+            'function',
+            'The historyRouter instance exposes a "' + data.title + '" function'
+        );
+    });
 
     QUnit.module('States', {
         beforeEach: function(assert) {
@@ -107,44 +122,41 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
         }
     });
 
-    QUnit
-        .cases.init(pagesProvider)
-        .test('pushState', function(data, assert) {
-            var ready = assert.async();
-            var instance = historyRouterFactory();
+    QUnit.cases.init(pagesProvider).test('pushState', function(data, assert) {
+        var ready = assert.async();
+        var instance = historyRouterFactory();
 
-            assert.expect(1);
+        assert.expect(1);
 
-            instance.pushState(data.state)
-                .then(function() {
-                    assert.equal(location.href, data.expected, 'The current page URL must comply to the target state');
-                    ready();
-                })
-                .catch(function() {
-                    assert.ok(false, 'Should not be rejected!');
-                    ready();
-                });
-        });
+        instance
+            .pushState(data.state)
+            .then(function() {
+                assert.equal(location.href, data.expected, 'The current page URL must comply to the target state');
+                ready();
+            })
+            .catch(function() {
+                assert.ok(false, 'Should not be rejected!');
+                ready();
+            });
+    });
 
-    QUnit
-        .cases.init(pagesProvider)
-        .test('replace', function(data, assert) {
-            var instance = historyRouterFactory();
-            var ready = assert.async();
+    QUnit.cases.init(pagesProvider).test('replace', function(data, assert) {
+        var instance = historyRouterFactory();
+        var ready = assert.async();
 
+        assert.expect(1);
 
-            assert.expect(1);
-
-            instance.replace(data.state)
-                .then(function() {
-                    assert.equal(location.href, data.expected, 'The current page URL must comply to the target state');
-                    ready();
-                })
-                .catch(function() {
-                    assert.ok(false, 'Should not be rejected!');
-                    ready();
-                });
-        });
+        instance
+            .replace(data.state)
+            .then(function() {
+                assert.equal(location.href, data.expected, 'The current page URL must comply to the target state');
+                ready();
+            })
+            .catch(function() {
+                assert.ok(false, 'Should not be rejected!');
+                ready();
+            });
+    });
 
     QUnit.test('forward', function(assert) {
         var ready = assert.async();
@@ -156,7 +168,8 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
             assert.ok(true, 'The controller has been started as expected');
         });
 
-        instance.forward('/tao/Test/user')
+        instance
+            .forward('/tao/Test/user')
             .then(function() {
                 assert.equal(location.href, testerUrl, 'The current page URL must comply to the target state');
                 ready();
@@ -175,21 +188,21 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
 
         assert.expect(3);
 
-        instance.pushState(url1)
+        instance
+            .pushState(url1)
             .then(function() {
                 assert.equal(location.href, url1, 'The url1 should be reached');
 
-                return instance.redirect(url2)
-                    .then(function() {
-                        assert.equal(location.href, url2, 'The url2 should be reached');
+                return instance.redirect(url2).then(function() {
+                    assert.equal(location.href, url2, 'The url2 should be reached');
 
-                        window.history.back();
+                    window.history.back();
 
-                        setTimeout(function() {
-                            assert.equal(location.href, url1, 'The url1 should be restored');
-                            ready();
-                        }, 250);
-                    });
+                    setTimeout(function() {
+                        assert.equal(location.href, url1, 'The url1 should be restored');
+                        ready();
+                    }, 250);
+                });
             })
             .catch(function() {
                 assert.ok(false, 'Should not be rejected!');
@@ -205,21 +218,21 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
 
         assert.expect(3);
 
-        instance.dispatch(url1, true)
+        instance
+            .dispatch(url1, true)
             .then(function() {
                 assert.equal(location.href, url1, 'The url1 should be reached');
 
-                return instance.dispatch(url2, true)
-                    .then(function() {
-                        assert.equal(location.href, url2, 'The url2 should be reached');
+                return instance.dispatch(url2, true).then(function() {
+                    assert.equal(location.href, url2, 'The url2 should be reached');
 
-                        instance.trigger('dispatch', url1);
+                    instance.trigger('dispatch', url1);
 
-                        setTimeout(function() {
-                            assert.equal(location.href, url1, 'The url1 should be restored');
-                            ready();
-                        }, 250);
-                    });
+                    setTimeout(function() {
+                        assert.equal(location.href, url1, 'The url1 should be restored');
+                        ready();
+                    }, 250);
+                });
             })
             .catch(function() {
                 assert.ok(false, 'Should not be rejected!');
@@ -227,23 +240,21 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
             });
     });
 
-    QUnit
-        .cases.init(errorsProvider)
-        .test('dispatch', function(data, assert) {
-            var instance = historyRouterFactory();
-            var ready = assert.async();
+    QUnit.cases.init(errorsProvider).test('dispatch', function(data, assert) {
+        var instance = historyRouterFactory();
+        var ready = assert.async();
 
-            assert.expect(1);
+        assert.expect(1);
 
-            instance.dispatch(data.state)
-                .then(function() {
-                    assert.ok(false, 'Should be rejected!');
-                    ready();
-                })
-                .catch(function() {
-                    assert.ok(true, 'Should be rejected!');
-                    ready();
-                });
-        });
-
+        instance
+            .dispatch(data.state)
+            .then(function() {
+                assert.ok(false, 'Should be rejected!');
+                ready();
+            })
+            .catch(function() {
+                assert.ok(true, 'Should be rejected!');
+                ready();
+            });
+    });
 });

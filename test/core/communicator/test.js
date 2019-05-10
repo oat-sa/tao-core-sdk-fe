@@ -23,7 +23,7 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
 
     QUnit.module('communicator factory', {
         beforeEach: function(assert) {
-            communicator.registerProvider('mock', {init: _.noop});
+            communicator.registerProvider('mock', { init: _.noop });
         },
         afterEach: function(assert) {
             communicator.clearProviders();
@@ -34,37 +34,51 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
         assert.expect(5);
         assert.equal(typeof communicator, 'function', 'The communicator module exposes a function');
         assert.equal(typeof communicator('mock'), 'object', 'The communicator factory produces an object');
-        assert.notStrictEqual(communicator('mock'), communicator('mock'), 'The communicator factory provides a different object on each call');
-        assert.equal(typeof communicator.registerProvider, 'function', 'The instance module exposes a function registerProvider()');
-        assert.equal(typeof communicator.getProvider, 'function', 'The instance module exposes a function getProvider()');
+        assert.notStrictEqual(
+            communicator('mock'),
+            communicator('mock'),
+            'The communicator factory provides a different object on each call'
+        );
+        assert.equal(
+            typeof communicator.registerProvider,
+            'function',
+            'The instance module exposes a function registerProvider()'
+        );
+        assert.equal(
+            typeof communicator.getProvider,
+            'function',
+            'The instance module exposes a function getProvider()'
+        );
     });
 
     var communicatorApi = [
-        {name: 'init', title: 'init'},
-        {name: 'destroy', title: 'destroy'},
+        { name: 'init', title: 'init' },
+        { name: 'destroy', title: 'destroy' },
 
-        {name: 'open', title: 'open'},
-        {name: 'close', title: 'close'},
+        { name: 'open', title: 'open' },
+        { name: 'close', title: 'close' },
 
-        {name: 'send', title: 'send'},
-        {name: 'channel', title: 'channel'},
+        { name: 'send', title: 'send' },
+        { name: 'channel', title: 'channel' },
 
-        {name: 'getConfig', title: 'getConfig'},
-        {name: 'setState', title: 'setState'},
-        {name: 'getState', title: 'getState'},
+        { name: 'getConfig', title: 'getConfig' },
+        { name: 'setState', title: 'setState' },
+        { name: 'getState', title: 'getState' },
 
-        {name: 'trigger', title: 'trigger'},
-        {name: 'before', title: 'before'},
-        {name: 'on', title: 'on'},
-        {name: 'after', title: 'after'}
+        { name: 'trigger', title: 'trigger' },
+        { name: 'before', title: 'before' },
+        { name: 'on', title: 'on' },
+        { name: 'after', title: 'after' }
     ];
 
-    QUnit
-        .cases.init(communicatorApi)
-        .test('api', function(data, assert) {
-            var instance = communicator('mock');
-            assert.equal(typeof instance[data.name], 'function', 'The communicator instance exposes a "' + data.name + '" function');
-        });
+    QUnit.cases.init(communicatorApi).test('api', function(data, assert) {
+        var instance = communicator('mock');
+        assert.equal(
+            typeof instance[data.name],
+            'function',
+            'The communicator instance exposes a "' + data.name + '" function'
+        );
+    });
 
     QUnit.module('provider', {
         beforeEach: function(assert) {
@@ -309,7 +323,7 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
 
         assert.expect(4);
 
-        communicator.registerProvider('foo', {init: _.noop});
+        communicator.registerProvider('foo', { init: _.noop });
 
         var instance = communicator('foo');
 
@@ -335,8 +349,8 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
         assert.expect(1);
 
         var config = {
-            'timeout': 15000,
-            'moo': 'norz'
+            timeout: 15000,
+            moo: 'norz'
         };
 
         communicator.registerProvider('foo', {
@@ -365,7 +379,6 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
 
         var instance = communicator('foo');
         instance.init().then(function() {
-
             assert.ok(!instance.getState('foo'), 'The state "foo" is not set');
 
             instance.setState('foo');

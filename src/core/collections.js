@@ -1,4 +1,3 @@
-
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,14 +21,13 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import 'lib/polyfill/es6-collections';
 
 //window should have beend feed by the polyfill
 //
 export default {
-    Map :     window.Map,
-    Set :     window.Set,
-    WeakMap : window.WeakMap,
-    WeakSet : window.WeakSet
+    Map: window.Map,
+    Set: window.Set,
+    WeakMap: window.WeakMap,
+    WeakSet: window.WeakSet
 };

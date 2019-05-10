@@ -47,27 +47,47 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
 
         assert.equal(typeof pluginFactory, 'function', 'The plugin module exposes a function');
         assert.equal(typeof pluginFactory(mockProvider), 'function', 'The plugin factory produces a function');
-        assert.notStrictEqual(pluginFactory(mockProvider), pluginFactory(mockProvider), 'The plugin factory provides a different object on each call');
+        assert.notStrictEqual(
+            pluginFactory(mockProvider),
+            pluginFactory(mockProvider),
+            'The plugin factory provides a different object on each call'
+        );
     });
 
     QUnit.test('provider format', function(assert) {
         assert.expect(4);
 
-        assert.throws(function() {
-            pluginFactory();
-        }, TypeError, 'A provider should be an object');
+        assert.throws(
+            function() {
+                pluginFactory();
+            },
+            TypeError,
+            'A provider should be an object'
+        );
 
-        assert.throws(function() {
-            pluginFactory({});
-        }, TypeError, 'A plugin provider should have a name');
+        assert.throws(
+            function() {
+                pluginFactory({});
+            },
+            TypeError,
+            'A plugin provider should have a name'
+        );
 
-        assert.throws(function() {
-            pluginFactory({name: ''});
-        }, TypeError, 'A plugin provider should have a valid name');
+        assert.throws(
+            function() {
+                pluginFactory({ name: '' });
+            },
+            TypeError,
+            'A plugin provider should have a valid name'
+        );
 
-        assert.throws(function() {
-            pluginFactory({name: 'foo'});
-        }, TypeError, 'A plugin provider should have a init function');
+        assert.throws(
+            function() {
+                pluginFactory({ name: 'foo' });
+            },
+            TypeError,
+            'A plugin provider should have a init function'
+        );
 
         pluginFactory({
             name: 'foo',
@@ -80,20 +100,36 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
 
         var myPlugin = pluginFactory(mockProvider, defaultConfig);
 
-        assert.throws(function() {
-            myPlugin();
-        }, TypeError, 'A plugin is instanciated with an host');
+        assert.throws(
+            function() {
+                myPlugin();
+            },
+            TypeError,
+            'A plugin is instanciated with an host'
+        );
 
-        assert.throws(function() {
-            myPlugin({});
-        }, TypeError, 'A plugin is instanciated with an eventified host');
+        assert.throws(
+            function() {
+                myPlugin({});
+            },
+            TypeError,
+            'A plugin is instanciated with an eventified host'
+        );
 
         assert.equal(typeof myPlugin(mockHost), 'object', 'My plugin factory produce a plugin instance object');
-        assert.notStrictEqual(myPlugin(mockHost), myPlugin(mockHost), 'My plugin factory provides different object on each call');
+        assert.notStrictEqual(
+            myPlugin(mockHost),
+            myPlugin(mockHost),
+            'My plugin factory provides different object on each call'
+        );
 
         var plugin = myPlugin(mockHost);
         assert.equal(typeof plugin.init, 'function', 'The plugin instance has also the default function init');
-        assert.equal(typeof plugin.getAreaBroker, 'function', 'The plugin instance has also the default function getAreaBroker');
+        assert.equal(
+            typeof plugin.getAreaBroker,
+            'function',
+            'The plugin instance has also the default function getAreaBroker'
+        );
         assert.equal(typeof plugin.finish, 'function', 'The plugin instance has also the default function finish');
         assert.equal(typeof plugin.render, 'function', 'The plugin instance has also the default function render');
         assert.equal(typeof plugin.destroy, 'function', 'The plugin instance has also the default function destroy');
@@ -103,12 +139,28 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
         assert.equal(typeof plugin.disable, 'function', 'The plugin instance has also the default function disable');
         assert.equal(typeof plugin.setState, 'function', 'The plugin instance has also the default function setState');
         assert.equal(typeof plugin.getState, 'function', 'The plugin instance has also the default function getState');
-        assert.equal(typeof plugin.getConfig, 'function', 'The plugin instance has also the default function getConfig');
-        assert.equal(typeof plugin.setConfig, 'function', 'The plugin instance has also the default function setConfig');
+        assert.equal(
+            typeof plugin.getConfig,
+            'function',
+            'The plugin instance has also the default function getConfig'
+        );
+        assert.equal(
+            typeof plugin.setConfig,
+            'function',
+            'The plugin instance has also the default function setConfig'
+        );
         assert.equal(typeof plugin.getName, 'function', 'The plugin instance has also the default function getName');
         assert.equal(typeof plugin.getHost, 'function', 'The plugin instance has also the default function getHost');
-        assert.equal(typeof plugin.getContent, 'function', 'The plugin instance has also the default function getContent');
-        assert.equal(typeof plugin.setContent, 'function', 'The plugin instance has also the default function setContent');
+        assert.equal(
+            typeof plugin.getContent,
+            'function',
+            'The plugin instance has also the default function getContent'
+        );
+        assert.equal(
+            typeof plugin.setContent,
+            'function',
+            'The plugin instance has also the default function setContent'
+        );
     });
 
     QUnit.test('config', function(assert) {
@@ -116,7 +168,7 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
 
         var myPlugin = pluginFactory(mockProvider, defaultConfig);
         var myAreaBroker = {};
-        var instanceConfig = {c: 'c'};
+        var instanceConfig = { c: 'c' };
         var plugin = myPlugin(mockHost, myAreaBroker, instanceConfig);
 
         assert.equal(typeof plugin, 'object', 'My plugin factory produce a plugin instance object');
@@ -207,9 +259,13 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
 
         var instance1 = myPlugin(mockHost);
 
-        assert.throws(function() {
-            instance1.setState({}, false);
-        }, TypeError, 'The state must have a valid name');
+        assert.throws(
+            function() {
+                instance1.setState({}, false);
+            },
+            TypeError,
+            'The state must have a valid name'
+        );
 
         //Custom state : active
         assert.strictEqual(instance1.getState('active'), false, 'no state set by default');
@@ -221,7 +277,6 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
         //Built-in state init:
         assert.strictEqual(instance1.getState('init'), false, 'init state = false by default');
         instance1.init().then(function() {
-
             assert.strictEqual(instance1.getState('init'), true, 'init state set');
 
             //Built-in visible state
@@ -350,8 +405,8 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
         assert.expect(4);
 
         var name = 'foo-plugin';
-        var content1 = {foo: 'bar'};
-        var content2 = {foo: 'moo'};
+        var content1 = { foo: 'bar' };
+        var content2 = { foo: 'moo' };
 
         var myPlugin = pluginFactory({
             name: name,

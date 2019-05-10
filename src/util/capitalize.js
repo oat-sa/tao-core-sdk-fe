@@ -21,7 +21,6 @@
  *
  * @author dieter <dieter@taotesting.com>
  */
-
 import _ from 'lodash';
 
 /**
@@ -32,21 +31,19 @@ import _ from 'lodash';
  * @returns {*}
  */
 var capitalize = function capitalize(input, allWords) {
-    var ucFirst = function ucFirst(str){
+    var ucFirst = function ucFirst(str) {
         return str.charAt(0).toUpperCase() + str.substr(1);
     };
 
-
-    if(!_.isString(input)) {
+    if (!_.isString(input)) {
         return input;
     }
 
-    if(allWords !== false && input.indexOf(' ') > -1) {
+    if (allWords !== false && input.indexOf(' ') > -1) {
         return _.map(input.split(' '), ucFirst).join(' ');
     }
     return ucFirst(input);
 };
-
 
 /**
  * @exports capitalize

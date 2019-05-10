@@ -21,28 +21,39 @@
 define(['core/middleware'], function(middlewaresHandlerFactory) {
     'use strict';
 
-    var middlewareApi = [
-        {title: 'use'},
-        {title: 'apply'}
-    ];
+    var middlewareApi = [{ title: 'use' }, { title: 'apply' }];
 
     QUnit.module('middlewaresHandler');
 
     QUnit.test('module', function(assert) {
         assert.expect(3);
 
-        assert.equal(typeof middlewaresHandlerFactory, 'function', 'The middlewaresHandlerFactory module exposes a function');
-        assert.equal(typeof middlewaresHandlerFactory(), 'object', 'The middlewaresHandlerFactory factory produces an object');
-        assert.notStrictEqual(middlewaresHandlerFactory(), middlewaresHandlerFactory(), 'The middlewaresHandlerFactory factory provides a different object on each call');
+        assert.equal(
+            typeof middlewaresHandlerFactory,
+            'function',
+            'The middlewaresHandlerFactory module exposes a function'
+        );
+        assert.equal(
+            typeof middlewaresHandlerFactory(),
+            'object',
+            'The middlewaresHandlerFactory factory produces an object'
+        );
+        assert.notStrictEqual(
+            middlewaresHandlerFactory(),
+            middlewaresHandlerFactory(),
+            'The middlewaresHandlerFactory factory provides a different object on each call'
+        );
     });
 
-    QUnit
-        .cases.init(middlewareApi)
-        .test('instance API ', function(data, assert) {
-            var instance = middlewaresHandlerFactory();
-            assert.expect(1);
-            assert.equal(typeof instance[data.title], 'function', 'The middlewaresHandlerFactory instance exposes a "' + data.title + '" function');
-        });
+    QUnit.cases.init(middlewareApi).test('instance API ', function(data, assert) {
+        var instance = middlewaresHandlerFactory();
+        assert.expect(1);
+        assert.equal(
+            typeof instance[data.title],
+            'function',
+            'The middlewaresHandlerFactory instance exposes a "' + data.title + '" function'
+        );
+    });
 
     QUnit.test('middlewares.apply() #success', function(assert) {
         var ready = assert.async();

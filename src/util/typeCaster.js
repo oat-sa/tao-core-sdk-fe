@@ -15,7 +15,6 @@
  *
  * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA;
  */
-
 import _ from 'lodash';
 
 export default {
@@ -27,12 +26,10 @@ export default {
      * @returns {Boolean} true if value === "true", defaultValue if set, false if defaultValue not set
      */
     strToBool: function strToBool(value, defaultValue) {
-        if(_.isBoolean(value)) {
+        if (_.isBoolean(value)) {
             return value;
-
         } else if (_.isString(value)) {
-            return value.toLowerCase() === "true";
-
+            return value.toLowerCase() === 'true';
         } else {
             return defaultValue || false;
         }

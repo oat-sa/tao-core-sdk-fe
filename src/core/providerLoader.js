@@ -22,10 +22,8 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import moduleLoaderFactory from 'core/moduleLoader';
-    
 
 /**
  * Checks a provider object
@@ -33,10 +31,12 @@ import moduleLoaderFactory from 'core/moduleLoader';
  * @returns {Boolean}
  */
 function validateProvider(provider) {
-    return _.isPlainObject(provider) &&
+    return (
+        _.isPlainObject(provider) &&
         _.isFunction(provider.init) &&
         _.isString(provider.name) &&
-        !_.isEmpty(provider.name);
+        !_.isEmpty(provider.name)
+    );
 }
 
 /**
@@ -57,4 +57,4 @@ export default function providerLoader(requiredProviders) {
             return this.getModules(category);
         }
     });
-};
+}

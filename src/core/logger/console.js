@@ -22,19 +22,18 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 
 var config = {
     level: 'info'
 };
 var mapping = {
-    trace : 'debug',
-    debug : 'debug',
-    info  : 'info',
-    warn  : 'warn',
-    error : 'error',
-    fatal : 'error'
+    trace: 'debug',
+    debug: 'debug',
+    info: 'info',
+    warn: 'warn',
+    error: 'error',
+    fatal: 'error'
 };
 
 /**
@@ -42,20 +41,20 @@ var mapping = {
  * @returns {logger} the logger
  */
 export default {
-    setConfig : function setConfig(newConfig){
+    setConfig: function setConfig(newConfig) {
         config = _.defaults(newConfig || {}, config);
     },
-    log : function log(record){
+    log: function log(record) {
         var level = record.level;
         if (this.checkMinLevel(config.level, level)) {
-            if(_.isFunction(window.console[mapping[level]])){
-                if(record.err){
+            if (_.isFunction(window.console[mapping[level]])) {
+                if (record.err) {
                     window.console[mapping[level]].call(window.console, record.name, record.msg, record.err, record);
                 } else {
                     window.console[mapping[level]].call(window.console, record.name, record.msg, record);
                 }
             } else {
-                window.console.log('['+ level.toUpperCase() + ']', record.name, record.msg, record);
+                window.console.log('[' + level.toUpperCase() + ']', record.name, record.msg, record);
             }
         }
     }

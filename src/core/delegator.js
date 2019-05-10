@@ -18,9 +18,8 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-
 import _ from 'lodash';
-    
+
 var defaults = {
     name: 'provided',
     eventifier: true

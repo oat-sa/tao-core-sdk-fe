@@ -18,7 +18,6 @@
 /**
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import $ from 'jquery';
 import _ from 'lodash';
 import categories from 'core/mimetype/categories.json';
@@ -29,7 +28,6 @@ import extensions from 'core/mimetype/extensions.json';
  * @exports core/mimetype
  */
 var mimetypeHelper = {
-
     /**
      * Gets the MIME type of a resource.
      *
@@ -42,7 +40,7 @@ var mimetypeHelper = {
      */
     getResourceType: function getResourceType(url, callback) {
         $.ajax({
-            type: "HEAD",
+            type: 'HEAD',
             async: true,
             url: url,
             success: function onSuccess(message, text, jqXHR) {
@@ -114,8 +112,7 @@ var mimetypeHelper = {
 
         var starType = checkType.replace(/\/.*$/, '/*');
 
-        return _.contains(validTypes, checkType) ||
-                _.contains(validTypes, starType);
+        return _.contains(validTypes, checkType) || _.contains(validTypes, starType);
     },
 
     /**
@@ -156,7 +153,6 @@ var mimetypeHelper = {
         }
         return type;
     }
-
 };
 
 /**

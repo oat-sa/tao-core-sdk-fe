@@ -22,13 +22,12 @@
  *
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-
 import _ from 'lodash';
 import $ from 'jquery';
 import url from 'util/url';
 
 var defaultConfig = {
-    url : url.route('log', 'Log', 'tao'),
+    url: url.route('log', 'Log', 'tao'),
     level: 'warning',
     delay: 500 //milliseconds of delay to flush
 };
@@ -61,14 +60,14 @@ function flush() {
  */
 function send(messages) {
     $.ajax({
-        url : config.url,
-        type : 'POST',
-        cache : false,
-        data : {messages : JSON.stringify(messages)},
-        dataType : 'json',
-        global : false,
-        error : function () {
-            _.forEach(flush, function (message) {
+        url: config.url,
+        type: 'POST',
+        cache: false,
+        data: { messages: JSON.stringify(messages) },
+        dataType: 'json',
+        global: false,
+        error: function() {
+            _.forEach(flush, function(message) {
                 push(message);
             });
         }
@@ -81,7 +80,7 @@ debouncedFlush = _.debounce(flush, defaultConfig.delay);
  * @returns {logger} the logger
  */
 export default {
-    setConfig : function setConfig(newConfig){
+    setConfig: function setConfig(newConfig) {
         config = _.defaults(newConfig || {}, defaultConfig);
         if (_.isArray(config.url)) {
             config.url = url.route.apply(url, config.url);
@@ -92,7 +91,7 @@ export default {
      * log message
      * @param {Object} record - See core/logger/api::log() method
      */
-    log : function log(message) {
+    log: function log(message) {
         if (this.checkMinLevel(config.level, message.level)) {
             push(message);
             debouncedFlush();

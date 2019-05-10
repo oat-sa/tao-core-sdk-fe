@@ -39,7 +39,11 @@ define(['core/store', 'core/cachedStore'], function(store, cachedStore) {
             assert.equal(typeof storage1, 'object', 'An instance of the cachedStore accessor has been created');
 
             cachedStore(name).then(function(storage2) {
-                assert.equal(typeof storage2, 'object', 'Another instance of the cachedStore accessor has been created');
+                assert.equal(
+                    typeof storage2,
+                    'object',
+                    'Another instance of the cachedStore accessor has been created'
+                );
                 assert.notEqual(storage1, storage2, 'The factory creates a new instance on each build');
 
                 ready();
@@ -113,14 +117,22 @@ define(['core/store', 'core/cachedStore'], function(store, cachedStore) {
                 assert.ok(true, 'The value has been set');
 
                 cachedStore(name).then(function(storage2) {
-                    assert.equal(typeof storage2, 'object', 'Another instance of the cachedStore accessor has been created');
+                    assert.equal(
+                        typeof storage2,
+                        'object',
+                        'Another instance of the cachedStore accessor has been created'
+                    );
 
                     var value = storage2.getItem(expectedName);
                     assert.equal(value, expectedValue, 'The got value is correct');
 
                     storage2.removeStore().then(function() {
                         cachedStore(name).then(function(storage3) {
-                            assert.equal(typeof storage3, 'object', 'Another instance of the cachedStore accessor has been created');
+                            assert.equal(
+                                typeof storage3,
+                                'object',
+                                'Another instance of the cachedStore accessor has been created'
+                            );
 
                             var value = storage3.getItem(expectedName);
                             assert.equal(typeof value, 'undefined', 'The got value is correct');
@@ -132,5 +144,4 @@ define(['core/store', 'core/cachedStore'], function(store, cachedStore) {
             });
         });
     });
-
 });

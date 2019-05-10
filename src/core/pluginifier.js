@@ -3,18 +3,19 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
  * of the License (non-upgradable).
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * Copyright (c) 2013-2019 (original work) Open Assessment Technologies SA ;
  */
+
 /**
  * Used to register jquery plugins
  *
@@ -25,15 +26,13 @@
  * @requires jquery
  * @requires lodash
  */
-
 import $ from 'jquery';
 import _ from 'lodash';
 
 /**
-* Abstract plugin used to provide common behavior to the plugins
-*/
+ * Abstract plugin used to provide common behavior to the plugins
+ */
 var basePlugin = {
-
     /**
      * Set options of the plugin
      *
@@ -42,65 +41,62 @@ var basePlugin = {
      * @param  {String} ns - the event namespace
      * @param  {Object} options - the options to set
      */
-    options : function(dataNs, ns, options){
-        return this.each(function(){
+    options: function(dataNs, ns, options) {
+        return this.each(function() {
             var $elt = $(this);
             var currentOptions = $elt.data(dataNs);
-            if(currentOptions){
+            if (currentOptions) {
                 $elt.data(dataNs, _.merge(currentOptions, options));
             }
         });
     },
 
     /**
-    * Disable the component.
-    *
-    * It can be called prior to the plugin initilization.
-    *
-    * Called the jQuery way once registered by the Pluginifier.
-    * @example $('selector').pluginName('disable');
-    * @param  {String} dataNs - the data namespace
-    * @param  {String} ns - the event namespace
-    * @fires  basePlugin#disable.ns
-    */
-    disable : function(dataNs, ns){
-        return this.each(function(){
+     * Disable the component.
+     *
+     * It can be called prior to the plugin initilization.
+     *
+     * Called the jQuery way once registered by the Pluginifier.
+     * @example $('selector').pluginName('disable');
+     * @param  {String} dataNs - the data namespace
+     * @param  {String} ns - the event namespace
+     * @fires  basePlugin#disable.ns
+     */
+    disable: function(dataNs, ns) {
+        return this.each(function() {
             var $elt = $(this);
             var options = $elt.data(dataNs);
-            if(options){
-                $elt.addClass(options.disableClass || 'disabled')
-                    .trigger('disable.'+ ns);
+            if (options) {
+                $elt.addClass(options.disableClass || 'disabled').trigger('disable.' + ns);
             }
         });
     },
 
     /**
-    * Enable the component.
-    *
-    * Called the jQuery way once registered by the Pluginifier.
-    * @example $('selector').pluginName('enable');
-    * @param  {String} dataNs - the data namespace
-    * @param  {String} ns - the event namespace
-    * @fires  basePlugin#enable.ns
-    */
-    enable : function(dataNs, ns){
-        return this.each(function(){
+     * Enable the component.
+     *
+     * Called the jQuery way once registered by the Pluginifier.
+     * @example $('selector').pluginName('enable');
+     * @param  {String} dataNs - the data namespace
+     * @param  {String} ns - the event namespace
+     * @fires  basePlugin#enable.ns
+     */
+    enable: function(dataNs, ns) {
+        return this.each(function() {
             var $elt = $(this);
             var options = $elt.data(dataNs);
-            if(options){
-                $elt.removeClass(options.disableClass || 'disabled')
-                    .trigger('enable.'+ ns);
+            if (options) {
+                $elt.removeClass(options.disableClass || 'disabled').trigger('enable.' + ns);
             }
         });
-    },
+    }
 };
 
 /**
-* Helps you to create a jQuery plugin, the Cards way
-* @exports core/pluginifer
-*/
+ * Helps you to create a jQuery plugin, the Cards way
+ * @exports core/pluginifer
+ */
 var Pluginifier = {
-
     /**
      * Regsiter a new jQuery plugin, the Cards way
      * @param {string} pluginName - the name of the plugin to regsiter. ie $('selector').pluginName();
@@ -111,43 +107,46 @@ var Pluginifier = {
      * @param {String} [config.dataNs = ui.pluginName] - plugin namespace (used for events and data-attr)
      * @param {Array<String>} [config.expose] - list of methods to expose
      */
-    register : function(pluginName, plugin, config){
-        config      = config  || {};
-        var ns      = config.ns || pluginName.toLowerCase();
-        var dataNs  = config.dataNs || 'ui.' + ns;
-        var expose  = config.expose || [];
+    register: function(pluginName, plugin, config) {
+        config = config || {};
+        var ns = config.ns || pluginName.toLowerCase();
+        var dataNs = config.dataNs || 'ui.' + ns;
+        var expose = config.expose || [];
 
         //checks
-        if(_.isFunction($.fn[pluginName])){
+        if (_.isFunction($.fn[pluginName])) {
             return $.error('A plugin named ' + pluginName + ' is already registered');
         }
-        if(!_.isPlainObject(plugin) || !_.isFunction(plugin.init)){
+        if (!_.isPlainObject(plugin) || !_.isFunction(plugin.init)) {
             return $.error('The object to register as a jQuery plugin must be a plain object with an `init` method.');
         }
 
         //configure and augments the plugin
-        _.assign(plugin, _.transform(basePlugin, function(result, prop, key){
-            if(_.isFunction(prop)){
-                result[key] = _.partial(basePlugin[key], dataNs, ns);
-            }
-        }));
+        _.assign(
+            plugin,
+            _.transform(basePlugin, function(result, prop, key) {
+                if (_.isFunction(prop)) {
+                    result[key] = _.partial(basePlugin[key], dataNs, ns);
+                }
+            })
+        );
 
         //set up public methods to wrap privates the jquery way
-        _.forEach(expose, function(toExposeName){
+        _.forEach(expose, function(toExposeName) {
             var privateMethod = toExposeName;
-            var publicMethod  = toExposeName;
-            if(!/^_/.test(expose)){
+            var publicMethod = toExposeName;
+            if (!/^_/.test(expose)) {
                 privateMethod = '_' + privateMethod;
             } else {
                 publicMethod = publicMethod.replace(/^_/, '');
             }
 
             //do not override if exists
-            if(_.isFunction(plugin[privateMethod]) && !_.isFunction(plugin[publicMethod])){
-                plugin[publicMethod] = function(){
+            if (_.isFunction(plugin[privateMethod]) && !_.isFunction(plugin[publicMethod])) {
+                plugin[publicMethod] = function() {
                     var returnValue;
                     var args = Array.prototype.slice.call(arguments, 0);
-                    this.each(function(){
+                    this.each(function() {
                         //call plugin._method($element, [remainingArgs...]);
                         returnValue = plugin[privateMethod].apply(plugin, [$(this)].concat(args));
                     });
@@ -159,17 +158,17 @@ var Pluginifier = {
         // map $('selector').pluginName() to plugin.init
         // map $('selector').pluginName('method', params) to plugin.method(params) to plugin._method($elt, params);
         // disable direct call to private (starting with _) methods
-        $.fn[pluginName] = function(method){
-            if(plugin[method]){
-                    if(/^_/.test(method)){
-                        $.error( 'Trying to call a private method `' + method + '`' );
-                    } else {
-                        return plugin[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
-                    }
-            } else if ( typeof method === 'object' || ! method) {
-                    return plugin.init.apply( this, arguments );
+        $.fn[pluginName] = function(method) {
+            if (plugin[method]) {
+                if (/^_/.test(method)) {
+                    $.error('Trying to call a private method `' + method + '`');
+                } else {
+                    return plugin[method].apply(this, Array.prototype.slice.call(arguments, 1));
+                }
+            } else if (typeof method === 'object' || !method) {
+                return plugin.init.apply(this, arguments);
             }
-            $.error( 'Method ' + method + ' does not exist on plugin' );
+            $.error('Method ' + method + ' does not exist on plugin');
         };
     }
 };

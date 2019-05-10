@@ -33,7 +33,6 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import format from 'core/format';
 import Promise from 'core/promise';
@@ -44,12 +43,12 @@ import Promise from 'core/promise';
 var defaultLevel = 'info';
 
 var levels = {
-    fatal : 60, // The service/app is going to stop or become unusable now. An operator should definitely look into this soon.
-    error : 50, // Fatal for a particular request, but the service/app continues servicing other requests. An operator should look at this soon(ish).
-    warn  : 40, // A note on something that should probably be looked at by an operator eventually.
-    info  : 30, // Detail on regular operation.
-    debug : 20, // Anything else, i.e. too verbose to be included in "info" level.
-    trace : 10  // Logging from external libraries used by your app or very detailed application logging.
+    fatal: 60, // The service/app is going to stop or become unusable now. An operator should definitely look into this soon.
+    error: 50, // Fatal for a particular request, but the service/app continues servicing other requests. An operator should look at this soon(ish).
+    warn: 40, // A note on something that should probably be looked at by an operator eventually.
+    info: 30, // Detail on regular operation.
+    debug: 20, // Anything else, i.e. too verbose to be included in "info" level.
+    trace: 10 // Logging from external libraries used by your app or very detailed application logging.
 };
 
 /**
@@ -68,14 +67,16 @@ var logQueue = [];
  * @param {String|Number} [level] - the level
  * @returns {String} the level
  */
-var getLevel = function getLevel(level){
-    if(typeof level === 'undefined' || (_.isString(level) && !_.has(levels, level)) ){
+var getLevel = function getLevel(level) {
+    if (typeof level === 'undefined' || (_.isString(level) && !_.has(levels, level))) {
         return defaultLevel;
     }
-    if(_.isNumber(level)){
-        return _.findKey(levels, function(l){
-            return l === level;
-        }) || defaultLevel;
+    if (_.isNumber(level)) {
+        return (
+            _.findKey(levels, function(l) {
+                return l === level;
+            }) || defaultLevel
+        );
     }
     return level;
 };
@@ -86,11 +87,11 @@ var getLevel = function getLevel(level){
  * @param {String|Number} [level] - the level
  * @returns {Number} the level
  */
-var getLevelNum = function getLevelNum(level){
-    if(_.isString(level) && _.has(levels, level)){
+var getLevelNum = function getLevelNum(level) {
+    if (_.isString(level) && _.has(levels, level)) {
         return levels[level];
     }
-    if(_.isNumber(level) && _.contains(levels, level)){
+    if (_.isNumber(level) && _.contains(levels, level)) {
         return level;
     }
     return levels[defaultLevel];
@@ -115,24 +116,23 @@ var checkMinLevel = function checkMinLevel(minLevel, level) {
  *
  * @returns {logger} a new logger instance
  */
-var loggerFactory = function loggerFactory(name, minLevel, fields){
-
+var loggerFactory = function loggerFactory(name, minLevel, fields) {
     var baseRecord;
     var logger;
 
-    if(!_.isString(name) || _.isEmpty(name)){
+    if (!_.isString(name) || _.isEmpty(name)) {
         throw new TypeError('A logger needs a name');
     }
 
-    if(_.isPlainObject(minLevel) && typeof field === 'undefined'){
+    if (_.isPlainObject(minLevel) && typeof field === 'undefined') {
         fields = minLevel;
         minLevel = defaultLevel;
     }
 
     baseRecord = _.defaults(fields || {}, {
-        name     : name,
-        pid      : 1,    // only for compat
-        hostname : navigator.userAgent
+        name: name,
+        pid: 1, // only for compat
+        hostname: navigator.userAgent
     });
 
     /**
@@ -141,8 +141,6 @@ var loggerFactory = function loggerFactory(name, minLevel, fields){
      * @typedef logger
      */
     logger = {
-
-
         /**
          * Log messages by delegating to the provider
          *
@@ -152,19 +150,18 @@ var loggerFactory = function loggerFactory(name, minLevel, fields){
          * @param {...String} [rest] - rest parameters if the message is formatted
          * @returns {logger} chains
          */
-        log : function log(level, recordFields, message){
-
+        log: function log(level, recordFields, message) {
             var record;
             var err;
             var rest = [];
             var time = new Date().toISOString();
 
             //without providers or not the level, we don't log.
-            if(loggerFactory.providers === false || !checkMinLevel(minLevel || defaultLevel, level)){
+            if (loggerFactory.providers === false || !checkMinLevel(minLevel || defaultLevel, level)) {
                 return;
             }
 
-            if(_.isString(recordFields) || recordFields instanceof Error){
+            if (_.isString(recordFields) || recordFields instanceof Error) {
                 message = recordFields;
                 recordFields = {};
                 rest = [].slice.call(arguments, 2);
@@ -173,12 +170,12 @@ var loggerFactory = function loggerFactory(name, minLevel, fields){
             }
 
             record = {
-                level : getLevel(level),
-                v     : bunyanVersion,
-                time  : time
+                level: getLevel(level),
+                v: bunyanVersion,
+                time: time
             };
 
-            if(checkMinLevel(levels.error, level) || message instanceof Error){
+            if (checkMinLevel(levels.error, level) || message instanceof Error) {
                 if (message instanceof Error) {
                     err = message;
                 } else {
@@ -188,7 +185,6 @@ var loggerFactory = function loggerFactory(name, minLevel, fields){
 
                 record.msg = err.message;
                 record.err = err;
-
             } else {
                 record.msg = format.apply(null, [message].concat(rest));
             }
@@ -207,8 +203,8 @@ var loggerFactory = function loggerFactory(name, minLevel, fields){
          * @param {String|Number} [level] - set the default level
          * @returns {String|logger} the default level as a getter or chains as a setter
          */
-        level : function(value){
-            if(typeof value !== 'undefined'){
+        level: function(value) {
+            if (typeof value !== 'undefined') {
                 //update the partial function
                 minLevel = getLevelNum(value);
                 return this;
@@ -223,16 +219,20 @@ var loggerFactory = function loggerFactory(name, minLevel, fields){
          * @param {Object} [childFields] - specialized child fields
          * @return {logger} the child logger
          */
-        child : function child(childFields){
+        child: function child(childFields) {
             return loggerFactory(name, minLevel, _.defaults(childFields, baseRecord));
         }
     };
 
     //augment the logger by each level
-    return _.reduce(levels, function reduceLogLevel(target, level, levelName){
-        target[levelName] = _.partial(logger.log, level);
-        return target;
-    }, logger);
+    return _.reduce(
+        levels,
+        function reduceLogLevel(target, level, levelName) {
+            target[levelName] = _.partial(logger.log, level);
+            return target;
+        },
+        logger
+    );
 };
 
 /**
@@ -252,22 +252,22 @@ loggerFactory.providers = false;
  * @param {Object} providerConfigs - provider's modules to load and register
  * @returns {Promise} resolves once modules are registered
  */
-loggerFactory.load = function load(providerConfigs){
+loggerFactory.load = function load(providerConfigs) {
     var self = this;
     var modules = [];
     this.providers = [];
 
-    return new Promise( function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         //we can load the loggers dynamically
-        _.forEach(providerConfigs, function (providerConfig, providerName) {
+        _.forEach(providerConfigs, function(providerConfig, providerName) {
             modules.push(providerName);
         });
-        require(modules, function(){
+        require(modules, function() {
             var loadedProviders = [].slice.call(arguments);
-            _.forEach(loadedProviders, function (provider, moduleKey){
+            _.forEach(loadedProviders, function(provider, moduleKey) {
                 try {
                     self.register(provider, providerConfigs[modules[moduleKey]]);
-                } catch(err){
+                } catch (err) {
                     reject(err);
                 }
             });
@@ -276,7 +276,6 @@ loggerFactory.load = function load(providerConfigs){
             self.flush();
 
             resolve();
-
         }, reject);
     });
 };
@@ -288,8 +287,8 @@ loggerFactory.load = function load(providerConfigs){
  * @param {Object} providerConfig - provider's config
  * @throws TypeError
  */
-loggerFactory.register = function register(provider, providerConfig){
-    if(!_.isPlainObject(provider) || !_.isFunction(provider.log)){
+loggerFactory.register = function register(provider, providerConfig) {
+    if (!_.isPlainObject(provider) || !_.isFunction(provider.log)) {
         throw new TypeError('A log provider is an object with a log method');
     }
     //propogate checkMinLevel function
@@ -301,15 +300,14 @@ loggerFactory.register = function register(provider, providerConfig){
     this.providers.push(provider);
 };
 
-
 /**
  * Flush the messages queue into the providers
  */
-loggerFactory.flush = function flush(){
-    if(_.isArray(this.providers) && this.providers.length > 0){
-        _.forEach(logQueue, function(message){
+loggerFactory.flush = function flush() {
+    if (_.isArray(this.providers) && this.providers.length > 0) {
+        _.forEach(logQueue, function(message) {
             //forward to the providers
-            _.forEach(loggerFactory.providers, function(provider){
+            _.forEach(loggerFactory.providers, function(provider) {
                 provider.log.call(provider, message);
             });
         });
@@ -323,7 +321,7 @@ loggerFactory.flush = function flush(){
  * @param {String|Number} [level] - set the default level
  * @returns {String} the defined level
  */
-loggerFactory.setDefaultLevel = function setDefaultLevel(level){
+loggerFactory.setDefaultLevel = function setDefaultLevel(level) {
     defaultLevel = getLevel(level);
     return defaultLevel;
 };

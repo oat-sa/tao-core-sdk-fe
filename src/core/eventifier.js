@@ -85,7 +85,6 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-
 import _ from 'lodash';
 import Promise from 'core/promise';
 import uuid from 'lib/uuid';
@@ -111,11 +110,14 @@ var eventifierLogger = loggerFactory('core/eventifier');
  * @param {String} eventNames - the event strings
  * @returns {String[]} the event list (no empty, no duplicate)
  */
-function getEventNames(eventNames){
-    if(!_.isString(eventNames) || _.isEmpty(eventNames)){
+function getEventNames(eventNames) {
+    if (!_.isString(eventNames) || _.isEmpty(eventNames)) {
         return [];
     }
-    return _(eventNames.split(/\s/g)).compact().uniq().value();
+    return _(eventNames.split(/\s/g))
+        .compact()
+        .uniq()
+        .value();
 }
 
 /**
@@ -123,8 +125,8 @@ function getEventNames(eventNames){
  * @param {String} eventName - the name of the event
  * @returns {String} the name part
  */
-function getName(eventName){
-    if(eventName.indexOf('.') > -1){
+function getName(eventName) {
+    if (eventName.indexOf('.') > -1) {
         return eventName.substr(0, eventName.indexOf('.'));
     }
     return eventName;
@@ -135,8 +137,8 @@ function getName(eventName){
  * @param {String} eventName - the name of the event
  * @returns {String} the namespace, that defaults to defaultNs
  */
-function getNamespace(eventName){
-    if(eventName.indexOf('.') > -1){
+function getNamespace(eventName) {
+    if (eventName.indexOf('.') > -1) {
         return eventName.substr(eventName.indexOf('.') + 1);
     }
     return defaultNs;
@@ -146,27 +148,26 @@ function getNamespace(eventName){
  * Creates a new EventHandler object structure
  * @returns {Object} the handler structure
  */
-function getHandlerObject(){
+function getHandlerObject() {
     return {
-        before : [],
+        before: [],
         between: [],
-        after  : []
+        after: []
     };
 }
-
 
 /**
  * Makes the target an event emitter by delegating calls to the event API.
  * @param {Object} [target = {}] - the target object, a new plain object is created when omited.
  * @returns {Object} the target for conveniance
  */
-function eventifier(target){
+function eventifier(target) {
     var targetName;
     var logger;
     var stoppedEvents;
 
     //it stores all the handlers under ns/name/[handlers]
-    var eventHandlers  = {};
+    var eventHandlers = {};
 
     /**
      * Get the handlers for an event type
@@ -174,7 +175,7 @@ function eventifier(target){
      * @param {String} [type = 'between'] - the type of event in before, between and after
      * @returns {Function[]} the handlers
      */
-    var getHandlers = function getHandlers(eventName, type){
+    var getHandlers = function getHandlers(eventName, type) {
         var name = getName(eventName);
         var ns = getNamespace(eventName);
 
@@ -188,7 +189,6 @@ function eventifier(target){
      * The API itself is just a placeholder, all methods will be delegated to a target.
      */
     var eventApi = {
-
         /**
          * Attach an handler to an event.
          * Calling `on` with the same eventName multiple times add callbacks: they
@@ -201,9 +201,9 @@ function eventifier(target){
          * @param {Function} handler - the callback to run once the event is triggered
          * @returns {Object} the target object
          */
-        on : function on(eventNames, handler){
-            if(_.isFunction(handler)){
-                _.forEach(getEventNames(eventNames), function(eventName){
+        on: function on(eventNames, handler) {
+            if (_.isFunction(handler)) {
+                _.forEach(getEventNames(eventNames), function(eventName) {
                     getHandlers(eventName).push(handler);
                 });
             }
@@ -229,15 +229,13 @@ function eventifier(target){
          * @param {String} eventNames - the name of the event, or multiple events separated by a space
          * @returns {Object} the target object
          */
-        off : function off(eventNames){
-
-            _.forEach(getEventNames(eventNames), function(eventName){
-
+        off: function off(eventNames) {
+            _.forEach(getEventNames(eventNames), function(eventName) {
                 var name = getName(eventName);
                 var ns = getNamespace(eventName);
                 var offNamespaces;
 
-                if(ns && !name){
+                if (ns && !name) {
                     if (ns === globalNs) {
                         offNamespaces = {};
                         offNamespaces[defaultNs] = eventHandlers[defaultNs];
@@ -247,8 +245,8 @@ function eventifier(target){
                         eventHandlers[ns] = {};
                     }
                 } else {
-                    _.forEach(eventHandlers, function(nsHandlers, namespace){
-                        if(nsHandlers[name] && (ns === defaultNs || ns === namespace)){
+                    _.forEach(eventHandlers, function(nsHandlers, namespace) {
+                        if (nsHandlers[name] && (ns === defaultNs || ns === namespace)) {
                             nsHandlers[name] = getHandlerObject();
                         }
                     });
@@ -266,9 +264,9 @@ function eventifier(target){
          * @this the target
          * @returns {Object} the target object
          */
-        removeAllListeners : function removeAllListeners(){
+        removeAllListeners: function removeAllListeners() {
             // full erase
-            eventHandlers  = {};
+            eventHandlers = {};
             return this;
         },
 
@@ -281,31 +279,31 @@ function eventifier(target){
          * @param {String} eventNames - the name of the event to trigger, or multiple events separated by a space
          * @returns {Object} the target object
          */
-        trigger : function trigger(eventNames){
+        trigger: function trigger(eventNames) {
             var self = this;
             var args = [].slice.call(arguments, 1);
 
             stoppedEvents = {};
 
-            _.forEach(getEventNames(eventNames), function(eventName){
+            _.forEach(getEventNames(eventNames), function(eventName) {
                 var ns = getNamespace(eventName);
                 var name = getName(eventName);
 
                 //check which ns needs to be executed and then merge the handlers to be executed
                 var mergedHandlers = _(eventHandlers)
-                    .filter(function(nsHandlers, namespace){
+                    .filter(function(nsHandlers, namespace) {
                         return nsHandlers[name] && (ns === defaultNs || ns === namespace || namespace === globalNs);
                     })
-                    .reduce(function(acc, nsHandlers){
-                        acc.before  = acc.before.concat(nsHandlers[name].before);
+                    .reduce(function(acc, nsHandlers) {
+                        acc.before = acc.before.concat(nsHandlers[name].before);
                         acc.between = acc.between.concat(nsHandlers[name].between);
-                        acc.after   = acc.after.concat(nsHandlers[name].after);
+                        acc.after = acc.after.concat(nsHandlers[name].after);
                         return acc;
                     }, getHandlerObject());
 
-                logger.trace({event : eventName, args : args}, 'trigger %s', eventName);
+                logger.trace({ event: eventName, args: args }, 'trigger %s', eventName);
 
-                if(mergedHandlers){
+                if (mergedHandlers) {
                     triggerAllHandlers(mergedHandlers, name, ns);
                 }
             });
@@ -325,7 +323,6 @@ function eventifier(target){
                             logHandlerStop('before', event, err);
                         });
                 } else {
-
                     triggerBetween(allHandlers, event);
                 }
             }
@@ -340,8 +337,8 @@ function eventifier(target){
                 pHandlers = handlers.map(function(handler) {
                     // .before() handlers use to return false to cancel the call stack
                     // to maintain backward compatibility, we treat this case as a rejected Promise
-                    var value = (shouldStop(event.name)) ? false : handler.apply(self, beforeArgs);
-                    return (value === false) ? Promise.reject() : value;
+                    var value = shouldStop(event.name) ? false : handler.apply(self, beforeArgs);
+                    return value === false ? Promise.reject() : value;
                 });
 
                 return Promise.all(pHandlers);
@@ -380,14 +377,14 @@ function eventifier(target){
 
             function triggerHandlers(handlers, event) {
                 var pHandlers;
-                pHandlers = handlers.map(function (handler) {
-                    return (shouldStop(event.name)) ? Promise.reject() : handler.apply(self, args);
+                pHandlers = handlers.map(function(handler) {
+                    return shouldStop(event.name) ? Promise.reject() : handler.apply(self, args);
                 });
                 return Promise.all(pHandlers);
             }
 
             function logHandlerStop(stoppedIn, event, err) {
-                if(err instanceof Error){
+                if (err instanceof Error) {
                     logger.error(err);
                 }
                 logger.trace({ err: err, event: event.name, stoppedIn: stoppedIn }, event.name + ' handlers stopped');
@@ -409,9 +406,9 @@ function eventifier(target){
          * @param {Function} handler - the callback to run once the event is triggered
          * @returns {Object} the target object
          */
-        before : function before(eventNames, handler){
-            if(_.isFunction(handler)) {
-                _.forEach(getEventNames(eventNames), function(eventName){
+        before: function before(eventNames, handler) {
+            if (_.isFunction(handler)) {
+                _.forEach(getEventNames(eventNames), function(eventName) {
                     getHandlers(eventName, 'before').push(handler);
                 });
             }
@@ -427,9 +424,9 @@ function eventifier(target){
          * @param {Function} handler - the callback to run once the event is triggered
          * @returns {Object} the target object
          */
-        after : function after(eventNames, handler){
-            if(_.isFunction(handler)) {
-                _.forEach(getEventNames(eventNames), function(eventName){
+        after: function after(eventNames, handler) {
+            if (_.isFunction(handler)) {
+                _.forEach(getEventNames(eventNames), function(eventName) {
                     getHandlers(eventName, 'after').push(handler);
                 });
             }
@@ -447,8 +444,8 @@ function eventifier(target){
          *
          * @param {string} name - of the event to stop
          */
-        stopEvent : function stopEvent(name) {
-            if (_.isString(name) && ! _.isEmpty(name.trim())) {
+        stopEvent: function stopEvent(name) {
+            if (_.isString(name) && !_.isEmpty(name.trim())) {
                 stoppedEvents[name.trim()] = true;
             }
         },
@@ -465,14 +462,14 @@ function eventifier(target){
          * @param {String|String[]} eventNames - the list of events to forward
          * @returns {Object} target - chains
          */
-        spread : function spread(destination, eventNames){
+        spread: function spread(destination, eventNames) {
             var self = this;
-            if(destination && _.isFunction(destination.trigger)){
-                if(_.isString(eventNames)){
+            if (destination && _.isFunction(destination.trigger)) {
+                if (_.isString(eventNames)) {
                     eventNames = getEventNames(eventNames);
                 }
                 _.forEach(eventNames, function(eventName) {
-                    self.on(eventName, function forwardEventTo(){
+                    self.on(eventName, function forwardEventTo() {
                         var args = [eventName].concat([].slice.call(arguments));
 
                         destination.trigger.apply(destination, args);
@@ -489,17 +486,19 @@ function eventifier(target){
     targetName = target.name || target.id || target.serial || uuid(6);
 
     //create a child logger per eventifier
-    logger = eventifierLogger.child({ target : targetName });
+    logger = eventifierLogger.child({ target: targetName });
 
-    _(eventApi).functions().forEach(function(method){
-        if(_.isFunction(target[method])){
-            eventifierLogger.warn('The target object has already a method named ' + method, target);
-        }
-        target[method] = function delegate(){
-            var args =  [].slice.call(arguments);
-            return eventApi[method].apply(target, args);
-        };
-    });
+    _(eventApi)
+        .functions()
+        .forEach(function(method) {
+            if (_.isFunction(target[method])) {
+                eventifierLogger.warn('The target object has already a method named ' + method, target);
+            }
+            target[method] = function delegate() {
+                var args = [].slice.call(arguments);
+                return eventApi[method].apply(target, args);
+            };
+        });
 
     return target;
 }

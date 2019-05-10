@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
+        <meta charset="utf-8" />
         <title>Test - Eventifier</title>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
-            require(['/environment/config.js'], function(){
+            require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
                     require.config({
-                        config : {
-                            'core/logger' : {
-                                level : 10, // trace
-                                loggers : {
-                                    'test/core/logger/testLogger' : {
-                                        'level' : 10
+                        config: {
+                            'core/logger': {
+                                level: 10, // trace
+                                loggers: {
+                                    'test/core/logger/testLogger': {
+                                        level: 10
                                     }
                                 }
                             }
                         }
                     });
                     require(['test/core/eventifier/test'], function() {
-                        QUnit.start();
+                        //moving test execution out of the call stack context
+                        setTimeout(function() {
+                            QUnit.start();
+                        });
                     });
                 });
             });

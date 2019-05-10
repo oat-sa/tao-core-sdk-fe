@@ -15,7 +15,6 @@
  *
  * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
-
 import _ from 'lodash';
 import boolean from 'core/encoder/boolean';
 import number from 'core/encoder/number';
@@ -30,12 +29,12 @@ import entity from 'core/encoder/entity';
  * @param {string} name - the declaration : array(a,b)
  * @returns {array} of extracted args
  */
-var extractArgs = function extractArgs(name){
+var extractArgs = function extractArgs(name) {
     var args = [];
     var matches = [];
-    if(name.indexOf('(') > -1){
+    if (name.indexOf('(') > -1) {
         matches = /\((.+?)\)/.exec(name);
-        if(matches && matches.length >= 1){
+        if (matches && matches.length >= 1) {
             args = matches[1].split(',');
         }
     }
@@ -47,44 +46,44 @@ var extractArgs = function extractArgs(name){
  * @param {string} name - the declaration : foo(a,b)
  * @returns {string} the name
  */
-var extractName = function extractName(name){
-    if(name.indexOf('(') > -1){
+var extractName = function extractName(name) {
+    if (name.indexOf('(') > -1) {
         return name.substr(0, name.indexOf('('));
     }
     return name;
 };
 
 /**
-* Provides multi sources encoding decoding
-* @exports core/encoder/encoders
-*/
-var encoders =  {
-    number : number,
+ * Provides multi sources encoding decoding
+ * @exports core/encoder/encoders
+ */
+var encoders = {
+    number: number,
     float: float,
-    time : time,
-    boolean : boolean,
-    array2str : array2str,
-    str2array : str2array,
-    entity : entity,
+    time: time,
+    boolean: boolean,
+    array2str: array2str,
+    str2array: str2array,
+    entity: entity,
 
-    register : function(name, encode, decode){
-        if(!_.isString(name)){
+    register: function(name, encode, decode) {
+        if (!_.isString(name)) {
             throw new Error('An encoder must have a valid name');
         }
-        if(!_.isFunction(encode)){
+        if (!_.isFunction(encode)) {
             throw new Error('Encode must be a function');
         }
-        if(!_.isFunction(decode)){
+        if (!_.isFunction(decode)) {
             throw new Error('Decode must be a function');
         }
-        this[name] = { encode : encode, decode : decode };
+        this[name] = { encode: encode, decode: decode };
     },
 
-    encode : function(name, value){
+    encode: function(name, value) {
         var encoder, args;
 
         name = extractName(name);
-        if(this[name]){
+        if (this[name]) {
             encoder = this[name];
             args = [value];
             return encoder.encode.apply(encoder, args.concat(extractArgs(name)));
@@ -92,11 +91,11 @@ var encoders =  {
         return value;
     },
 
-    decode : function(name, value){
+    decode: function(name, value) {
         var decoder, args;
 
         name = extractName(name);
-        if(this[name]){
+        if (this[name]) {
             decoder = this[name];
             args = [value];
             return decoder.decode.apply(decoder, args.concat(extractArgs(name)));
