@@ -21,18 +21,22 @@ import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import json from 'rollup-plugin-json';
 import copy from 'rollup-plugin-copy';
-import { uglify } from 'rollup-plugin-uglify';
 
 const { srcDir, outputDir } = require('./path');
 
 const inputs = glob.sync(path.join(srcDir, '!(lib)', '**', '*.js'));
+const inputGlobalNames = inputs.reduce((memo, input) => {
+    const moduleName = path.relative(srcDir, input).replace(/\.js$/, '');
+    return {...memo, [moduleName]: moduleName};
+}, {});
+
 const localExternals = inputs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
 
 const libs = glob.sync(path.join(srcDir, 'lib', '**', '*.js'));
 const libExternals = libs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
 
 export default inputs.map(input => {
-    const name = path.basename(input, '.js');
+    const name = path.relative(srcDir, input).replace(/\.js$/, '');
     const dir = path.dirname(path.relative(srcDir, input));
 
     return {
@@ -40,9 +44,26 @@ export default inputs.map(input => {
         output: {
             dir: path.join(outputDir, dir),
             format: 'umd',
-            name
+            name,
+            globals: {
+                'jquery': '$',
+                'lodash': '_',
+                'context': 'context',
+                'module': 'module',
+                'moment': 'moment',
+                'i18n': '__',
+                'async': 'async',
+                'handlebars': 'handlebars',
+                'lib/uuid': 'lib/uuid',
+                'lib/store/idbstore': 'lib/store/idbstore',
+                'lib/decimal/decimal': 'lib/decimal/decimal',
+                'lib/expr-eval/expr-eval': 'lib/expr-eval/expr-eval',
+                ...inputGlobalNames
+            }
         },
         external: [
+            ...localExternals,
+            ...libExternals,
             'jquery',
             'lodash',
             'handlebars',
@@ -56,10 +77,7 @@ export default inputs.map(input => {
             'lib/store/idbstore',
             'lib/decimal/decimal',
             'lib/expr-eval/expr-eval',
-            'ui/feedback'
-        ]
-            .concat(localExternals)
-            .concat(libExternals),
+        ],
         plugins: [
             alias({
                 resolve: ['.js', '.json'],
@@ -73,8 +91,7 @@ export default inputs.map(input => {
             copy({
                 targets: [path.resolve(srcDir, 'lib')],
                 outputFolder: outputDir
-            }),
-            uglify()
+            })
         ]
     };
 });
