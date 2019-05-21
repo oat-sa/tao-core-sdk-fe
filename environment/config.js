@@ -33,7 +33,7 @@ requirejs.config({
         lib: '/dist/lib',
         util: '/dist/util',
 
-        jquery: '/node_modules/jquery/jquery',
+        jquery: '/node_modules/jquery/dist/jquery',
         lodash: '/node_modules/lodash/lodash',
         moment: '/node_modules/moment/moment',
         handlebars: '/node_modules/handlebars/dist/handlebars.amd',
