@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test - Eventifier</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function() {
+                require(['qunitEnv'], function() {
+                    require.config({
+                        config: {
+                            'core/logger': {
+                                level: 10, // trace
+                                loggers: {
+                                    'test/core/logger/testLogger': {
+                                        level: 10
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    require(['test/core/eventifier/test'], function() {
+                        //moving test execution out of the call stack context
+                        setTimeout(function() {
+                            QUnit.start();
+                        });
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>
