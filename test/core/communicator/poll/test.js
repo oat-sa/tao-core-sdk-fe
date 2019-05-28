@@ -140,7 +140,9 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
             url: 'service.url',
             response: function(settings) {
                 assert.equal(settings.url, config.service, 'The provider has called the right service');
-                this.responseText = JSON.stringify({});
+                this.responseText = JSON.stringify({
+                    success: true
+                });
             }
         });
 
@@ -215,6 +217,7 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
             {
                 request: [],
                 response: {
+                    success: true,
                     messages: [],
                     responses: []
                 }
@@ -227,6 +230,7 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
                     }
                 ],
                 response: {
+                    success: true,
                     messages: [
                         {
                             channel: requestChannel,
@@ -253,9 +257,11 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
             },
             onAfterComplete: function() {
                 // advance to next test step:
-                currentStep = Math.min(currentStep + 1, testPath.length - 1);
-                expectedRequest = testPath[currentStep].request;
-                expectedResponse = testPath[currentStep].response;
+                _.defer(function() {
+                    currentStep = Math.min(currentStep + 1, testPath.length - 1);
+                    expectedRequest = testPath[currentStep].request;
+                    expectedResponse = testPath[currentStep].response;
+                });
             }
         });
 
@@ -342,6 +348,7 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
             {
                 request: [],
                 response: {
+                    success: true,
                     messages: [],
                     responses: []
                 }
@@ -354,6 +361,7 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
                     }
                 ],
                 response: {
+                    success: true,
                     messages: [
                         {
                             channel: requestChannel,
@@ -384,9 +392,11 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
             },
             onAfterComplete: function() {
                 // advance to next test step:
-                currentStep = Math.min(currentStep + 1, testPath.length - 1);
-                expectedRequest = testPath[currentStep].request;
-                expectedResponse = testPath[currentStep].response;
+                _.defer(function() {
+                    currentStep = Math.min(currentStep + 1, testPath.length - 1);
+                    expectedRequest = testPath[currentStep].request;
+                    expectedResponse = testPath[currentStep].response;
+                });
             }
         });
 
@@ -446,6 +456,7 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
             {
                 request: [],
                 response: {
+                    success: true,
                     messages: [],
                     responses: []
                 }
@@ -457,7 +468,10 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
                         message: requestMessage
                     }
                 ],
-                response: 'error'
+                response: {
+                    success: false,
+                    type: 'error'
+                }
             }
         ];
 
@@ -495,9 +509,11 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
             },
             onAfterComplete: function() {
                 // advance to next test step:
-                currentStep = Math.min(currentStep + 1, testPath.length - 1);
-                expectedRequest = testPath[currentStep].request;
-                expectedResponse = testPath[currentStep].response;
+                _.defer(function() {
+                    currentStep = Math.min(currentStep + 1, testPath.length - 1);
+                    expectedRequest = testPath[currentStep].request;
+                    expectedResponse = testPath[currentStep].response;
+                });
             }
         });
 
@@ -507,28 +523,46 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
             assert.ok(false, 'The provider must not receive any message');
         });
 
-        instance.init().then(function() {
-            assert.equal(instance.getState('ready'), true, 'The provider is initialized');
-
-            instance.open().then(function() {
+        instance
+            .init()
+            .then(function() {
+                assert.equal(instance.getState('ready'), true, 'The provider is initialized');
+                return instance.open();
+            })
+            .then(function() {
                 assert.equal(instance.getState('open'), true, 'The connection is open');
+                return instance.send(requestChannel, requestMessage);
+            })
+            .then(function() {
+                assert.ok(false, 'The message should not be received');
+                ready();
+            })
+            .catch(function() {
+                assert.ok(true, 'The message has not been received');
 
-                instance.send(requestChannel, requestMessage).catch(function() {
-                    assert.ok(true, 'The message has not been received');
-
-                    // Double send error to check the token reset
-                    instance.send(requestChannel, requestMessage).catch(function() {
-                        assert.ok(true, 'The message has not been received');
-
-                        instance.destroy().then(function() {
-                            assert.ok(true, 'The provider is destroyed');
-
-                            ready();
-                        });
-                    });
+                // Double send error to check the token reset
+                return instance.send(requestChannel, requestMessage);
+            })
+            .then(function() {
+                assert.ok(false, 'The message should not be received');
+                ready();
+            })
+            .catch(function() {
+                assert.ok(true, 'The message has not been received');
+                return instance.destroy();
+            })
+            .then(function() {
+                assert.ok(true, 'The provider is destroyed');
+                ready();
+            })
+            .catch(function(err) {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
                 });
+                ready();
             });
-        });
     });
 
     QUnit.test('receive', function(assert) {
@@ -543,6 +577,7 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
         var expectedChannel = 'foo';
 
         var expectedResponse = {
+            success: true,
             messages: [
                 {
                     channel: expectedChannel,

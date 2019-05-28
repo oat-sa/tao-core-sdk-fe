@@ -2,20 +2,12 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>Test - Communicator - Poll</title>
+        <title>Test - Capitalization</title>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
-                    //some mocks
-                    requirejs.config({
-                        config: {
-                            'core/request': {
-                                noToken: true
-                            }
-                        }
-                    });
-                    require(['test/core/communicator/poll/test'], function() {
+                    require(['test/util/clipboard/test'], function() {
                         QUnit.start();
                     });
                 });
@@ -25,5 +17,14 @@
     <body>
         <div id="qunit"></div>
         <div id="qunit-fixture"></div>
+        <div>
+            <div id="test"></div>
+            <div>
+                <label for="result">You can paste result:</label>
+                <textarea id="result"></textarea>
+                <button id="paste">Paste</button>
+                <p>Status: <span id="paste-state"></span></p>
+            </div>
+        </div>
     </body>
 </html>
