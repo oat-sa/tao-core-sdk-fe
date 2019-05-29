@@ -40,7 +40,7 @@ requirejs.config({
 
         'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
         'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle',
-        async: '/node_modules/async/lib/async'
+        'async': '/node_modules/async/lib/async'
     },
     shim: {
         'jquery.simulate': {
