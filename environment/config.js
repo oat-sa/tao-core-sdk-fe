@@ -21,7 +21,6 @@ requirejs.config({
     paths: {
         css: '/node_modules/require-css/css',
         json: '/node_modules/requirejs-plugins/src/json',
-        async: '/node_modules/requirejs-plugins/src/async',
         text: '/node_modules/text/text',
 
         'qunit-parameterize': '/environment/qunit2-parameterize',
@@ -40,7 +39,8 @@ requirejs.config({
         'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
 
         'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
-        'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle'
+        'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle',
+        async: '/node_modules/async/lib/async'
     },
     shim: {
         'jquery.simulate': {
