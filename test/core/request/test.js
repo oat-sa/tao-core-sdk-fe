@@ -48,7 +48,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 errorCode: 1,
                 errorMessage: 'oops'
             },
-            'Error',
+            'OK',
             {
                 status: 200
             }
@@ -60,7 +60,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 errorCode: 2,
                 errorMsg: 'woops'
             },
-            'Error',
+            'OK',
             {
                 status: 200
             }
@@ -70,7 +70,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
             {
                 success: false
             },
-            'Error',
+            'OK',
             {
                 status: 200
             }
@@ -326,24 +326,6 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 url: '//500',
                 reject: true,
                 err: new Error('500 : Server Error')
-            },
-            {
-                title: '200 error 1',
-                url: '//200/error/1',
-                reject: true,
-                err: new Error('1 : oops')
-            },
-            {
-                title: '200 error 2',
-                url: '//200/error/2',
-                reject: true,
-                err: new Error('2 : woops')
-            },
-            {
-                title: '200 error fallback',
-                url: '//200/error/fallback',
-                reject: true,
-                err: new Error('The server has sent an empty response')
             }
         ])
         .test('request failure with ', function(caseData, assert) {
@@ -405,6 +387,87 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         .catch(function(err) {
                             assert.equal(err.name, caseData.err.name, 'Reject error is the one expected');
                             assert.equal(err.message, caseData.err.message, 'Reject error is correct');
+                            ready();
+                        });
+                });
+        });
+    QUnit.cases
+        .init([
+            {
+                title: '200 error 1',
+                url: '//200/error/1',
+            },
+            {
+                title: '200 error 2',
+                url: '//200/error/2',
+            },
+            {
+                title: '200 error fallback',
+                url: '//200/error/fallback',
+            }
+        ])
+        .test('request with success: false', function(caseData, assert) {
+            var ready = assert.async();
+            var tokenHandler = tokenHandlerFactory();
+
+            // mock the endpoints:
+            $.mockjax([
+                {
+                    url: /^\/\/200.*$/,
+                    status: 200,
+                    headers: {
+                        // respond with:
+                        'X-CSRF-Token': 'token2'
+                    },
+                    response: function(settings) {
+                        var response = _.cloneDeep(responses[settings.url][0]);
+                        var content;
+                        if (response) {
+                            content = response.data || {};
+                            if (caseData.headers) {
+                                content.requestHeaders = settings.headers;
+                            }
+                            if (response.success === false) {
+                                this.responseText = JSON.stringify(response);
+                            } else {
+                                this.responseText = JSON.stringify({
+                                    success: true,
+                                    content: content
+                                });
+                            }
+                        }
+                    }
+                },
+                {
+                    url: '//500',
+                    status: 500,
+                    statusText: 'Server Error'
+                }
+            ]);
+
+            tokenHandler
+                .clearStore()
+                .then(function() {
+                    return tokenHandler.setToken('token1');
+                })
+                .then(function() {
+                    var result = request(caseData);
+
+                    assert.expect(3);
+
+                    assert.ok(result instanceof Promise, 'The request function returns a promise');
+
+                    result
+                        .then(function(response) {
+                            assert.deepEqual(response.content, caseData.content, 'The given result is correct');
+
+                            tokenHandler.getToken().then(function(storedToken) {
+                                assert.equal(storedToken, 'token2', 'The token was updated with the next in sequence');
+                                ready();
+                            });
+                        })
+                        .catch(function() {
+                            assert.ok(false, 'Should not reject');
                             ready();
                         });
                 });

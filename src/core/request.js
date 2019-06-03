@@ -183,7 +183,7 @@ export default function request(options) {
                                     );
                                 }
 
-                                if (response && response.success === true) {
+                                if (xhr.status === 200 || (response && response.success === true)) {
                                     // there's some data
                                     return resolve(response);
                                 }
