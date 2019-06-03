@@ -25,6 +25,7 @@
  *   - the responseBody:
  *      { success : true, data : [the results]}
  *      { success : false, data : {Exception}, message : 'Something went wrong' }
+ *      { success : false, code : X, message : 'Something went wrong' }
  *   - 204 for empty content
  *   - 403 if CSRF token validation fails
  *
@@ -57,11 +58,16 @@ export default function request(url, data, method, headers, background, noToken)
         background: background,
         noToken: noToken === false ? false : true
     }).then(function(response) {
-        if (!_.isUndefined(response)) {
-            if (response.success) {
-                return response.data;
-            }
-            throw new Error(response.data);
+        if (_.isUndefined(response)) { // in case 204 empty content
+            return Promise.resolve();
+        } else if (response.success) {
+            return Promise.resolve(response.data);
         }
+        else {
+            return Promise.reject(response); // in case success:false different types of response
+        }
+    })
+    .catch(function(error) {
+        return Promise.reject(error);
     });
 }

@@ -395,15 +395,15 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
         .init([
             {
                 title: '200 error 1',
-                url: '//200/error/1',
+                url: '//200/error/1'
             },
             {
                 title: '200 error 2',
-                url: '//200/error/2',
+                url: '//200/error/2'
             },
             {
                 title: '200 error fallback',
-                url: '//200/error/fallback',
+                url: '//200/error/fallback'
             }
         ])
         .test('request with success: false', function(caseData, assert) {
@@ -459,7 +459,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
 
                     result
                         .then(function(response) {
-                            assert.deepEqual(response.content, caseData.content, 'The given result is correct');
+                            assert.deepEqual(response, responses[caseData.url][0], 'The given result is correct');
 
                             tokenHandler.getToken().then(function(storedToken) {
                                 assert.equal(storedToken, 'token2', 'The token was updated with the next in sequence');

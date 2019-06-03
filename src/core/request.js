@@ -25,6 +25,7 @@
  *   - the responseBody:
  *      { success : true, data : [the results]}
  *      { success : false, data : {Exception}, message : 'Something went wrong' }
+ *      { success : false, code : X, message : 'Something went wrong' }
  *   - 204 for empty content
  *   - 403 if CSRF token validation fails
  *
