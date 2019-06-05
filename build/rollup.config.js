@@ -20,20 +20,18 @@ import path from 'path';
 import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import json from 'rollup-plugin-json';
-import copy from 'rollup-plugin-copy';
+import resolve from 'rollup-plugin-node-resolve';
+import commonJS from 'rollup-plugin-commonjs'
 
 const { srcDir, outputDir } = require('./path');
 
-const inputs = glob.sync(path.join(srcDir, '!(lib)', '**', '*.js'));
+const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
 const inputGlobalNames = inputs.reduce((memo, input) => {
     const moduleName = path.relative(srcDir, input).replace(/\.js$/, '');
     return { ...memo, [moduleName]: moduleName };
 }, {});
 
 const localExternals = inputs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
-
-const libs = glob.sync(path.join(srcDir, 'lib', '**', '*.js'));
-const libExternals = libs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
 
 export default inputs.map(input => {
     const name = path.relative(srcDir, input).replace(/\.js$/, '');
@@ -54,44 +52,41 @@ export default inputs.map(input => {
                 i18n: '__',
                 async: 'async',
                 handlebars: 'handlebars',
+                'idb-wrapper': 'IDBStore',
                 'lib/uuid': 'lib/uuid',
-                'lib/store/idbstore': 'lib/store/idbstore',
                 'lib/decimal/decimal': 'lib/decimal/decimal',
                 'lib/expr-eval/expr-eval': 'lib/expr-eval/expr-eval',
-                'lib/polyfill/es6-promise': 'lib/polyfill/es6-promise',
+                'webcrypto-shim': 'webcrypto-shim',
                 ...inputGlobalNames
             }
         },
         external: [
             ...localExternals,
-            ...libExternals,
-            'jquery',
-            'lodash',
-            'handlebars',
-            'moment',
-            'i18n',
             'async',
-            'jquery.fileDownload',
-            'module',
             'context',
-            'lib/uuid',
-            'lib/store/idbstore',
+            'handlebars',
+            'i18n',
+            'jquery',
+            'jquery.fileDownload',
             'lib/decimal/decimal',
-            'lib/expr-eval/expr-eval'
+            'lib/expr-eval/expr-eval',
+            'lib/uuid',
+            'lodash',
+            'module',
+            'moment'
         ],
         plugins: [
+            resolve(),
+            commonJS({
+                include: 'node_modules/**'
+            }),
             alias({
                 resolve: ['.js', '.json'],
                 core: path.resolve(srcDir, 'core'),
-                util: path.resolve(srcDir, 'util'),
-                lib: path.resolve(srcDir, 'lib')
+                util: path.resolve(srcDir, 'util')
             }),
             json({
                 preferConst: false
-            }),
-            copy({
-                targets: [path.resolve(srcDir, 'lib')],
-                outputFolder: outputDir
             })
         ]
     };

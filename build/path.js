@@ -19,13 +19,13 @@
 /**
   * This file contains path definitions for build scripts.
   */
- const path = require("path");
- const rootPath = path.resolve(__dirname, "..");
- 
+const path = require("path");
+const rootPath = path.resolve(__dirname, "..");
+
 module.exports = {
     srcDir: path.resolve(rootPath, "src"),
     testDir: path.resolve(rootPath, "test"),
     outputDir: path.resolve(rootPath, "dist"),
     testOutputDir: path.resolve(rootPath, "test")
 };
- 
+
