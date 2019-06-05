@@ -167,24 +167,6 @@ define(['jquery', 'lodash', 'core/dataProvider/request', 'core/promise'], functi
             url: '//500',
             reject: true,
             err: new Error('500 : Server Error')
-        },
-        {
-            title: '200 error 1',
-            url: '//200/error/1',
-            reject: true,
-            err: new Error('1 : oops')
-        },
-        {
-            title: '200 error 2',
-            url: '//200/error/2',
-            reject: true,
-            err: new Error('2 : woops')
-        },
-        {
-            title: '200 error fallback',
-            url: '//200/error/fallback',
-            reject: true,
-            err: new Error('The server has sent an empty response')
         }
     ];
 
@@ -220,5 +202,39 @@ define(['jquery', 'lodash', 'core/dataProvider/request', 'core/promise'], functi
                     ready();
                 });
         }
+    });
+
+    requestCases = [
+        {
+            title: '200 error 1',
+            url: '//200/error/1'
+        },
+        {
+            title: '200 error 2',
+            url: '//200/error/2'
+        },
+        {
+            title: '200 error fallback',
+            url: '//200/error/fallback'
+        }
+    ];
+
+    QUnit.cases.init(requestCases).test('request with ', function(data, assert) {
+        var ready = assert.async();
+
+        var result = request(data.url, data.data, data.method, data.headers, data.background, data.noToken);
+        assert.ok(result instanceof Promise, 'The request function returns a promise');
+
+        assert.expect(2);
+
+        result
+            .then(function() {
+                assert.ok(false, 'Should reject');
+                ready();
+            })
+            .catch(function(response) {
+                assert.deepEqual(response, responses[data.url][0], 'Reject response is correct');
+                ready();
+            });
     });
 });

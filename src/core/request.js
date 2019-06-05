@@ -25,6 +25,7 @@
  *   - the responseBody:
  *      { success : true, data : [the results]}
  *      { success : false, data : {Exception}, message : 'Something went wrong' }
+ *      { success : false, code : X, message : 'Something went wrong' }
  *   - 204 for empty content
  *   - 403 if CSRF token validation fails
  *
@@ -183,7 +184,7 @@ export default function request(options) {
                                     );
                                 }
 
-                                if (response && response.success === true) {
+                                if (xhr.status === 200 || (response && response.success === true)) {
                                     // there's some data
                                     return resolve(response);
                                 }
