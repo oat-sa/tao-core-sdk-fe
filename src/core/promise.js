@@ -19,11 +19,12 @@
 /**
  * Wrap the Promise Polyfill
  *
+ * @deprecated use direclty the Promise type
+ *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import es6Promise from 'lib/polyfill/es6-promise';
 
 /**
  * @exports core/promise
  */
-export default window.Promise || es6Promise.Promise;
+export default Promise;
