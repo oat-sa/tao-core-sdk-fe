@@ -19,12 +19,11 @@
 /**
  * Wrap the ES6 Collections polyfill
  *
+ * @deprecated use the collections types directly
+ *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import 'lib/polyfill/es6-collections';
 
-//window should have beend feed by the polyfill
-//
 export default {
     Map: window.Map,
     Set: window.Set,
