@@ -23,7 +23,7 @@
  */
 import _ from 'lodash';
 import Promise from 'core/promise';
-import IDBStore from 'lib/store/idbstore';
+import IDBStore from 'idb-wrapper';
 import uuid from 'lib/uuid';
 
 /**
