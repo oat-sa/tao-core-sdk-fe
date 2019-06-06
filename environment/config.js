@@ -29,18 +29,20 @@ requirejs.config({
         test: '/test',
 
         core: '/dist/core',
-        lib: '/dist/lib',
         util: '/dist/util',
 
-        jquery: '/node_modules/jquery/dist/jquery',
+        jquery: '/node_modules/jquery/jquery',
         lodash: '/node_modules/lodash/lodash',
         moment: '/node_modules/moment/moment',
         handlebars: '/node_modules/handlebars/dist/handlebars.amd',
         'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
 
+        'lib/uuid': '/node_modules/@oat-sa/tao-core-libs/dist/uuid',
         'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
         'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle',
-        'async': '/node_modules/async/lib/async'
+        'async': '/node_modules/async/lib/async',
+        'webcrypto-shim': '/node_modules/webcrypto-shim/webcrypto-shim',
+        'idb-wrapper': '/node_modules/idb-wrapper/idbstore'
     },
     shim: {
         'jquery.simulate': {

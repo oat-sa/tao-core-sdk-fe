@@ -25,7 +25,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import 'lib/polyfill/webcrypto-shim';
+import 'webcrypto-shim';
 
 //get the native implementation of the CryptoSubtle
 var subtle = window.crypto.subtle || window.crypto.webkitSubtle;
