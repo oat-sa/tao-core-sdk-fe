@@ -77,9 +77,7 @@ export default inputs.map(input => {
         ],
         plugins: [
             resolve(),
-            commonJS({
-                include: 'node_modules/**'
-            }),
+            commonJS(),
             alias({
                 resolve: ['.js', '.json'],
                 core: path.resolve(srcDir, 'core'),
