@@ -55,7 +55,7 @@ var idStoreName = 'id';
  * Check if we're using the v2 of IndexedDB
  * @type {Boolean}
  */
-var isIndexedDB2 = 'getAll' in IDBObjectStore.prototype;
+var isIndexedDB2 = typeof IDBObjectStore !== 'undefined' && 'getAll' in IDBObjectStore.prototype;
 
 /**
  * Opens a store
