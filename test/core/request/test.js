@@ -30,6 +30,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
 ) {
     'use strict';
 
+    var errors;
     var responses = {
         '//200': [
             {
@@ -73,6 +74,16 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
             'OK',
             {
                 status: 200
+            }
+        ],
+
+        '//403': [
+            {
+                success: false
+            },
+            'Error',
+            {
+                status: 403
             }
         ],
 
@@ -391,6 +402,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         });
                 });
         });
+
     QUnit.cases
         .init([
             {
@@ -437,11 +449,6 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                             }
                         }
                     }
-                },
-                {
-                    url: '//500',
-                    status: 500,
-                    statusText: 'Server Error'
                 }
             ]);
 
@@ -468,6 +475,99 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         })
                         .catch(function() {
                             assert.ok(false, 'Should not reject');
+                            ready();
+                        });
+                });
+        });
+
+
+    QUnit.module('errors');
+
+    errors = {
+        '//nothing': {
+            code: 0,
+            sent: false,
+            source: 'network',
+            message: '0 : timeout'
+        },
+        '//403': {
+            code: 403,
+            sent: true,
+            source: 'network',
+            message: '403 : Authentication Error'
+        }
+    };
+
+    QUnit.cases
+        .init([
+            {
+                title: 'no response',
+                url: '//nothing'
+            },
+            {
+                title: '403 response',
+                url: '//403'
+            }
+        ])
+        .test('error-throwing cases', function(caseData, assert) {
+            var ready = assert.async();
+            var tokenHandler = tokenHandlerFactory();
+
+            // mock the endpoints:
+            $.mockjax([
+                {
+                    url: '//nothing',
+                    responseTime: 500,
+                    isTimeout: true
+                },
+                {
+                    url: '//403',
+                    status: 403,
+                    statusText: 'Authentication Error',
+                    response: function(settings) {
+                        var response = _.cloneDeep(responses[settings.url][0]);
+                        var content;
+                        if (response) {
+                            content = response.data || {};
+                            if (caseData.headers) {
+                                content.requestHeaders = settings.headers;
+                            }
+                            if (response.success === false) {
+                                this.responseText = JSON.stringify(response);
+                            } else {
+                                this.responseText = JSON.stringify({
+                                    success: true,
+                                    content: content
+                                });
+                            }
+                        }
+                    }
+                }
+            ]);
+
+            tokenHandler
+                .clearStore()
+                .then(function() {
+                    return tokenHandler.setToken('token1');
+                })
+                .then(function() {
+                    var result = request(caseData);
+
+                    assert.expect(5);
+
+                    assert.ok(result instanceof Promise, 'The request function returns a promise');
+
+                    result
+                        .then(function() {
+                            assert.ok(false, 'Should not resolve, but did!');
+                            ready();
+                        })
+                        .catch(function(error) {
+                            var expected = errors[caseData.url];
+                            assert.equal(error.code, expected.code, 'The correct error code');
+                            assert.equal(error.sent, expected.sent, 'The correct error sent status');
+                            assert.equal(error.source, expected.source, 'The correct error source');
+                            assert.equal(error.message, expected.message, 'The correct error message');
                             ready();
                         });
                 });
