@@ -66,8 +66,9 @@ var createError = function createError(response, fallbackMessage, httpCode, http
     }
     err.response = response;
     err.sent = httpSent;
+    err.source = response.source || 'request';
 
-    if (httpCode) {
+    if (_.isNumber(httpCode)) {
         err.code = httpCode;
     }
     return err;
@@ -209,7 +210,7 @@ export default function request(options) {
                         try {
                             response = JSON.parse(xhr.responseText);
                         } catch (parseErr) {
-                            response = xhr.responseText;
+                            response = {};
                         }
 
                         response = _.defaults(response, {
