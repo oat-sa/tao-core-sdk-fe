@@ -21,7 +21,7 @@ import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import json from 'rollup-plugin-json';
 import resolve from 'rollup-plugin-node-resolve';
-import commonJS from 'rollup-plugin-commonjs'
+import commonJS from 'rollup-plugin-commonjs';
 
 const { srcDir, outputDir } = require('./path');
 
@@ -31,7 +31,12 @@ const inputGlobalNames = inputs.reduce((memo, input) => {
     return { ...memo, [moduleName]: moduleName };
 }, {});
 
-const localExternals = inputs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
+const localExternals = inputs.map(input =>
+    path
+        .relative(srcDir, input)
+        .replace(/\\/g, '/')
+        .replace(/\.js$/, '')
+);
 
 export default inputs.map(input => {
     const name = path.relative(srcDir, input).replace(/\.js$/, '');
