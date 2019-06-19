@@ -51,6 +51,7 @@
     "mime": "^2.4.2",
     "moment": "2.11.1",
     "node-qunit-puppeteer": "^1.0.12",
+    "nyc": "^14.1.1",
     "promise-limit": "^2.7.0",
     "qunit": "^2.9.2",
     "require-css": "^0.1.10",
