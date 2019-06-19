@@ -25,13 +25,13 @@ define(['core/mimetype'], function(mimeType) {
         .init([
             {
                 url: '/test/core/mimetype/samples/audio.mp3',
-                type: 'audio/mpeg; charset=utf-8',
+                type: 'audio/mpeg',
                 error: false,
                 title: 'MP3'
             },
             {
                 url: '/test/core/mimetype/samples/video.mp4',
-                type: 'video/mp4; charset=utf-8',
+                type: 'video/mp4',
                 error: false,
                 title: 'MP4'
             },

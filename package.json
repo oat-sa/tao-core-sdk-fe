@@ -10,8 +10,11 @@
   ],
   "license": "GPL-2.0",
   "scripts": {
-    "test:keepAlive": "node ./build/webserver.js",
-    "test": "node ./build/testrunner.js",
+    "test": "npx qunit-testrunner",
+    "test:keepAlive": "npx qunit-testrunner -l",
+    "test:cov": "npx qunit-testrunner --cov",
+    "coverage": "nyc report",
+    "coverage:html": "nyc report --reporter=lcov && open coverage/lcov-report/index.html",
     "build": "rollup --config ./build/rollup.config.js",
     "lint": "eslint src/util src/core test",
     "prepare": "npm run build"
@@ -33,6 +36,7 @@
   "devDependencies": {
     "@oat-sa/expr-eval": "^1.3.0",
     "@oat-sa/tao-core-libs": "^0.1.0",
+    "@oat-sa/tao-qunit-testrunner": "github:oat-sa/tao-qunit-testrunner-fe#feature/NEX-145_initial-test-runner",
     "async": "^0.2.10",
     "decimal.js": "^10.1.1",
     "eslint": "^5.16.0",
