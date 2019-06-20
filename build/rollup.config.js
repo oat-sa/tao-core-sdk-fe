@@ -75,7 +75,6 @@ export default inputs.map(input => {
             babel({
                 presets: [[
                     '@babel/env', {
-                        targets: 'extends @oat-sa/browserslist-config-tao',
                         useBuiltIns: false
                     }
                 ]]
