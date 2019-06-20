@@ -1,5 +1,5 @@
 {
     "verbose": 2,
     "api-mock": true,
-    "coverage-instrument-glob": "dist/**/*.js"
+    "coverage-instrument-spec": "dist/**/*.js"
 }
