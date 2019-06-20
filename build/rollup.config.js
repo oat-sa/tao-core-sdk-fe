@@ -26,10 +26,6 @@ import commonJS from 'rollup-plugin-commonjs';
 const { srcDir, outputDir } = require('./path');
 
 const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
-const inputGlobalNames = inputs.reduce((memo, input) => {
-    const moduleName = path.relative(srcDir, input).replace(/\.js$/, '');
-    return { ...memo, [moduleName]: moduleName };
-}, {});
 
 const localExternals = inputs.map(input =>
     path
@@ -46,24 +42,8 @@ export default inputs.map(input => {
         input,
         output: {
             dir: path.join(outputDir, dir),
-            format: 'umd',
-            name,
-            globals: {
-                jquery: '$',
-                lodash: '_',
-                context: 'context',
-                module: 'module',
-                moment: 'moment',
-                i18n: '__',
-                async: 'async',
-                handlebars: 'handlebars',
-                'idb-wrapper': 'IDBStore',
-                'lib/uuid': 'lib/uuid',
-                'lib/decimal/decimal': 'lib/decimal/decimal',
-                'lib/expr-eval/expr-eval': 'lib/expr-eval/expr-eval',
-                'webcrypto-shim': 'webcrypto-shim',
-                ...inputGlobalNames
-            }
+            format: 'amd',
+            name
         },
         external: [
             ...localExternals,
