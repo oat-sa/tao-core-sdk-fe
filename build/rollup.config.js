@@ -22,17 +22,18 @@ import alias from 'rollup-plugin-alias';
 import json from 'rollup-plugin-json';
 import resolve from 'rollup-plugin-node-resolve';
 import commonJS from 'rollup-plugin-commonjs';
+import babel from 'rollup-plugin-babel';
 
 const { srcDir, outputDir } = require('./path');
 
 const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
 
-const localExternals = inputs.map(input =>
+const localExternals = inputs.map(input => (
     path
         .relative(srcDir, input)
         .replace(/\\/g, '/')
         .replace(/\.js$/, '')
-);
+));
 
 export default inputs.map(input => {
     const name = path.relative(srcDir, input).replace(/\.js$/, '');
@@ -70,6 +71,14 @@ export default inputs.map(input => {
             }),
             json({
                 preferConst: false
+            }),
+            babel({
+                presets: [[
+                    '@babel/env', {
+                        targets: 'extends @oat-sa/browserslist-config-tao',
+                        useBuiltIns: false
+                    }
+                ]]
             })
         ]
     };
