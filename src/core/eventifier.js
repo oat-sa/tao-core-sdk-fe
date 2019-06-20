@@ -93,17 +93,17 @@ import loggerFactory from 'core/logger';
 /**
  * All events have a namespace, this one is the default
  */
-var defaultNs = '@';
+const defaultNs = '@';
 
 /**
  * Namespace that targets all event
  */
-var globalNs = '*';
+const globalNs = '*';
 
 /**
  * Create a logger
  */
-var eventifierLogger = loggerFactory('core/eventifier');
+const eventifierLogger = loggerFactory('core/eventifier');
 
 /**
  * Get the list of events from an eventName string (ie, separated by spaces)
@@ -158,7 +158,7 @@ function getHandlerObject() {
 
 /**
  * Makes the target an event emitter by delegating calls to the event API.
- * @param {Object} [target = {}] - the target object, a new plain object is created when omited.
+ * @param {Object} [target] - the target object, a new plain object is created when omited.
  * @returns {Object} the target for conveniance
  */
 function eventifier(target) {
@@ -172,7 +172,7 @@ function eventifier(target) {
     /**
      * Get the handlers for an event type
      * @param {String} eventName - the event name, namespace included
-     * @param {String} [type = 'between'] - the type of event in before, between and after
+     * @param {String} [type='between'] - the type of event in before, between and after
      * @returns {Function[]} the handlers
      */
     var getHandlers = function getHandlers(eventName, type) {
@@ -203,7 +203,7 @@ function eventifier(target) {
          */
         on: function on(eventNames, handler) {
             if (_.isFunction(handler)) {
-                _.forEach(getEventNames(eventNames), function(eventName) {
+                _.forEach(getEventNames(eventNames), eventName => {
                     getHandlers(eventName).push(handler);
                 });
             }
