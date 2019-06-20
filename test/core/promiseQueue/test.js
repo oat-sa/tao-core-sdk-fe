@@ -154,7 +154,7 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                 setTimeout(function() {
                     states.a = 'done';
                     resolve();
-                }, 100);
+                }, 200);
             });
         });
         queue.serie(function b() {
@@ -163,7 +163,7 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                 setTimeout(function a() {
                     states.b = 'done';
                     resolve();
-                }, 100);
+                }, 200);
             });
         });
         queue.serie(function c() {
@@ -172,23 +172,23 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                 setTimeout(function a() {
                     states.c = 'done';
                     resolve();
-                }, 100);
+                }, 200);
             });
         });
 
         setTimeout(function() {
             assert.deepEqual(states, { a: 'started', b: 'waiting', c: 'waiting' });
-        }, 10);
+        }, 50);
         setTimeout(function() {
             assert.deepEqual(states, { a: 'done', b: 'started', c: 'waiting' });
-        }, 110);
+        }, 300);
         setTimeout(function() {
             assert.deepEqual(states, { a: 'done', b: 'done', c: 'started' });
-        }, 210);
+        }, 500);
         setTimeout(function() {
             assert.deepEqual(states, { a: 'done', b: 'done', c: 'done' });
             ready();
-        }, 310);
+        }, 700);
     });
 
     QUnit.test('serie resolved data and reject', function(assert) {
@@ -266,7 +266,7 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                 setTimeout(function() {
                     states.a = 'done';
                     resolve();
-                }, 100);
+                }, 200);
             });
         });
         queue
@@ -276,7 +276,7 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                     setTimeout(function a() {
                         states.b = 'error';
                         reject(new Error('b'));
-                    }, 100);
+                    }, 200);
                 });
             })
             .catch(function(err) {
@@ -289,7 +289,7 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                         setTimeout(function a() {
                             states.d = 'done';
                             resolve();
-                        }, 100);
+                        }, 200);
                     });
                 });
             });
@@ -302,7 +302,7 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
                     setTimeout(function a() {
                         states.c = 'done';
                         resolve();
-                    }, 100);
+                    }, 200);
                 });
             })
             .then(function() {
@@ -316,16 +316,16 @@ define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
 
         setTimeout(function() {
             assert.deepEqual(states, { a: 'started', b: 'waiting', c: 'waiting', d: 'waiting' });
-        }, 10);
+        }, 100);
         setTimeout(function() {
             assert.deepEqual(states, { a: 'done', b: 'started', c: 'waiting', d: 'waiting' });
-        }, 110);
+        }, 300);
         setTimeout(function() {
             assert.deepEqual(states, { a: 'done', b: 'error', c: 'waiting', d: 'started' });
-        }, 210);
+        }, 500);
         setTimeout(function() {
             assert.deepEqual(states, { a: 'done', b: 'error', c: 'waiting', d: 'done' });
             ready();
-        }, 310);
+        }, 700);
     });
 });
