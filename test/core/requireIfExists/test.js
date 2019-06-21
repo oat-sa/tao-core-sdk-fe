@@ -33,8 +33,8 @@ define(['core/requireIfExists'], function(requireIfExists) {
         var ready = assert.async();
         assert.expect(1);
 
-        requireIfExists('core/Promise').then(function(Promise) {
-            assert.notEqual(typeof Promise, 'undefined', 'The core/Promise module has been loaded');
+        requireIfExists('core/promise').then(function(Promise) {
+            assert.notEqual(typeof Promise, 'undefined', 'The core/promise module has been loaded');
             ready();
         });
     });
