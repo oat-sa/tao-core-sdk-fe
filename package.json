@@ -14,7 +14,7 @@
     "test:keepAlive": "npx qunit-testrunner -l",
     "test:cov": "npx qunit-testrunner --cov",
     "coverage": "nyc report",
-    "coverage:html": "nyc report --reporter=lcov && open coverage/lcov-report/index.html",
+    "coverage:html": "nyc report --reporter=lcov && open-cli coverage/lcov-report/index.html",
     "build": "rollup --config ./build/rollup.config.js",
     "lint": "eslint src/util src/core test",
     "prepare": "npm run build"
@@ -52,6 +52,7 @@
     "moment": "2.11.1",
     "node-qunit-puppeteer": "^1.0.12",
     "nyc": "^14.1.1",
+    "open-cli": "^5.0.0",
     "promise-limit": "^2.7.0",
     "qunit": "^2.9.2",
     "require-css": "^0.1.10",
