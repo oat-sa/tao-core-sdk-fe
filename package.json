@@ -1,6 +1,6 @@
 {
   "name": "@oat-sa/tao-core-sdk",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "displayName": "TAO Core SDK",
   "description": "Core libraries of TAO",
   "homepage": "https://github.com/oat-sa/tao-core-sdk-fe#readme",
@@ -16,6 +16,7 @@
     "coverage": "nyc report",
     "coverage:html": "nyc report --reporter=lcov && open-cli coverage/lcov-report/index.html",
     "build": "rollup --config ./build/rollup.config.js",
+    "build:watch": "rollup --config ./build/rollup.config.js --watch",
     "lint": "eslint src/util src/core test",
     "prepare": "npm run build"
   },
