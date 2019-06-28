@@ -79,7 +79,13 @@ var defaults = {
  * @param {String} [config.token] - An optional initial security token
  * @type {Object}
  */
-var pollProvider = {
+const pollProvider = {
+
+    /**
+     * The provider name
+     */
+    name : 'poll',
+
     /**
      * Initializes the communication implementation
      * @returns {Promise}
