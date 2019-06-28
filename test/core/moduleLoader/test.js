@@ -278,7 +278,7 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
             })
             .catch( err => {
                 assert.ok(err instanceof TypeError);
-                assert.equal(err.message, `The module from 'test/core/moduleLoader/mockModule' is not valid`);
+                assert.equal(err.message, `The module 'test/core/moduleLoader/mockModule' is not valid`);
             })
             .then( ready );
     });
