@@ -29,58 +29,61 @@ import pollProvider from 'core/communicator/poll';
  * 'request' provider for {@link core/communicator}
  * @extends {core/communicator/poll} never start nor stop the polling
  */
-var requestProvider = _.defaults(
-    {
-        /**
-         * @returns {Promise}
-         */
-        destroy: function destroy() {
-            this.throttledSend = null;
-            this.messagesQueue = null;
+const requestProvider = _.defaults({
 
-            return Promise.resolve();
-        },
+    /**
+     * the provider name
+     */
+    name: 'request',
 
-        /**
-         * @returns {Promise}
-         */
-        open: function open() {
-            return Promise.resolve();
-        },
+    /**
+     * @returns {Promise}
+     */
+    destroy: function destroy() {
+        this.throttledSend = null;
+        this.messagesQueue = null;
 
-        /**
-         * @returns {Promise}
-         */
-        close: function close() {
-            return Promise.resolve();
-        },
-
-        /**
-         * Sends an messages through the communication implementation
-         * @param {String} channel - The name of the communication channel to use
-         * @param {Object} message - The message to send
-         * @returns {Promise}
-         */
-        send: function send(channel, message) {
-            // queue the message, it will be sent soon
-            var pending = {
-                channel: channel,
-                message: message
-            };
-            var promise = new Promise(function(resolve, reject) {
-                pending.promise = {
-                    resolve: resolve,
-                    reject: reject
-                };
-            });
-            this.messagesQueue.push(pending);
-
-            this.request();
-
-            return promise;
-        }
+        return Promise.resolve();
     },
-    pollProvider
-);
+
+    /**
+     * @returns {Promise}
+     */
+    open: function open() {
+        return Promise.resolve();
+    },
+
+    /**
+     * @returns {Promise}
+     */
+    close: function close() {
+        return Promise.resolve();
+    },
+
+    /**
+     * Sends an messages through the communication implementation
+     * @param {String} channel - The name of the communication channel to use
+     * @param {Object} message - The message to send
+     * @returns {Promise}
+     */
+    send: function send(channel, message) {
+        // queue the message, it will be sent soon
+        var pending = {
+            channel: channel,
+            message: message
+        };
+        var promise = new Promise(function(resolve, reject) {
+            pending.promise = {
+                resolve: resolve,
+                reject: reject
+            };
+        });
+        this.messagesQueue.push(pending);
+
+        this.request();
+
+        return promise;
+    }
+}, pollProvider );
 
 export default requestProvider;

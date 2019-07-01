@@ -91,12 +91,16 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
          * @returns {loader} chains
          * @throws {TypeError} misuse
          */
-        add: function add(def) {
+        add(def) {
+            if (!_.isPlainObject(def)) {
+                throw new TypeError('The module definition module must be an object');
+            }
             if (_.isEmpty(def.module) || !_.isString(def.module)) {
                 throw new TypeError('An AMD module must be defined');
             }
             if (_.isEmpty(def.category) || !_.isString(def.category)) {
-                throw new TypeError('Providers must belong to a category');
+                const identifyProvider = def.id || def.name || def.module;
+                throw new TypeError(`The provider '${identifyProvider}' must belong to a category`);
             }
 
             modules[def.category] = modules[def.category] || [];
@@ -148,10 +152,10 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
 
         /**
          * Loads the dynamic modules : trigger the dependency resolution
-         * @param {Boolean} [loadBundles = false] - does load the bundles
+         * @param {Boolean} [loadBundles=false] - does load the bundles
          * @returns {Promise}
          */
-        load: function load(loadBundles) {
+        load(loadBundles) {
             var self = this;
 
             //compute the providers dependencies
@@ -165,15 +169,18 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
             /**
              * Loads AMD modules and wrap then into a Promise
              * @param {String[]} amdModules - the list of modules to require
-             * @returns {Promise}
+             * @returns {Promise} resolves with the loaded modules
              */
-            var loadModules = function loadModules(amdModules) {
+            var loadModules = function loadModules(amdModules = []) {
                 if (_.isArray(amdModules) && amdModules.length) {
-                    return new Promise(function(resolve, reject) {
-                        require(amdModules, function() {
-                            //resolve with an array of loaded modules
-                            resolve([].slice.call(arguments));
-                        }, reject);
+                    return new Promise((resolve, reject) => {
+                        require(
+                            amdModules,
+                            (...loadedModules) => resolve(loadedModules),
+                            err => {
+                                reject(err);
+                            }
+                        );
                     });
                 }
                 return Promise.resolve();
@@ -183,18 +190,15 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
             // 2. load dependencies
             // 3. add them to the modules list
             return loadModules(loadBundles ? bundles : [])
-                .then(function() {
-                    return loadModules(dependencies);
-                })
-                .then(function(loadedModules) {
-                    _.forEach(dependencies, function(dependency, index) {
-                        var module = loadedModules[index];
-                        var category = _.findKey(modules, function(val) {
-                            return _.contains(val, dependency);
-                        });
+                .then( () => loadModules(dependencies) )
+                .then( loadedModules => {
+                    _.forEach(dependencies, (dependency, index) => {
 
-                        if (!validate(module)) {
-                            throw new TypeError('Invalid module');
+                        const module = loadedModules[index];
+                        const category = _.findKey(modules, val => _.contains(val, dependency));
+
+                        if (typeof validate === 'function' && !validate(module)) {
+                            throw new TypeError(`The module '${dependency}' is not valid`);
                         }
 
                         if (_.isString(category)) {

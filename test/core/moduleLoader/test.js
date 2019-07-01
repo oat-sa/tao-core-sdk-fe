@@ -13,11 +13,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017-2019 (original work) Open Assessment Technologies SA ;
  */
 
 /**
- * Module loade\'s test
+ * Module loader's test
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
@@ -259,7 +259,7 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
         };
         var loader, promise;
 
-        assert.expect(5);
+        assert.expect(6);
 
         loader = moduleLoader();
 
@@ -275,12 +275,12 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
         promise
             .then(function() {
                 assert.ok(false, 'The promise should fail since the loaded provider is wrong');
-                ready();
             })
-            .catch(function(e) {
-                assert.ok(true, e);
-                ready();
-            });
+            .catch( err => {
+                assert.ok(err instanceof TypeError);
+                assert.equal(err.message, `The module 'test/core/moduleLoader/mockModule' is not valid`);
+            })
+            .then( ready );
     });
 
     QUnit.test('load a bundle', function(assert) {
