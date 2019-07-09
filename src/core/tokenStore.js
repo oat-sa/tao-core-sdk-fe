@@ -209,12 +209,14 @@ export default function tokenStoreFactory(options) {
         },
 
         /**
-         * Checks one token and removes it from the store if expired
+         * Checks one token and removes it from the store if expired.
+         * If the timeLimit is lesser than or equal to 0, no time limit is applied.
          * @param {token} token - the token object
          * @returns {Promise<Boolean>}
          */
         checkExpiry(token) {
-            if (Date.now() - token.receivedAt > config.tokenTimeLimit) {
+            const {tokenTimeLimit} = config;
+            if (tokenTimeLimit > 0 && Date.now() - token.receivedAt > tokenTimeLimit) {
                 return this.remove(token.value);
             }
             return Promise.resolve(true);

@@ -386,13 +386,25 @@ define(['lodash', 'core/promise', 'core/tokenStore'], function(_, Promise, token
             });
     });
 
-    QUnit.test('expireOldTokens', function(assert) {
+    QUnit.cases.init([{
+        title: 'with time limit',
+        options: {
+            tokenTimeLimit: 100
+        },
+        shouldExpire: true
+    }, {
+        title: 'without time limit',
+        options: {
+            tokenTimeLimit: 0
+        },
+        shouldExpire: false
+    }]).test('expireOldTokens ', function(data, assert) {
         var ready = assert.async();
         var tokenStore;
 
         assert.expect(2);
 
-        tokenStore = tokenStoreFactory({ tokenTimeLimit: 100 });
+        tokenStore = tokenStoreFactory(data.options);
 
         tokenStore
             .clear()
@@ -421,7 +433,11 @@ define(['lodash', 'core/promise', 'core/tokenStore'], function(_, Promise, token
                 return tokenStore.getSize();
             })
             .then(function(size) {
-                assert.equal(size, 1, 'A single token remains after small time delay');
+                if (data.shouldExpire) {
+                    assert.equal(size, 1, 'A single token remains after small time delay');
+                } else {
+                    assert.equal(size, 4, 'No token have expired');
+                }
                 ready();
             })
             .catch(function(err) {
