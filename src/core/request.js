@@ -49,6 +49,8 @@ var queue = promiseQueue();
 
 var logger = loggerFactory('core/request');
 
+var tempToken;
+
 /**
  * Create a new error based on the given response
  * @param {Object} response - the server body response as plain object
@@ -106,17 +108,36 @@ export default function request(options) {
     function runRequest() {
         /**
          * Fetches a security token and appends it to headers, if required
+         * Also saves the retrieved token in a temporary variable, in case we need to re-enqueue it
          * @returns {Promise<Object>} - resolves with headers object
          */
         var computeHeaders = function computeHeaders() {
             var headers = _.extend({}, options.headers);
             if (!options.noToken) {
                 return tokenHandler.getToken().then(function(token) {
+                    tempToken = token;
+
                     headers[tokenHeaderName] = token || 'none';
                     return headers;
                 });
             }
             return Promise.resolve(headers);
+        };
+
+        /**
+         * Replaces the locally-stored tempToken into the tokenStore
+         * Unsets the local copy
+         * @returns {Promise} - resolves when done
+         */
+        var reEnqueueTempToken = function reEnqueueTempToken() {
+            if (tempToken) {
+                logger.debug('re-enqueueing %s token %s', tokenHeaderName, tempToken);
+                return tokenHandler.setToken(tempToken)
+                    .then(function() {
+                        tempToken = null;
+                    });
+            }
+            return Promise.resolve();
         };
 
         /**
