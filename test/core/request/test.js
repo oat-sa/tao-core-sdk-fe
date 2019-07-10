@@ -76,6 +76,15 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 status: 200
             }
         ],
+        '//202': [
+            {
+                success: false
+            },
+            'Accepted',
+            {
+                status: 202
+            }
+        ],
 
         '//403': [
             {
@@ -554,6 +563,12 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
             source: 'network',
             message: '0 : timeout'
         },
+        '//202': {
+            code: 202,
+            sent: true,
+            source: 'request',
+            message: 'The server has sent an empty response'
+        },
         '//403': {
             code: 403,
             sent: true,
@@ -571,6 +586,10 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
             {
                 title: '403 response',
                 url: '//403'
+            },
+            {
+                title: '2xx catch-all',
+                url: '//202'
             }
         ])
         .test('error-throwing cases ', function(caseData, assert) {
