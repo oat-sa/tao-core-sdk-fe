@@ -88,7 +88,9 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
 
         '//403': [
             {
-                success: false
+                success: false,
+                errorCode: 403,
+                errorMsg: 'Authentication Error'
             },
             'Error',
             {
@@ -98,7 +100,9 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
 
         '//500': [
             {
-                success: false
+                success: false,
+                errorCode: 500,
+                errorMsg: 'Internal Server Error'
             },
             'Error',
             {
@@ -531,6 +535,12 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
             sent: true,
             source: 'network',
             message: '403 : Authentication Error'
+        },
+        '//500': {
+            code: 500,
+            sent: true,
+            source: 'request',
+            message: '500 : Internal Server Error'
         }
     };
 
