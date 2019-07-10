@@ -48,7 +48,7 @@ export default function tokenHandlerFactory(options) {
             initialToken: options
         };
     }
-    options = _.defaults({}, options, defaults);
+    options = _.defaults({}, options, _.omit(module.config(), 'tokens'), defaults);
     // Initialise storage for tokens:
     const tokenStore = tokenStoreFactory(options);
 
