@@ -227,6 +227,7 @@ export default function request(options) {
                             });
                     })
                     .fail(function(xhr, textStatus, errorThrown) {
+                        var tokenHandlerPromise;
                         var response;
                         try {
                             response = JSON.parse(xhr.responseText);
@@ -246,21 +247,27 @@ export default function request(options) {
                             message: errorThrown || __('An error occurred!')
                         });
 
-                        setTokenFromXhr(xhr)
-                            .then(function() {
-                                reject(
-                                    createError(
-                                        response,
-                                        xhr.status + ' : ' + xhr.statusText,
-                                        xhr.status,
-                                        xhr.readyState > 0
-                                    )
-                                );
-                            })
-                            .catch(function(error) {
-                                logger.error(error);
-                                reject(createError(response, error, xhr.status, xhr.readyState > 0));
-                            });
+
+                        if (response.code === 0) {
+                            tokenHandlerPromise = reEnqueueTempToken();
+                        } else {
+                            tokenHandlerPromise = setTokenFromXhr(xhr);
+                        }
+
+                        tokenHandlerPromise.then(function() {
+                            reject(
+                                createError(
+                                    response,
+                                    xhr.status + ' : ' + xhr.statusText,
+                                    xhr.status,
+                                    xhr.readyState > 0
+                                )
+                            );
+                        })
+                        .catch(function(error) {
+                            logger.error(error);
+                            reject(createError(response, error, xhr.status, xhr.readyState > 0));
+                        });
                     });
             });
         });
