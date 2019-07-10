@@ -337,7 +337,15 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 url: '//500',
                 reject: true,
                 err: new Error('500 : Server Error')
+            },
+            {
+                title: 'disconnected',
+                url: '//offline',
+                reject: true,
+                err: new Error('0 : timeout'),
+                reuseToken: true
             }
+
         ])
         .test('request failure with ', function(caseData, assert) {
             var ready = assert.async();
@@ -346,35 +354,15 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
             // mock the endpoints:
             $.mockjax([
                 {
-                    url: /^\/\/200.*$/,
-                    status: 200,
-                    headers: {
-                        // respond with:
-                        'X-CSRF-Token': 'token2'
-                    },
-                    response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
-                    }
-                },
-                {
                     url: '//500',
                     status: 500,
                     statusText: 'Server Error'
+                },
+                {
+                    url: '//offline',
+                    status: 0,
+                    responseTime: 100,
+                    isTimeout: true
                 }
             ]);
 
@@ -386,7 +374,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 .then(function() {
                     var result = request(caseData);
 
-                    assert.expect(3);
+                    assert.expect(4);
 
                     assert.ok(result instanceof Promise, 'The request function returns a promise');
 
@@ -398,7 +386,15 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         .catch(function(err) {
                             assert.equal(err.name, caseData.err.name, 'Reject error is the one expected');
                             assert.equal(err.message, caseData.err.message, 'Reject error is correct');
-                            ready();
+
+                            tokenHandler.getToken().then(function(storedToken) {
+                                if (caseData.reuseToken) {
+                                    assert.equal(storedToken, 'token1', 'The token was re-enqueued');
+                                } else {
+                                    assert.equal(storedToken, null, 'The token store is now empty');
+                                }
+                                ready();
+                            });
                         });
                 });
         });
