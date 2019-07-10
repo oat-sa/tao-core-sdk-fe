@@ -36,7 +36,6 @@ import _ from 'lodash';
 import __ from 'i18n';
 import module from 'module';
 import context from 'context';
-import Promise from 'core/promise';
 import promiseQueue from 'core/promiseQueue';
 import tokenHandlerFactory from 'core/tokenHandler';
 import loggerFactory from 'core/logger';
