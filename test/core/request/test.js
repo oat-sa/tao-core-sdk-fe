@@ -109,6 +109,25 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
         '//204': [null, 'No Content', { status: 204 }]
     };
 
+    var standardMockResponse = function(settings, caseData, context) {
+        var response = _.cloneDeep(responses[settings.url][0]);
+        var content;
+        if (response) {
+            content = response.data || {};
+            if (caseData.headers) {
+                content.requestHeaders = settings.headers;
+            }
+            if (response.success === false) {
+                context.responseText = JSON.stringify(response);
+            } else {
+                context.responseText = JSON.stringify({
+                    success: true,
+                    content: content
+                });
+            }
+        }
+    };
+
     QUnit.module('API');
 
     QUnit.test('module', function(assert) {
@@ -170,22 +189,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                     url: /^\/\/200.*$/,
                     status: 200,
                     response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
+                        return standardMockResponse(settings, caseData, this);
                     }
                 }
             ]);
@@ -243,23 +247,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         'X-CSRF-Token': 'token2'
                     },
                     response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
+                        return standardMockResponse(settings, caseData, this);
                     }
                 }
             ]);
@@ -311,23 +299,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                     'X-CSRF-Token': 'token3'
                 },
                 response: function(settings) {
-                    var response = _.cloneDeep(responses[settings.url][0]);
-                    var content;
-
-                    if (response) {
-                        content = response.data || {};
-                        if (data.headers) {
-                            content.requestHeaders = settings.headers;
-                        }
-                        if (response.success === false) {
-                            this.responseText = JSON.stringify(response);
-                        } else {
-                            this.responseText = JSON.stringify({
-                                success: true,
-                                content: content
-                            });
-                        }
-                    }
+                    return standardMockResponse(settings, data, this);
                 }
             }
         ]);
@@ -505,22 +477,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         'X-CSRF-Token': 'token2'
                     },
                     response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
+                        return standardMockResponse(settings, caseData, this);
                     }
                 }
             ]);
@@ -608,22 +565,14 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                     status: 403,
                     statusText: 'Authentication Error',
                     response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
+                        return standardMockResponse(settings, caseData, this);
+                    }
+                },
+                {
+                    url: '//202',
+                    status: 202,
+                    response: function(settings) {
+                        return standardMockResponse(settings, caseData, this);
                     }
                 }
             ]);
