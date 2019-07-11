@@ -48,8 +48,6 @@ const queue = promiseQueue();
 
 const logger = loggerFactory('core/request');
 
-let tempToken;
-
 /**
  * Create a new error based on the given response
  * @param {Object} response - the server body response as plain object
@@ -105,6 +103,9 @@ export default function request(options) {
      * @returns {Promise} resolves with response, or rejects if something went wrong
      */
     const runRequest = () => {
+
+        let tempToken;
+
         /**
          * Fetches a security token and appends it to headers, if required
          * Also saves the retrieved token in a temporary constiable, in case we need to re-enqueue it
