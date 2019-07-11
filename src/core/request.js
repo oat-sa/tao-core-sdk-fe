@@ -36,18 +36,17 @@ import _ from 'lodash';
 import __ from 'i18n';
 import module from 'module';
 import context from 'context';
-import Promise from 'core/promise';
 import promiseQueue from 'core/promiseQueue';
 import tokenHandlerFactory from 'core/tokenHandler';
 import loggerFactory from 'core/logger';
 
-var tokenHeaderName = 'X-CSRF-Token';
+const tokenHeaderName = 'X-CSRF-Token';
 
-var tokenHandler = tokenHandlerFactory();
+const tokenHandler = tokenHandlerFactory();
 
-var queue = promiseQueue();
+const queue = promiseQueue();
 
-var logger = loggerFactory('core/request');
+const logger = loggerFactory('core/request');
 
 /**
  * Create a new error based on the given response
@@ -57,10 +56,10 @@ var logger = loggerFactory('core/request');
  * @param {Boolean} httpSent - the sent status
  * @returns {Error} the new error
  */
-var createError = function createError(response, fallbackMessage, httpCode, httpSent) {
-    var err;
+const createError = (response, fallbackMessage, httpCode, httpSent) => {
+    let err;
     if (response && response.errorCode) {
-        err = new Error(response.errorCode + ' : ' + (response.errorMsg || response.errorMessage || response.error));
+        err = new Error(`${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`);
     } else {
         err = new Error(fallbackMessage);
     }
@@ -103,15 +102,21 @@ export default function request(options) {
      * Function wrapper which allows the contents to be run now, or added to a queue
      * @returns {Promise} resolves with response, or rejects if something went wrong
      */
-    function runRequest() {
+    const runRequest = () => {
+
+        let tempToken;
+
         /**
          * Fetches a security token and appends it to headers, if required
+         * Also saves the retrieved token in a temporary constiable, in case we need to re-enqueue it
          * @returns {Promise<Object>} - resolves with headers object
          */
-        var computeHeaders = function computeHeaders() {
-            var headers = _.extend({}, options.headers);
+        const computeHeaders = () => {
+            const headers = {...options.headers};
             if (!options.noToken) {
-                return tokenHandler.getToken().then(function(token) {
+                return tokenHandler.getToken().then(token => {
+                    tempToken = token;
+
                     headers[tokenHeaderName] = token || 'none';
                     return headers;
                 });
@@ -120,15 +125,29 @@ export default function request(options) {
         };
 
         /**
+         * Replaces the locally-stored tempToken into the tokenStore
+         * Unsets the local copy
+         * @returns {Promise} - resolves when done
+         */
+        const reEnqueueTempToken = () => {
+            if (tempToken) {
+                logger.debug('re-enqueueing %s token %s', tokenHeaderName, tempToken);
+                return tokenHandler.setToken(tempToken)
+                    .then(() => {
+                        tempToken = null;
+                    });
+            }
+            return Promise.resolve();
+        };
+
+        /**
          * Extracts returned security token from headers and adds it to store
          * @param {Object} xhr
          * @returns {Promise} - resolves when done
          */
-        var setTokenFromXhr = function setTokenFromXhr(xhr) {
-            var token;
-
+        const setTokenFromXhr = xhr => {
             if (_.isFunction(xhr.getResponseHeader)) {
-                token = xhr.getResponseHeader(tokenHeaderName);
+                const token = xhr.getResponseHeader(tokenHeaderName);
                 logger.debug('received %s header %s', tokenHeaderName, token);
 
                 if (token) {
@@ -138,9 +157,9 @@ export default function request(options) {
             return Promise.resolve();
         };
 
-        return computeHeaders().then(function(customHeaders) {
-            return new Promise(function(resolve, reject) {
-                var noop;
+        return computeHeaders()
+            .then(customHeaders => new Promise((resolve, reject) => {
+                const noop = undefined; // eslint-disable-line no-undefined
                 $.ajax({
                     url: options.url,
                     method: options.method || 'GET',
@@ -150,7 +169,7 @@ export default function request(options) {
                     dataType: options.dataType || 'json',
                     async: true,
                     timeout: options.timeout * 1000 || context.timeout * 1000 || 0,
-                    beforeSend: function() {
+                    beforeSend() {
                         if (!_.isEmpty(customHeaders)) {
                             logger.debug(
                                 'sending %s header %s',
@@ -161,92 +180,101 @@ export default function request(options) {
                     },
                     global: !options.background //TODO fix this with TT-260
                 })
-                    .done(function(response, status, xhr) {
-                        setTokenFromXhr(xhr)
-                            .then(function() {
-                                if (
-                                    xhr.status === 204 ||
-                                    (response && response.errorCode === 204) ||
-                                    status === 'nocontent'
-                                ) {
-                                    // no content, so resolve with empty data.
-                                    return resolve();
-                                }
-
-                                // handle case where token expired or invalid
-                                if (xhr.status === 403 || (response && response.errorCode === 403)) {
-                                    return reject(
-                                        createError(
-                                            response,
-                                            xhr.status + ' : ' + xhr.statusText,
-                                            xhr.status,
-                                            xhr.readyState > 0
-                                        )
-                                    );
-                                }
-
-                                if (xhr.status === 200 || (response && response.success === true)) {
-                                    // there's some data
-                                    return resolve(response);
-                                }
-
-                                //the server has handled the error
-                                reject(
-                                    createError(
-                                        response,
-                                        __('The server has sent an empty response'),
-                                        xhr.status,
-                                        xhr.readyState > 0
-                                    )
-                                );
-                            })
-                            .catch(function(error) {
-                                logger.error(error);
-                                reject(createError(response, error, xhr.status, xhr.readyState > 0));
-                            });
-                    })
-                    .fail(function(xhr, textStatus, errorThrown) {
-                        var response;
-                        try {
-                            response = JSON.parse(xhr.responseText);
-                        } catch (parseErr) {
-                            response = {};
+                .done((response, status, xhr) => {
+                    setTokenFromXhr(xhr).then(() => {
+                        if (
+                            xhr.status === 204 ||
+                            (response && response.errorCode === 204) ||
+                            status === 'nocontent'
+                        ) {
+                            // no content, so resolve with empty data.
+                            return resolve();
                         }
 
-                        response = _.defaults(response, {
-                            success: false,
-                            source: 'network',
-                            cause: options.url,
-                            purpose: 'proxy',
-                            context: this,
-                            code: xhr.status,
-                            sent: xhr.readyState > 0,
-                            type: 'error',
-                            message: errorThrown || __('An error occurred!')
-                        });
+                        // handle case where token expired or invalid
+                        if (xhr.status === 403 || (response && response.errorCode === 403)) {
+                            return reject(
+                                createError(
+                                    response,
+                                    `${xhr.status} : ${xhr.statusText}`,
+                                    xhr.status,
+                                    xhr.readyState > 0
+                                )
+                            );
+                        }
 
-                        setTokenFromXhr(xhr)
-                            .then(function() {
-                                reject(
-                                    createError(
-                                        response,
-                                        xhr.status + ' : ' + xhr.statusText,
-                                        xhr.status,
-                                        xhr.readyState > 0
-                                    )
-                                );
-                            })
-                            .catch(function(error) {
-                                logger.error(error);
-                                reject(createError(response, error, xhr.status, xhr.readyState > 0));
-                            });
+                        if (xhr.status === 200 || (response && response.success === true)) {
+                            // there's some data
+                            return resolve(response);
+                        }
+
+                        //the server has handled the error
+                        reject(
+                            createError(
+                                response,
+                                __('The server has sent an empty response'),
+                                xhr.status,
+                                xhr.readyState > 0
+                            )
+                        );
+                    })
+                    .catch(error => {
+                        logger.error(error);
+                        reject(createError(response, error, xhr.status, xhr.readyState > 0));
                     });
-            });
-        });
-    }
+                })
+                .fail((xhr, textStatus, errorThrown) => {
+                    let response;
+                    try {
+                        response = JSON.parse(xhr.responseText);
+                    } catch (parseErr) {
+                        response = {};
+                    }
+
+                    const responseExtras = {
+                        success: false,
+                        source: 'network',
+                        cause: options.url,
+                        purpose: 'proxy',
+                        context: this,
+                        code: xhr.status,
+                        sent: xhr.readyState > 0,
+                        type: 'error',
+                        textStatus: textStatus,
+                        message: errorThrown || __('An error occurred!')
+                    };
+
+                    const enhancedResponse = {...responseExtras, ...response};
+
+                    // if the request failed because the browser is offline,
+                    // we need to recycle the used request token
+                    let tokenHandlerPromise;
+                    if (enhancedResponse.code === 0) {
+                        tokenHandlerPromise = reEnqueueTempToken();
+                    } else {
+                        tokenHandlerPromise = setTokenFromXhr(xhr);
+                    }
+
+                    tokenHandlerPromise.then(() => {
+                        reject(
+                            createError(
+                                enhancedResponse,
+                                `${xhr.status} : ${xhr.statusText}`,
+                                xhr.status,
+                                xhr.readyState > 0
+                            )
+                        );
+                    })
+                    .catch(error => {
+                        logger.error(error);
+                        reject(createError(enhancedResponse, error, xhr.status, xhr.readyState > 0));
+                    });
+                });
+            }));
+    };
 
     // Decide how to launch the request based on certain params:
-    return tokenHandler.getQueueLength().then(function(queueLength) {
+    return tokenHandler.getQueueLength().then(queueLength => {
         if (options.noToken === true) {
             // no token protection, run the request
             return runRequest();

@@ -76,10 +76,21 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 status: 200
             }
         ],
+        '//202': [
+            {
+                success: false
+            },
+            'Accepted',
+            {
+                status: 202
+            }
+        ],
 
         '//403': [
             {
-                success: false
+                success: false,
+                errorCode: 403,
+                errorMsg: 'Authentication Error'
             },
             'Error',
             {
@@ -89,7 +100,9 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
 
         '//500': [
             {
-                success: false
+                success: false,
+                errorCode: 500,
+                errorMsg: 'Internal Server Error'
             },
             'Error',
             {
@@ -98,6 +111,25 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
         ],
 
         '//204': [null, 'No Content', { status: 204 }]
+    };
+
+    var standardMockResponse = function(settings, caseData, context) {
+        var response = _.cloneDeep(responses[settings.url][0]);
+        var content;
+        if (response) {
+            content = response.data || {};
+            if (caseData.headers) {
+                content.requestHeaders = settings.headers;
+            }
+            if (response.success === false) {
+                context.responseText = JSON.stringify(response);
+            } else {
+                context.responseText = JSON.stringify({
+                    success: true,
+                    content: content
+                });
+            }
+        }
     };
 
     QUnit.module('API');
@@ -119,9 +151,8 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
 
     QUnit.module('request');
 
-    QUnit.test('bad request call with ', function(assert) {
+    QUnit.test('bad request call: no url', function(assert) {
         var caseData = {
-            title: 'no url',
             err: new TypeError('At least give a URL...')
         };
 
@@ -162,22 +193,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                     url: /^\/\/200.*$/,
                     status: 200,
                     response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
+                        return standardMockResponse(settings, caseData, this);
                     }
                 }
             ]);
@@ -235,23 +251,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         'X-CSRF-Token': 'token2'
                     },
                     response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
+                        return standardMockResponse(settings, caseData, this);
                     }
                 }
             ]);
@@ -283,6 +283,59 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         });
                 });
         });
+
+    QUnit.test('tokenised request with multiple tokens available', function(assert) {
+        var data = {
+            url: '//200',
+            content: { foo: 'bar' }
+        };
+
+        var ready = assert.async();
+        var tokenHandler = tokenHandlerFactory();
+
+        // mock the endpoints:
+        $.mockjax([
+            {
+                url: /^\/\/200.*$/,
+                status: 200,
+                headers: {
+                    // respond with:
+                    'X-CSRF-Token': 'token3'
+                },
+                response: function(settings) {
+                    return standardMockResponse(settings, data, this);
+                }
+            }
+        ]);
+
+        tokenHandler
+            .clearStore()
+            .then(function() {
+                return tokenHandler.setToken('token1');
+            })
+            .then(function() {
+                return tokenHandler.setToken('token2');
+            })
+            .then(function() {
+                var result = request(data);
+
+                assert.expect(2);
+
+                assert.ok(result instanceof Promise, 'The request function returns a promise');
+
+                result
+                    .then(function() {
+                        tokenHandler.getToken().then(function(storedToken) {
+                            assert.equal(storedToken, 'token2', 'The next token is the second original token');
+                            ready();
+                        });
+                    })
+                    .catch(function() {
+                        assert.ok(false, 'Should not reject');
+                        ready();
+                    });
+            });
+    });
 
     QUnit.test('empty response [204]', function(assert) {
         var data = {
@@ -337,7 +390,15 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 url: '//500',
                 reject: true,
                 err: new Error('500 : Server Error')
+            },
+            {
+                title: 'disconnected',
+                url: '//offline',
+                reject: true,
+                err: new Error('0 : timeout'),
+                reuseToken: true
             }
+
         ])
         .test('request failure with ', function(caseData, assert) {
             var ready = assert.async();
@@ -346,35 +407,15 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
             // mock the endpoints:
             $.mockjax([
                 {
-                    url: /^\/\/200.*$/,
-                    status: 200,
-                    headers: {
-                        // respond with:
-                        'X-CSRF-Token': 'token2'
-                    },
-                    response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
-                    }
-                },
-                {
                     url: '//500',
                     status: 500,
                     statusText: 'Server Error'
+                },
+                {
+                    url: '//offline',
+                    status: 0,
+                    responseTime: 100,
+                    isTimeout: true
                 }
             ]);
 
@@ -386,7 +427,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 .then(function() {
                     var result = request(caseData);
 
-                    assert.expect(3);
+                    assert.expect(4);
 
                     assert.ok(result instanceof Promise, 'The request function returns a promise');
 
@@ -398,7 +439,15 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         .catch(function(err) {
                             assert.equal(err.name, caseData.err.name, 'Reject error is the one expected');
                             assert.equal(err.message, caseData.err.message, 'Reject error is correct');
-                            ready();
+
+                            tokenHandler.getToken().then(function(storedToken) {
+                                if (caseData.reuseToken) {
+                                    assert.equal(storedToken, 'token1', 'The token was re-enqueued');
+                                } else {
+                                    assert.equal(storedToken, null, 'The token store is now empty');
+                                }
+                                ready();
+                            });
                         });
                 });
         });
@@ -418,7 +467,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 url: '//200/error/fallback'
             }
         ])
-        .test('request with success: false', function(caseData, assert) {
+        .test('request with success: false ', function(caseData, assert) {
             var ready = assert.async();
             var tokenHandler = tokenHandlerFactory();
 
@@ -432,22 +481,7 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         'X-CSRF-Token': 'token2'
                     },
                     response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
+                        return standardMockResponse(settings, caseData, this);
                     }
                 }
             ]);
@@ -490,11 +524,23 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
             source: 'network',
             message: '0 : timeout'
         },
+        '//202': {
+            code: 202,
+            sent: true,
+            source: 'request',
+            message: 'The server has sent an empty response'
+        },
         '//403': {
             code: 403,
             sent: true,
             source: 'network',
             message: '403 : Authentication Error'
+        },
+        '//500': {
+            code: 500,
+            sent: true,
+            source: 'request',
+            message: '500 : Internal Server Error'
         }
     };
 
@@ -507,9 +553,13 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
             {
                 title: '403 response',
                 url: '//403'
+            },
+            {
+                title: '2xx catch-all',
+                url: '//202'
             }
         ])
-        .test('error-throwing cases', function(caseData, assert) {
+        .test('error-throwing cases ', function(caseData, assert) {
             var ready = assert.async();
             var tokenHandler = tokenHandlerFactory();
 
@@ -525,22 +575,14 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                     status: 403,
                     statusText: 'Authentication Error',
                     response: function(settings) {
-                        var response = _.cloneDeep(responses[settings.url][0]);
-                        var content;
-                        if (response) {
-                            content = response.data || {};
-                            if (caseData.headers) {
-                                content.requestHeaders = settings.headers;
-                            }
-                            if (response.success === false) {
-                                this.responseText = JSON.stringify(response);
-                            } else {
-                                this.responseText = JSON.stringify({
-                                    success: true,
-                                    content: content
-                                });
-                            }
-                        }
+                        return standardMockResponse(settings, caseData, this);
+                    }
+                },
+                {
+                    url: '//202',
+                    status: 202,
+                    response: function(settings) {
+                        return standardMockResponse(settings, caseData, this);
                     }
                 }
             ]);
