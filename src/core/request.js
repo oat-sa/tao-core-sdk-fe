@@ -158,7 +158,7 @@ export default function request(options) {
 
         return computeHeaders().then(customHeaders => {
             return new Promise((resolve, reject) => {
-                const noop = void(0);
+                const noop = undefined; // eslint-disable-line no-undefined
                 $.ajax({
                     url: options.url,
                     method: options.method || 'GET',
