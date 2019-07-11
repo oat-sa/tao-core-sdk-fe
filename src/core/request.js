@@ -145,7 +145,7 @@ export default function request(options) {
          * @param {Object} xhr
          * @returns {Promise} - resolves when done
          */
-        const setTokenFromXhr = (xhr) => {
+        const setTokenFromXhr = xhr => {
             if (_.isFunction(xhr.getResponseHeader)) {
                 const token = xhr.getResponseHeader(tokenHeaderName);
                 logger.debug('received %s header %s', tokenHeaderName, token);
@@ -157,8 +157,8 @@ export default function request(options) {
             return Promise.resolve();
         };
 
-        return computeHeaders().then(customHeaders => {
-            return new Promise((resolve, reject) => {
+        return computeHeaders()
+            .then(customHeaders => new Promise((resolve, reject) => {
                 const noop = undefined; // eslint-disable-line no-undefined
                 $.ajax({
                     url: options.url,
@@ -169,7 +169,7 @@ export default function request(options) {
                     dataType: options.dataType || 'json',
                     async: true,
                     timeout: options.timeout * 1000 || context.timeout * 1000 || 0,
-                    beforeSend: () => {
+                    beforeSend() {
                         if (!_.isEmpty(customHeaders)) {
                             logger.debug(
                                 'sending %s header %s',
@@ -242,7 +242,7 @@ export default function request(options) {
                         type: 'error',
                         textStatus: textStatus,
                         message: errorThrown || __('An error occurred!')
-                    }
+                    };
 
                     const enhancedResponse = {...responseExtras, ...response};
 
@@ -270,9 +270,8 @@ export default function request(options) {
                         reject(createError(enhancedResponse, error, xhr.status, xhr.readyState > 0));
                     });
                 });
-            });
-        });
-    }
+            }));
+    };
 
     // Decide how to launch the request based on certain params:
     return tokenHandler.getQueueLength().then(queueLength => {
