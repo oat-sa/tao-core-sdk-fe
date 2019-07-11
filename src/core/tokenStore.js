@@ -23,7 +23,6 @@
  * @author Martin Nicholson <martin@taotesting.com>
  */
 import _ from 'lodash';
-import Promise from 'core/promise';
 import store from 'core/store';
 
 /**

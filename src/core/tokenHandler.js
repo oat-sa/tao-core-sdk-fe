@@ -22,7 +22,6 @@
 import _ from 'lodash';
 import module from 'module';
 import tokenStoreFactory from 'core/tokenStore';
-import Promise from 'core/promise';
 import promiseQueue from 'core/promiseQueue';
 
 let clientConfigFetched = false;
