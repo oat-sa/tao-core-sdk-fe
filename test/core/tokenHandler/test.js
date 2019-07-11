@@ -22,15 +22,6 @@
 define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise, tokenHandlerFactory) {
     'use strict';
 
-    var proxyApi = [
-        { name: 'getToken' },
-        { name: 'setToken' },
-        { name: 'getClientConfigTokens' },
-        { name: 'clearStore' },
-        { name: 'getQueueLength' },
-        { name: 'setMaxSize' }
-    ];
-
     QUnit.module('tokenHandler');
 
     QUnit.test('module', function(assert) {
@@ -45,7 +36,14 @@ define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise
         );
     });
 
-    QUnit.cases.init(proxyApi).test('instance API ', function(data, assert) {
+    QUnit.cases.init([
+        {name: 'getToken'},
+        {name: 'setToken'},
+        {name: 'getClientConfigTokens'},
+        {name: 'clearStore'},
+        {name: 'getQueueLength'},
+        {name: 'setMaxSize'}
+    ]).test('instance API ', function(data, assert) {
         var instance = tokenHandlerFactory();
         assert.expect(1);
         assert.equal(
@@ -55,32 +53,124 @@ define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise
         );
     });
 
-    QUnit.module('behaviour');
+    QUnit.module('behaviour', {
+        beforeEach: function() {
+            this.cachedModuleConfig = requirejs.s.contexts._.config.config['core/tokenHandler'];
+        },
+        afterEach: function() {
+            requirejs.s.contexts._.config.config['core/tokenHandler'] = this.cachedModuleConfig;
+        }
+    });
 
-    QUnit.test('set/get single token', function(assert) {
+    QUnit.cases.init([{
+        title: 'default, no delay',
+        token: '42a0d04bbc519952',
+        shouldExpire: false
+    }, {
+        title: 'with time limit, no delay, local config',
+        options: {
+            tokenTimeLimit: 100
+        },
+        token: 'b4cf23d4e0f4be32',
+        shouldExpire: false
+    }, {
+        title: 'with time limit, no delay, platform config',
+        moduleOptions: {
+            tokenTimeLimit: 100
+        },
+        token: 'b4cf23d4e0f4be32',
+        shouldExpire: false
+    }, {
+        title: 'with time limit, delay, local config',
+        options: {
+            tokenTimeLimit: 100
+        },
+        token: '68b29e61b6b79123',
+        delay: 200,
+        shouldExpire: true
+    }, {
+        title: 'with time limit, delay, platform config',
+        moduleOptions: {
+            tokenTimeLimit: 100
+        },
+        token: '68b29e61b6b79123',
+        delay: 200,
+        shouldExpire: true
+    }, {
+        title: 'without time limit, no delay, local config',
+        options: {
+            tokenTimeLimit: 0
+        },
+        token: '359db188e255d9c9',
+        shouldExpire: false
+    }, {
+        title: 'without time limit, no delay, platform config',
+        moduleOptions: {
+            tokenTimeLimit: 0
+        },
+        token: '359db188e255d9c9',
+        shouldExpire: false
+    }, {
+        title: 'without time limit, delay, local config',
+        options: {
+            tokenTimeLimit: 0
+        },
+        token: '22bca22ae34e0219',
+        delay: 200,
+        shouldExpire: false
+    }, {
+        title: 'without time limit, delay, platform config',
+        moduleOptions: {
+            tokenTimeLimit: 0
+        },
+        token: '22bca22ae34e0219',
+        delay: 200,
+        shouldExpire: false
+    }]).test('set/get single token', function(data, assert) {
         var ready = assert.async();
-        var tokenHandler = tokenHandlerFactory();
-        var expectedToken = { value: 'e56fg1a3b9de2237f', receivedAt: Date.now() };
+        var tokenHandler;
 
         assert.expect(2);
 
+        if (data.moduleOptions) {
+            requirejs.s.contexts._.config.config['core/tokenHandler'] = data.moduleOptions;
+        }
+        tokenHandler = tokenHandlerFactory(data.options);
+
         tokenHandler
-            .setToken(expectedToken.value)
+            .setToken(data.token)
             .then(function(result) {
                 assert.ok(result, 'The setToken method returns true');
 
-                return tokenHandler.getToken();
+                return new Promise(function(resolve, reject) {
+                    window.setTimeout(function() {
+                        tokenHandler.getToken()
+                            .then(resolve)
+                            .catch(reject);
+                    }, data.delay || 0);
+                });
             })
             .then(function(returnedToken) {
-                assert.equal(returnedToken, expectedToken.value, 'The getToken method returns the right token');
-
-                return tokenHandler.clearStore();
+                if (data.shouldExpire) {
+                    assert.notEqual(returnedToken, data.token, 'The getToken method does not return the provided token');
+                } else {
+                    assert.equal(returnedToken, data.token, 'The getToken method returns the right token');
+                }
+            })
+            .catch(function(err) {
+                if (data.shouldExpire && err instanceof Error && err.message === 'No tokens available. Please refresh the page.') {
+                    assert.ok(true, 'The token has expired as expected');
+                } else {
+                    return Promise.reject(err);
+                }
             })
             .then(function() {
-                ready();
+                return tokenHandler.clearStore();
             })
             .catch(function(err) {
                 assert.ok(false, err.message);
+            })
+            .then(function() {
                 ready();
             });
     });

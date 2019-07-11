@@ -22,12 +22,11 @@
 import _ from 'lodash';
 import module from 'module';
 import tokenStoreFactory from 'core/tokenStore';
-import Promise from 'core/promise';
 import promiseQueue from 'core/promiseQueue';
 
-var clientConfigFetched = false;
+let clientConfigFetched = false;
 
-var defaults = {
+const defaults = {
     maxSize: 6,
     tokenTimeLimit: 1000 * 60 * 24
 };
@@ -41,7 +40,6 @@ var defaults = {
  * @returns {tokenHandler}
  */
 export default function tokenHandlerFactory(options) {
-    var tokenStore;
 
     // Convert legacy parameter:
     if (_.isString(options)) {
@@ -49,10 +47,13 @@ export default function tokenHandlerFactory(options) {
             initialToken: options
         };
     }
-    options = _.defaults({}, options, defaults);
+    options = _.defaults({}, options, _.omit(module.config(), 'tokens'), defaults);
     // Initialise storage for tokens:
-    tokenStore = tokenStoreFactory(options);
+    const tokenStore = tokenStoreFactory(options);
 
+    /**
+     * @typedef {Object} tokenHandler
+     */
     return {
         /**
          * Gets the next security token from the token queue
@@ -61,18 +62,18 @@ export default function tokenHandlerFactory(options) {
          *
          * @returns {Promise<String>} the token value
          */
-        getToken: function getToken() {
-            var self = this;
-            var initialToken = options.initialToken;
+        getToken() {
+            const initialToken = options.initialToken;
 
-            var getFirstTokenValue = function getFirstTokenValue() {
-                return tokenStore.dequeue().then(function(currentToken) {
-                    if (currentToken) {
-                        return currentToken.value;
-                    }
-                    return null;
-                });
-            };
+            const getFirstTokenValue = () => (
+                tokenStore.dequeue()
+                    .then(currentToken => {
+                        if (currentToken) {
+                            return currentToken.value;
+                        }
+                        return null;
+                    })
+            );
 
             // If set, initialToken will be provided directly, without using store:
             if (initialToken) {
@@ -83,16 +84,15 @@ export default function tokenHandlerFactory(options) {
             // Some async checks before we go for the token:
             return tokenStore
                 .expireOldTokens()
-                .then(function() {
-                    return tokenStore.getSize();
-                })
-                .then(function(queueSize) {
+                .then(() => tokenStore.getSize())
+                .then(queueSize => {
                     if (queueSize > 0) {
                         // Token available, use it
                         return getFirstTokenValue();
                     } else if (!clientConfigFetched) {
                         // Client Config allowed! (first and only time)
-                        return self.getClientConfigTokens().then(getFirstTokenValue);
+                        return this.getClientConfigTokens()
+                            .then(getFirstTokenValue);
                     } else {
                         // No more token options, refresh needed
                         return Promise.reject(new Error('No tokens available. Please refresh the page.'));
@@ -106,7 +106,7 @@ export default function tokenHandlerFactory(options) {
          * @param {String} newToken
          * @returns {Promise<Boolean>} - resolves true if successful
          */
-        setToken: function setToken(newToken) {
+        setToken(newToken) {
             return tokenStore.enqueue(newToken);
         },
 
@@ -114,56 +114,49 @@ export default function tokenHandlerFactory(options) {
          * Extracts tokens from the Client Config which should be received on every page load
          * @returns {Promise<Boolean>} - resolves true when completed
          */
-        getClientConfigTokens: function getClientConfigTokens() {
-            var self = this;
-            var clientTokens = _.map(module.config().tokens, function(serverToken) {
-                return {
-                    value: serverToken,
-                    receivedAt: Date.now()
-                };
-            });
+        getClientConfigTokens() {
+            const {tokens} = module.config();
+            const clientTokens = (tokens || []).map(serverToken => ({
+                value: serverToken,
+                receivedAt: Date.now()
+            }));
 
             // Record that this function ran:
             clientConfigFetched = true;
 
-            return Promise.resolve(clientTokens).then(function(newTokens) {
-                // Add the fetched tokens to the store
-                // Uses a promiseQueue to ensure synchronous adding
-                var setTokenQueue = promiseQueue();
+            return Promise.resolve(clientTokens)
+                .then(newTokens => {
+                    // Add the fetched tokens to the store
+                    // Uses a promiseQueue to ensure synchronous adding
+                    const setTokenQueue = promiseQueue();
 
-                _.forEach(newTokens, function(token) {
-                    setTokenQueue.serie(function() {
-                        return self.setToken(token);
-                    });
-                });
+                    newTokens.forEach(token => setTokenQueue.serie(() => this.setToken(token)));
 
-                return setTokenQueue.serie(function() {
-                    return true;
+                    return setTokenQueue.serie(() => true);
                 });
-            });
         },
 
         /**
          * Clears the token store
          * @returns {Promise<Boolean>} - resolves to true when cleared
          */
-        clearStore: function clearStore() {
+        clearStore() {
             return tokenStore.clear();
         },
 
         /**
          * Getter for the current queue length
-         * @returns {Promise<Integer>}
+         * @returns {Promise<Number>}
          */
-        getQueueLength: function getQueueLength() {
+        getQueueLength() {
             return tokenStore.getSize();
         },
 
         /**
          * Setter for maximum pool size
-         * @param {Integer} size
+         * @param {Number} size
          */
-        setMaxSize: function setMaxSize(size) {
+        setMaxSize(size) {
             tokenStore.setMaxSize(size);
         }
     };
