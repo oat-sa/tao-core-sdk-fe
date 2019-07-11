@@ -158,7 +158,7 @@ export default function request(options) {
 
         return computeHeaders().then(customHeaders => {
             return new Promise((resolve, reject) => {
-                let noop;
+                const noop = void(0);
                 $.ajax({
                     url: options.url,
                     method: options.method || 'GET',
