@@ -12,10 +12,11 @@
   "scripts": {
     "test": "npx qunit-testrunner",
     "test:keepAlive": "npx qunit-testrunner --keepalive",
-    "test:cov": "npx qunit-testrunner --cov",
+    "test:cov": "npm run build:cov && npx qunit-testrunner --cov",
     "coverage": "nyc report",
     "coverage:html": "nyc report --reporter=lcov && open-cli coverage/lcov-report/index.html",
     "build": "rollup --config ./build/rollup.config.js",
+    "build:cov": "rollup --config ./build/rollup.config.js --environment COVERAGE",
     "build:watch": "rollup --config ./build/rollup.config.js --watch",
     "lint": "eslint src/util src/core test",
     "prepare": "npm run build"
@@ -65,6 +66,7 @@
     "rollup-plugin-alias": "^1.5.1",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-istanbul": "^2.0.1",
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^5.0.1",
     "text": "github:requirejs/text#2.0.16"
