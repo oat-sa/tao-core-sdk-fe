@@ -146,7 +146,7 @@ export default function tokenHandlerFactory(options) {
 
         /**
          * Getter for the current queue length
-         * @returns {Promise<Integer>}
+         * @returns {Promise<Number>}
          */
         getQueueLength() {
             return tokenStore.getSize();
@@ -154,7 +154,7 @@ export default function tokenHandlerFactory(options) {
 
         /**
          * Setter for maximum pool size
-         * @param {Integer} size
+         * @param {Number} size
          */
         setMaxSize(size) {
             tokenStore.setMaxSize(size);

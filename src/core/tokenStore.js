@@ -168,7 +168,7 @@ export default function tokenStoreFactory(options) {
 
         /**
          * Gets the current size of the store
-         * @returns {Promise<Integer>}
+         * @returns {Promise<Number>}
          */
         getSize() {
             return this.getIndex()
@@ -177,7 +177,7 @@ export default function tokenStoreFactory(options) {
 
         /**
          * Setter for maximum pool size
-         * @param {Integer} size
+         * @param {Number} size
          */
         setMaxSize(size) {
             if (_.isNumber(size) && size > 0 && size !== config.maxSize) {
