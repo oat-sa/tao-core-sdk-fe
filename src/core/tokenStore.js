@@ -114,13 +114,11 @@ export default function tokenStoreFactory(options) {
          */
         getIndex() {
             return this.getTokens()
-                .then(tokens => {
-                    return _.chain(tokens)
-                        .values()
+                .then(tokens => (
+                    Object.values(tokens)
                         .sort((t1, t2) => t1.receivedAt - t2.receivedAt)
-                        .map('value')
-                        .value();
-                });
+                        .map(token => token.value)
+                ));
         },
 
         /**
@@ -131,7 +129,7 @@ export default function tokenStoreFactory(options) {
          */
         has(key) {
             return this.getIndex()
-                .then(latestIndex => _.contains(latestIndex, key));
+                .then(latestIndex => latestIndex.includes(key));
         },
 
         /**
@@ -201,7 +199,7 @@ export default function tokenStoreFactory(options) {
                     if (excess > 0) {
                         const keysToRemove = latestIndex.slice(0, excess);
                         return Promise.all(
-                            _.map(keysToRemove, key => this.remove(key))
+                            keysToRemove.map(key => this.remove(key))
                         );
                     }
                     return true;
@@ -229,10 +227,14 @@ export default function tokenStoreFactory(options) {
         expireOldTokens() {
             return this.getTokens()
                 // Check each token's expiry, synchronously:
-                .then(tokens => _.reduce(
-                    tokens,
-                    (previousPromise, nextToken) => previousPromise.then(() => this.checkExpiry(nextToken)),
-                    Promise.resolve()
+                .then(tokens => (
+                    Object.values(tokens)
+                        .reduce(
+                            (previousPromise, nextToken) => (
+                                previousPromise.then(() => this.checkExpiry(nextToken))
+                            ),
+                            Promise.resolve()
+                        )
                 ))
                 // All done
                 .then(() => true);
