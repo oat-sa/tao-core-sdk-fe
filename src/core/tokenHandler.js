@@ -116,7 +116,8 @@ export default function tokenHandlerFactory(options) {
          * @returns {Promise<Boolean>} - resolves true when completed
          */
         getClientConfigTokens() {
-            const clientTokens = _.map(module.config().tokens, serverToken => ({
+            const {tokens} = module.config();
+            const clientTokens = (tokens || []).map(serverToken => ({
                 value: serverToken,
                 receivedAt: Date.now()
             }));
@@ -130,9 +131,7 @@ export default function tokenHandlerFactory(options) {
                     // Uses a promiseQueue to ensure synchronous adding
                     const setTokenQueue = promiseQueue();
 
-                    _.forEach(newTokens, token => {
-                        setTokenQueue.serie(() => this.setToken(token));
-                    });
+                    newTokens.forEach(token => setTokenQueue.serie(() => this.setToken(token)));
 
                     return setTokenQueue.serie(() => true);
                 });
