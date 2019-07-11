@@ -244,7 +244,7 @@ export default function request(options) {
                         message: errorThrown || __('An error occurred!')
                     }
 
-                    const enhancedResponse = {...response, ...responseExtras};
+                    const enhancedResponse = {...responseExtras, ...response};
 
                     // if the request failed because the browser is offline,
                     // we need to recycle the used request token
