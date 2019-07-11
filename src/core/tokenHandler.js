@@ -65,15 +65,15 @@ export default function tokenHandlerFactory(options) {
         getToken() {
             const initialToken = options.initialToken;
 
-            const getFirstTokenValue = () => {
-                return tokenStore.dequeue()
+            const getFirstTokenValue = () => (
+                tokenStore.dequeue()
                     .then(currentToken => {
                         if (currentToken) {
                             return currentToken.value;
                         }
                         return null;
-                    });
-            };
+                    })
+            );
 
             // If set, initialToken will be provided directly, without using store:
             if (initialToken) {
