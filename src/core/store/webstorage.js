@@ -44,14 +44,18 @@ var knownStoresName = 'index';
  */
 var idStoreName = 'id';
 
-var writingQueue = promiseQueue();
-
 /**
  * WebStorage is an implementation of browser's Web Storage API
  * @param {Storage} storage Alias to a Storage API
  * @returns {Function} Factory function
  */
 const webStorageFactory = function(storage) {
+    /**
+     * Write queue of store
+     * @type {PromiseQueue}
+     */
+    var writingQueue = promiseQueue();
+
     /**
      * Set an entry into a store
      * @param {String} storeName - unprefixed store name
