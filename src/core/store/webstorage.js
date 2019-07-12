@@ -54,7 +54,7 @@ const webStorageFactory = function(storage) {
      * Write queue of store
      * @type {PromiseQueue}
      */
-    var writingQueue = promiseQueue();
+    const writingQueue = promiseQueue();
 
     /**
      * Set an entry into a store
