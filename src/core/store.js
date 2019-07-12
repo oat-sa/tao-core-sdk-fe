@@ -39,6 +39,7 @@ import module from 'module';
 import loggerFactory from 'core/logger';
 import Promise from 'core/promise';
 import localStorageBackend from 'core/store/localstorage';
+import sessionStorageBackend from 'core/store/sessionstorage';
 import indexedDBBackend from 'core/store/indexeddb';
 import memoryBackend from 'core/store/memory';
 
@@ -158,19 +159,20 @@ var checkQuotas = function checkQuotas() {
                 if (_.isNumber(estimate.usage) && _.isNumber(estimate.quota) && estimate.quota > 0) {
                     usedRatio = estimate.usage / estimate.quota;
                     if (usedRatio > config.lowSpaceRatio) {
-                        logger.warn('The browser storage is getting low ' + usedRatio.toFixed(2) + '% used', estimate);
+                        logger.warn(`The browser storage is getting low ${usedRatio.toFixed(2)}% used`, estimate);
                         logger.warn('We will attempt to clean oldster databases in persistent backends');
                         store.cleanUpSpace(config.invalidation.oldster, [], localStorageBackend);
+                        store.cleanUpSpace(config.invalidation.oldster, [], sessionStorageBackend);
                         if (isIndexDBSupported) {
                             store.cleanUpSpace(config.invalidation.oldster, [], indexedDBBackend);
                         }
                     } else {
-                        logger.debug('Browser storage estimate : ' + usedRatio.toFixed(2) + '% used', estimate);
+                        logger.debug(`Browser storage estimate : ${usedRatio.toFixed(2)}% used`, estimate);
                     }
                 }
             })
             .catch(function(err) {
-                logger.warn('Unable to retrieve quotas : ' + err.message);
+                logger.warn(`Unable to retrieve quotas : ${err.message}`);
             });
     }
     quotaChecked = true;
@@ -247,6 +249,7 @@ store = function storeLoader(storeName, preselectedBackend) {
  */
 store.backends = {
     localStorage: localStorageBackend,
+    sessionStorage: sessionStorageBackend,
     indexedDB: indexedDBBackend,
     memory: memoryBackend
 };
@@ -305,7 +308,7 @@ store.cleanUpSpace = function cleanUpSpace(since, storeNamePattern, preselectedB
             .valueOf();
     }
 
-    logger.info('Trying to remove stores lastly opened before ' + tsThreshold + '(' + since + ')');
+    logger.info(`Trying to remove stores lastly opened before ${tsThreshold}(${since})`);
 
     return store.removeAll(invalidate, preselectedBackend);
 };
