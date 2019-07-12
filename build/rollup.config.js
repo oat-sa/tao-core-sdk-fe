@@ -23,6 +23,7 @@ import json from 'rollup-plugin-json';
 import resolve from 'rollup-plugin-node-resolve';
 import commonJS from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
+import istanbul from 'rollup-plugin-istanbul';
 
 const { srcDir, outputDir } = require('./path');
 
@@ -72,6 +73,7 @@ export default inputs.map(input => {
             json({
                 preferConst: false
             }),
+            ...(process.env.COVERAGE ? [istanbul()] : []),
             babel({
                 presets: [[
                     '@babel/env', {

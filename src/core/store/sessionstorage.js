@@ -18,4 +18,4 @@
 
 import webstorageFactory from 'core/store/webstorage';
 
-export default webstorageFactory(window.localStorage);
+export default webstorageFactory(window.sessionStorage);
