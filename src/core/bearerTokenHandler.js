@@ -78,25 +78,26 @@ export default function bearerTokenHandlerFactory(options = {}) {
          * @returns {Promise<string|null>} Promise of Bearer token
          */
         getToken() {
-            const getTokenPromise = new Promise((resolve, reject) => {
-                tokenStorage.getAccessToken().then(accessToken => {
-                    if (accessToken) {
-                        resolve(accessToken);
-                    } else {
-                        tokenStorage.getRefreshToken().then(refreshToken => {
-                            if (refreshToken) {
-                                unQueuedRefreshToken().then(token => {
-                                    resolve(token);
-                                });
+            return actionQueue.serie(
+                () =>
+                    new Promise((resolve, reject) => {
+                        tokenStorage.getAccessToken().then(accessToken => {
+                            if (accessToken) {
+                                resolve(accessToken);
                             } else {
-                                reject(new Error('Token not available and cannot be refreshed'));
+                                tokenStorage.getRefreshToken().then(refreshToken => {
+                                    if (refreshToken) {
+                                        unQueuedRefreshToken().then(token => {
+                                            resolve(token);
+                                        });
+                                    } else {
+                                        reject(new Error('Token not available and cannot be refreshed'));
+                                    }
+                                });
                             }
                         });
-                    }
-                });
-            });
-
-            return actionQueue.serie(() => getTokenPromise);
+                    })
+            );
         },
 
         storeRefreshToken(refreshToken) {

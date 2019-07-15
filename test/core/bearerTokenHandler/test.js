@@ -101,7 +101,7 @@ define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, 
     });
 
     QUnit.test('refresh token', function(assert) {
-        assert.expect(3);
+        assert.expect(4);
 
         const done = assert.async();
 
@@ -120,10 +120,90 @@ define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, 
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
-            this.handler.getToken().then(storedBearerToken => {
-                assert.equal(storedBearerToken, bearerToken, 'get refreshed bearer token');
-                done();
+            this.handler.getToken().then(refreshedBearerToken => {
+                assert.equal(refreshedBearerToken, bearerToken, 'get refreshed bearer token');
+
+                this.handler.getToken().then(storedBearerToken => {
+                    assert.equal(storedBearerToken, bearerToken, 'get bearer token from store without refresh');
+                    done();
+                });
             });
+        });
+    });
+
+    QUnit.module('Concurrency', {
+        beforeEach: function() {
+            this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: 'refreshUrl' });
+        },
+        afterEach: function() {
+            this.handler.clearStore();
+            mockedRequest.reset();
+        }
+    });
+
+    QUnit.test('queue get token if other get is in progress', function(assert) {
+        assert.expect(4);
+
+        const done = assert.async();
+
+        const bearerToken = 'some bearer token';
+        const refreshToken = 'some refresh token';
+
+        mockedRequest.setup({
+            refreshUrl: request => {
+                const data = JSON.parse(request.data);
+                assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                return new Promise(resolve => {
+                    setTimeout(() => resolve({ accessToken: bearerToken }), 100);
+                });
+            }
+        });
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
+            assert.equal(setTokenResult, true, 'refresh token is set');
+
+            const firstGetTokenPromise = this.handler.getToken().then(refreshedBearerToken => {
+                assert.equal(refreshedBearerToken, bearerToken, 'get refreshed bearer token');
+            });
+
+            const secondGetTokenPromise = this.handler.getToken().then(storedBearerToken => {
+                assert.equal(storedBearerToken, bearerToken, 'get bearer token from store without refresh');
+            });
+
+            Promise.all([firstGetTokenPromise, secondGetTokenPromise]).then(done);
+        });
+    });
+
+    QUnit.test('queue get token if refresh token is in progress', function(assert) {
+        assert.expect(4);
+
+        const done = assert.async();
+
+        const bearerToken = 'some bearer token';
+        const refreshToken = 'some refresh token';
+
+        mockedRequest.setup({
+            refreshUrl: request => {
+                const data = JSON.parse(request.data);
+                assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                return new Promise(resolve => {
+                    setTimeout(() => resolve({ accessToken: bearerToken }), 100);
+                });
+            }
+        });
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
+            assert.equal(setTokenResult, true, 'refresh token is set');
+
+            const refreshTokenPromise = this.handler.refreshToken().then(refreshedBearerToken => {
+                assert.equal(refreshedBearerToken, bearerToken, 'get refreshed bearer token');
+            });
+
+            const getTokenPromise = this.handler.getToken().then(storedBearerToken => {
+                assert.equal(storedBearerToken, bearerToken, 'get bearer token from store without refresh');
+            });
+
+            Promise.all([refreshTokenPromise, getTokenPromise]).then(done);
         });
     });
 });
