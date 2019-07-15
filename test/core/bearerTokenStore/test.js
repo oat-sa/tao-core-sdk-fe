@@ -53,10 +53,11 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     const exampleTokens = ['foo', 'bar', 'baz'];
 
     QUnit.cases.init(exampleTokens).test('set access token', function(token, assert) {
-        assert.expect(1);
+        assert.expect(2);
         const done = assert.async();
 
-        this.storage.setAccessToken(token).then(() => {
+        this.storage.setAccessToken(token).then(storeResult => {
+            assert.equal(storeResult, true, 'token successfully set');
             this.storage.getAccessToken().then(storedToken => {
                 assert.equal(token, storedToken, 'get back stored access token');
                 done();
@@ -65,10 +66,11 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     });
 
     QUnit.cases.init(exampleTokens).test('set refresh token', function(token, assert) {
-        assert.expect(1);
+        assert.expect(2);
         const done = assert.async();
 
-        this.storage.setRefreshToken(token).then(() => {
+        this.storage.setRefreshToken(token).then(storeResult => {
+            assert.equal(storeResult, true, 'token successfully set');
             this.storage.getRefreshToken().then(storedToken => {
                 assert.equal(token, storedToken, 'get back stored refresh token');
                 done();
@@ -77,13 +79,14 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     });
 
     QUnit.test('set tokens', function(assert) {
-        assert.expect(2);
+        assert.expect(3);
         const done = assert.async();
 
         const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
-        Promise.all([this.storage.setTokens(accessToken, refreshToken)]).then(() => {
+        this.storage.setTokens(accessToken, refreshToken).then(storeResult => {
+            assert.equal(storeResult, true, 'tokens successfully set');
             Promise.all([this.storage.getAccessToken(), this.storage.getRefreshToken()]).then(
                 ([storedAccessToken, storedRefreshToken]) => {
                     assert.equal(storedAccessToken, accessToken, 'get back stored access token');
@@ -95,11 +98,13 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     });
 
     QUnit.test('clear access token', function(assert) {
-        assert.expect(1);
+        assert.expect(3);
         const done = assert.async();
 
-        this.storage.setAccessToken('some accessToken').then(() => {
-            this.storage.clearAccessToken().then(() => {
+        this.storage.setAccessToken('some accessToken').then(storeResult => {
+            assert.equal(storeResult, true, 'token successfully set');
+            this.storage.clearAccessToken().then(clearResult => {
+                assert.equal(clearResult, true, 'token successfully cleared');
                 this.storage.getAccessToken().then(storedToken => {
                     assert.equal(storedToken, null, 'access token is cleared');
                     done();
@@ -109,11 +114,13 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     });
 
     QUnit.test('clear refresh token', function(assert) {
-        assert.expect(1);
+        assert.expect(3);
         const done = assert.async();
 
-        this.storage.setRefreshToken('some refreshToken').then(() => {
-            this.storage.clearRefreshToken().then(() => {
+        this.storage.setRefreshToken('some refreshToken').then(storeResult => {
+            assert.equal(storeResult, true, 'token successfully set');
+            this.storage.clearRefreshToken().then(clearResult => {
+                assert.equal(clearResult, true, 'token successfully cleared');
                 this.storage.getRefreshToken().then(storedToken => {
                     assert.equal(storedToken, null, 'refresh token is cleared');
                     done();
@@ -123,11 +130,13 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     });
 
     QUnit.test('clear tokens', function(assert) {
-        assert.expect(2);
+        assert.expect(4);
         const done = assert.async();
 
-        this.storage.setRefreshToken('some access token', 'some refresh token').then(() => {
-            this.storage.clear().then(() => {
+        this.storage.setTokens('some access token', 'some refresh token').then(storeResult => {
+            assert.equal(storeResult, true, 'tokens successfully set');
+            this.storage.clear().then(clearResult => {
+                assert.equal(clearResult, true, 'token successfully cleared');
                 Promise.all([this.storage.getAccessToken(), this.storage.getRefreshToken()]).then(
                     ([storedAccessToken, storedRefreshToken]) => {
                         assert.equal(storedAccessToken, null, 'access token is cleared');
@@ -151,13 +160,14 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     });
 
     QUnit.test('stores could access to same tokens', function(assert) {
-        assert.expect(2);
+        assert.expect(3);
         const done = assert.async();
 
         const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
-        this.storage1.setTokens(accessToken, refreshToken).then(() => {
+        this.storage1.setTokens(accessToken, refreshToken).then(storeResult => {
+            assert.equal(storeResult, true, 'tokens successfully set');
             Promise.all([this.storage2.getAccessToken(), this.storage2.getRefreshToken()]).then(
                 ([storedAccessToken, storedRefreshToken]) => {
                     assert.equal(storedAccessToken, accessToken, 'get back stored access token');
@@ -169,14 +179,16 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     });
 
     QUnit.test('store will be empty if other store will be cleared', function(assert) {
-        assert.expect(2);
+        assert.expect(4);
         const done = assert.async();
 
         const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
-        this.storage1.setTokens(accessToken, refreshToken).then(() => {
-            this.storage2.clear().then(() => {
+        this.storage1.setTokens(accessToken, refreshToken).then(storeResult => {
+            assert.equal(storeResult, true, 'tokens successfully set');
+            this.storage2.clear().then(clearResult => {
+                assert.equal(clearResult, true, 'token successfully cleared');
                 Promise.all([this.storage1.getAccessToken(), this.storage1.getRefreshToken()]).then(
                     ([storedAccessToken, storedRefreshToken]) => {
                         assert.equal(storedAccessToken, null, 'could not get back cleared access token');
@@ -200,7 +212,7 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     });
 
     QUnit.test('stores could not access to same tokens', function(assert) {
-        assert.expect(4);
+        assert.expect(6);
         const done = assert.async();
 
         const accessToken1 = 'access token 1';
@@ -211,7 +223,10 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
         Promise.all([
             this.storage1.setTokens(accessToken1, refreshToken1),
             this.storage2.setTokens(accessToken2, refreshToken2)
-        ]).then(() => {
+        ]).then(([storeResult1, storeResult2]) => {
+            assert.equal(storeResult1, true, 'tokens 1 successfully set');
+            assert.equal(storeResult2, true, 'tokens 2 successfully set');
+
             Promise.all([
                 this.storage1.getAccessToken(),
                 this.storage1.getRefreshToken(),
@@ -228,14 +243,16 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
     });
 
     QUnit.test('store content will be kept if other store will be cleared', function(assert) {
-        assert.expect(2);
+        assert.expect(4);
         const done = assert.async();
 
         const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
-        this.storage1.setTokens(accessToken, refreshToken).then(() => {
-            this.storage2.clear().then(() => {
+        this.storage1.setTokens(accessToken, refreshToken).then(storeResult => {
+            assert.equal(storeResult, true, 'tokens successfully set');
+            this.storage2.clear().then(clearResult => {
+                assert.equal(clearResult, true, 'token successfully cleared');
                 Promise.all([this.storage1.getAccessToken(), this.storage1.getRefreshToken()]).then(
                     ([storedAccessToken, storedRefreshToken]) => {
                         assert.equal(storedAccessToken, accessToken, 'get back stored access token');

@@ -30,6 +30,7 @@ import store from 'core/store';
 const defaultOptions = {
     namespace: 'global'
 };
+
 /**
  * @param {Object} options={} Factory options
  * @param {string} options[namespace] Namespace of the store
@@ -85,10 +86,14 @@ export default function bearerTokenStoreFactory(options = {}) {
          * Store access and refresh token
          * @param {string} accessToken
          * @param {string} refreshToken
-         * @returns {Promise<Boolean[]>} Tokens successfully set
+         * @returns {Promise<Boolean>} Tokens successfully set
          */
         setTokens(accessToken, refreshToken) {
-            return Promise.all([this.setAccessToken(accessToken), this.setRefreshToken(refreshToken)]);
+            return new Promise(resolve => {
+                Promise.all([this.setAccessToken(accessToken), this.setRefreshToken(refreshToken)]).then(() =>
+                    resolve(true)
+                );
+            });
         },
 
         /**
@@ -109,10 +114,12 @@ export default function bearerTokenStoreFactory(options = {}) {
 
         /**
          * Clear the whole storage
-         * @returns {Promise<Boolean[]>} tokens successfully cleared
+         * @returns {Promise<Boolean>} tokens successfully cleared
          */
         clear() {
-            return Promise.all([this.clearAccessToken(), this.clearRefreshToken()]);
+            return new Promise(resolve => {
+                Promise.all([this.clearAccessToken(), this.clearRefreshToken()]).then(() => resolve(true));
+            });
         }
     };
 }
