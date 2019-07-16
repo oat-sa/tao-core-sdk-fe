@@ -37,6 +37,7 @@ const defaultOptions = {
  * Bearer token handler factory
  * @param {Object} options Options of bearer token handler
  * @param {string} options[serviceName] Name of the service what Bearer token belongs to
+ * @param {string} options[refreshTokenUrl] Url where handler could refresh bearer token
  */
 export default function bearerTokenHandlerFactory(options = {}) {
     options = { ...defaultOptions, ...options };
@@ -65,7 +66,7 @@ export default function bearerTokenHandlerFactory(options = {}) {
                 } else {
                     coreRequest({
                         url: refreshTokenUrl,
-                        method: 'GET',
+                        method: 'POST',
                         data: JSON.stringify({ refreshToken }),
                         dataType: 'json',
                         contentType: 'application/json',
