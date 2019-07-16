@@ -20,7 +20,7 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, mockedRequest) => {
+define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenHandlerFactory) => {
     'use strict';
 
     QUnit.module('factory');
@@ -40,13 +40,17 @@ define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, 
         );
     });
 
+    // prevent the AJAX mocks to pollute the logs
+    $.mockjaxSettings.logger = null;
+    $.mockjaxSettings.responseTime = 1;
+
     QUnit.module('API', {
         beforeEach: function() {
-            this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: 'refreshUrl' });
+            this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
         },
         afterEach: function() {
             this.handler.clearStore();
-            mockedRequest.reset();
+            $.mockjax.clear();
         }
     });
 
@@ -108,15 +112,17 @@ define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, 
         const bearerToken = 'some bearer token';
         const refreshToken = 'some refresh token';
 
-        mockedRequest.setup({
-            refreshUrl: request => {
-                const data = JSON.parse(request.data);
-                assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                return new Promise(resolve => {
-                    setTimeout(resolve({ accessToken: bearerToken }), 100);
-                });
+        $.mockjax([
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(request) {
+                    const data = JSON.parse(request.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: bearerToken });
+                }
             }
-        });
+        ]);
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
@@ -133,11 +139,11 @@ define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, 
 
     QUnit.module('Concurrency', {
         beforeEach: function() {
-            this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: 'refreshUrl' });
+            this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
         },
         afterEach: function() {
             this.handler.clearStore();
-            mockedRequest.reset();
+            $.mockjax.clear();
         }
     });
 
@@ -149,15 +155,17 @@ define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, 
         const bearerToken = 'some bearer token';
         const refreshToken = 'some refresh token';
 
-        mockedRequest.setup({
-            refreshUrl: request => {
-                const data = JSON.parse(request.data);
-                assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                return new Promise(resolve => {
-                    setTimeout(() => resolve({ accessToken: bearerToken }), 100);
-                });
+        $.mockjax([
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(request) {
+                    const data = JSON.parse(request.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: bearerToken });
+                }
             }
-        });
+        ]);
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
@@ -182,15 +190,17 @@ define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, 
         const bearerToken = 'some bearer token';
         const refreshToken = 'some refresh token';
 
-        mockedRequest.setup({
-            refreshUrl: request => {
-                const data = JSON.parse(request.data);
-                assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                return new Promise(resolve => {
-                    setTimeout(() => resolve({ accessToken: bearerToken }), 100);
-                });
+        $.mockjax([
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(request) {
+                    const data = JSON.parse(request.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: bearerToken });
+                }
             }
-        });
+        ]);
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
@@ -217,32 +227,33 @@ define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, 
         const refreshToken = 'some refresh token';
 
         const setupSecondRequest = () => {
-            mockedRequest.reset();
-            mockedRequest.setup({
-                refreshUrl: request => {
-                    const data = JSON.parse(request.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    return new Promise(resolve => {
-                        setTimeout(() => {
-                            resolve({ accessToken: bearerToken2 });
-                        }, 100);
-                    });
+            $.mockjax.clear();
+            $.mockjax([
+                {
+                    url: /^\/\/refreshUrl$/,
+                    status: 200,
+                    response: function(request) {
+                        const data = JSON.parse(request.data);
+                        assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                        this.responseText = JSON.stringify({ accessToken: bearerToken2 });
+                        setupSecondRequest();
+                    }
                 }
-            });
+            ]);
         };
 
-        mockedRequest.setup({
-            refreshUrl: request => {
-                const data = JSON.parse(request.data);
-                assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        setupSecondRequest();
-                        resolve({ accessToken: bearerToken1 });
-                    }, 100);
-                });
+        $.mockjax([
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(request) {
+                    const data = JSON.parse(request.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: bearerToken1 });
+                    setupSecondRequest();
+                }
             }
-        });
+        ]);
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');

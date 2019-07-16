@@ -7,12 +7,6 @@
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
-                    //some mocks
-                    requirejs.config({
-                        paths: {
-                            'core/request': 'test/core/bearerTokenHandler/mock/request'
-                        }
-                    });
                     require(['test/core/bearerTokenHandler/test'], function() {
                         QUnit.start();
                     });
