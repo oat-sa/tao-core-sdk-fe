@@ -71,11 +71,15 @@ export default function bearerTokenHandlerFactory(options = {}) {
                         contentType: 'application/json',
                         noToken: true,
                         timeout: 3000
-                    }).then(({ accessToken }) => {
-                        tokenStorage.setAccessToken(accessToken).then(() => {
-                            resolve(accessToken);
+                    })
+                        .then(({ accessToken }) => {
+                            tokenStorage.setAccessToken(accessToken).then(() => {
+                                resolve(accessToken);
+                            });
+                        })
+                        .catch(error => {
+                            reject(error);
                         });
-                    });
                 }
             });
         });
@@ -95,9 +99,11 @@ export default function bearerTokenHandlerFactory(options = {}) {
                             } else {
                                 tokenStorage.getRefreshToken().then(refreshToken => {
                                     if (refreshToken) {
-                                        unQueuedRefreshToken().then(token => {
-                                            resolve(token);
-                                        });
+                                        unQueuedRefreshToken()
+                                            .then(token => {
+                                                resolve(token);
+                                            })
+                                            .catch(reject);
                                     } else {
                                         reject(new Error('Token not available and cannot be refreshed'));
                                     }

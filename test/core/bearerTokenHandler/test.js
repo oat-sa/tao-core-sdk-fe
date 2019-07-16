@@ -137,6 +137,64 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
         });
     });
 
+    QUnit.test('unsuccessful refresh token', function(assert) {
+        assert.expect(3);
+
+        const done = assert.async();
+
+        const error = 'some backend error';
+        const refreshToken = 'some refresh token';
+
+        $.mockjax([
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 401,
+                response: function(request) {
+                    const data = JSON.parse(request.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ error });
+                }
+            }
+        ]);
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
+            assert.equal(setTokenResult, true, 'refresh token is set');
+            this.handler.refreshToken().catch(errorResponse => {
+                assert.equal(errorResponse.response.error, error, 'should get back api error message');
+                done();
+            });
+        });
+    });
+
+    QUnit.test('unsuccessful get token if refresh fails', function(assert) {
+        assert.expect(3);
+
+        const done = assert.async();
+
+        const error = 'some backend error';
+        const refreshToken = 'some refresh token';
+
+        $.mockjax([
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 401,
+                response: function(request) {
+                    const data = JSON.parse(request.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ error });
+                }
+            }
+        ]);
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
+            assert.equal(setTokenResult, true, 'refresh token is set');
+            this.handler.getToken().catch(errorResponse => {
+                assert.equal(errorResponse.response.error, error, 'should get back api error message');
+                done();
+            });
+        });
+    });
+
     QUnit.module('Concurrency', {
         beforeEach: function() {
             this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
