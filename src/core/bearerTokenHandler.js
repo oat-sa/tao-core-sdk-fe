@@ -47,8 +47,16 @@ export default function bearerTokenHandlerFactory(options = {}) {
         namespace: serviceName
     });
 
+    /**
+     * Action queue to avoid concurrent token updates
+     */
     const actionQueue = promiseQueue();
 
+    /**
+     * This is an "unsafe" refresh token, because it allows to call multiple time paralelly
+     * It will refresh the token from provided API and saves it for later use
+     * @returns {Promise<string>} Promise of new token
+     */
     const unQueuedRefreshToken = () =>
         new Promise((resolve, reject) => {
             tokenStorage.getRefreshToken().then(refreshToken => {
@@ -100,18 +108,32 @@ export default function bearerTokenHandlerFactory(options = {}) {
             );
         },
 
+        /**
+         * Saves refresh token for later
+         * @param {string} refreshToken
+         * @returns {Promise<Boolean>} Promise of token store
+         */
         storeRefreshToken(refreshToken) {
             return actionQueue.serie(() => {
                 return tokenStorage.setRefreshToken(refreshToken);
             });
         },
 
+        /**
+         * Saves initial bearer token
+         * @param {string} bearerToken
+         * @returns {Promise<Boolean>} Promise of token store
+         */
         storeBearerToken(bearerToken) {
             return actionQueue.serie(() => {
                 return tokenStorage.setAccessToken(bearerToken);
             });
         },
 
+        /**
+         * Clear store with all tokens
+         * @returns {Promise<Boolean>} Promise of store clear
+         */
         clearStore() {
             return actionQueue.serie(() => {
                 return tokenStorage.clear();
