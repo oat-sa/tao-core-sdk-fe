@@ -206,4 +206,56 @@ define(['core/bearerTokenHandler', 'core/request'], (bearerTokenHandlerFactory, 
             Promise.all([refreshTokenPromise, getTokenPromise]).then(done);
         });
     });
+
+    QUnit.test('queue refresh token if another refresh token is in progress', function(assert) {
+        assert.expect(5);
+
+        const done = assert.async();
+
+        const bearerToken1 = 'some bearer token 1';
+        const bearerToken2 = 'some bearer token 2';
+        const refreshToken = 'some refresh token';
+
+        const setupSecondRequest = () => {
+            mockedRequest.reset();
+            mockedRequest.setup({
+                refreshUrl: request => {
+                    const data = JSON.parse(request.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    return new Promise(resolve => {
+                        setTimeout(() => {
+                            resolve({ accessToken: bearerToken2 });
+                        }, 100);
+                    });
+                }
+            });
+        };
+
+        mockedRequest.setup({
+            refreshUrl: request => {
+                const data = JSON.parse(request.data);
+                assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        setupSecondRequest();
+                        resolve({ accessToken: bearerToken1 });
+                    }, 100);
+                });
+            }
+        });
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
+            assert.equal(setTokenResult, true, 'refresh token is set');
+
+            const refreshTokenPromise1 = this.handler.refreshToken().then(refreshedBearerToken => {
+                assert.equal(refreshedBearerToken, bearerToken1, 'get refreshed bearer token');
+            });
+
+            const refreshTokenPromise2 = this.handler.refreshToken().then(storedBearerToken => {
+                assert.equal(storedBearerToken, bearerToken2, 'get bearer token from store without refresh');
+            });
+
+            Promise.all([refreshTokenPromise1, refreshTokenPromise2]).then(done);
+        });
+    });
 });
