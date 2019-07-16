@@ -733,9 +733,59 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
             this.handler.storeBearerToken(expiredBearerToken),
             this.handler.storeRefreshToken(refreshToken)
         ]).then(([setBearerTokenResponse, setRefreshTokenResponse]) => {
-            assert.equal(setBearerTokenResponse, true, true, 'bearer token stored successfully');
-            assert.equal(setRefreshTokenResponse, true, true, 'refresh token stored successfully');
+            assert.equal(setBearerTokenResponse, true, 'bearer token stored successfully');
+            assert.equal(setRefreshTokenResponse, true, 'refresh token stored successfully');
             request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }).then(() => {
+                done();
+            });
+        });
+    });
+
+    QUnit.test('Token refreshing and retry only one time after 401', function(assert) {
+        assert.expect(7);
+
+        const done = assert.async();
+
+        const expiredBearerToken = 'invalid bearer token';
+        const refreshToken = 'some refresh token';
+
+        const originalError = {
+            error: 'some error'
+        };
+
+        $.mockjax([
+            {
+                url: /^\/\/endpoint$/,
+                status: 401,
+                response: function(requestData) {
+                    assert.equal(
+                        requestData.headers.Authorization,
+                        `Bearer: ${expiredBearerToken}`,
+                        'called with expired bearer token'
+                    );
+                    this.responseText = JSON.stringify(originalError);
+                }
+            },
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(requestData) {
+                    const data = JSON.parse(requestData.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: expiredBearerToken });
+                }
+            }
+        ]);
+
+        Promise.all([
+            this.handler.storeBearerToken(expiredBearerToken),
+            this.handler.storeRefreshToken(refreshToken)
+        ]).then(([setBearerTokenResponse, setRefreshTokenResponse]) => {
+            assert.equal(setBearerTokenResponse, true, 'bearer token stored successfully');
+            assert.equal(setRefreshTokenResponse, true, 'refresh token stored successfully');
+            request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }).catch(error => {
+                assert.equal(error.response.code, 401, 'should get back original status code');
+                assert.deepEqual(error.response.error, originalError.error, 'should get back original api error');
                 done();
             });
         });
@@ -775,8 +825,8 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
             this.handler.storeBearerToken(expiredBearerToken),
             this.handler.storeRefreshToken(refreshToken)
         ]).then(([setBearerTokenResponse, setRefreshTokenResponse]) => {
-            assert.equal(setBearerTokenResponse, true, true, 'bearer token stored successfully');
-            assert.equal(setRefreshTokenResponse, true, true, 'refresh token stored successfully');
+            assert.equal(setBearerTokenResponse, true, 'bearer token stored successfully');
+            assert.equal(setRefreshTokenResponse, true, 'refresh token stored successfully');
             request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }).catch(error => {
                 assert.equal(error.response.code, 401, 'should get back original status code');
                 assert.deepEqual(error.response.error, originalError.error, 'should get back original api error');
