@@ -18,6 +18,7 @@
 
 /**
  * Give and refresh Bearer token
+ * @module core/bearerTokenHandler
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
@@ -36,10 +37,10 @@ const defaultOptions = {
 /**
  * Bearer token handler factory
  * @param {Object} options Options of bearer token handler
- * @param {string} options[serviceName] Name of the service what Bearer token belongs to
- * @param {string} options[refreshTokenUrl] Url where handler could refresh bearer token
+ * @param {String} options.serviceName Name of the service what Bearer token belongs to
+ * @param {String} options.refreshTokenUrl Url where handler could refresh bearer token
  */
-export default function bearerTokenHandlerFactory(options = {}) {
+const bearerTokenHandlerFactory = function bearerTokenHandlerFactory(options = {}) {
     options = { ...defaultOptions, ...options };
 
     const { serviceName, refreshTokenUrl } = options;
@@ -50,13 +51,14 @@ export default function bearerTokenHandlerFactory(options = {}) {
 
     /**
      * Action queue to avoid concurrent token updates
+     * @type {Promise<any>}
      */
     const actionQueue = promiseQueue();
 
     /**
      * This is an "unsafe" refresh token, because it allows to call multiple time paralelly
      * It will refresh the token from provided API and saves it for later use
-     * @returns {Promise<string>} Promise of new token
+     * @returns {Promise<String>} Promise of new token
      */
     const unQueuedRefreshToken = () =>
         new Promise((resolve, reject) => {
@@ -88,37 +90,37 @@ export default function bearerTokenHandlerFactory(options = {}) {
     return {
         /**
          * Get Bearer token
-         * @returns {Promise<string|null>} Promise of Bearer token
+         * @returns {Promise<String|null>} Promise of Bearer token
          */
         getToken() {
-            return actionQueue.serie(
-                () =>
-                    new Promise((resolve, reject) => {
-                        tokenStorage.getAccessToken().then(accessToken => {
-                            if (accessToken) {
-                                resolve(accessToken);
-                            } else {
-                                tokenStorage.getRefreshToken().then(refreshToken => {
-                                    if (refreshToken) {
-                                        unQueuedRefreshToken()
-                                            .then(token => {
-                                                resolve(token);
-                                            })
-                                            .catch(reject);
-                                    } else {
-                                        reject(new Error('Token not available and cannot be refreshed'));
-                                    }
-                                });
-                            }
-                        });
-                    })
-            );
+            const getTokenPromiseCreator = () =>
+                new Promise((resolve, reject) => {
+                    tokenStorage.getAccessToken().then(accessToken => {
+                        if (accessToken) {
+                            resolve(accessToken);
+                        } else {
+                            tokenStorage.getRefreshToken().then(refreshToken => {
+                                if (refreshToken) {
+                                    unQueuedRefreshToken()
+                                        .then(token => {
+                                            resolve(token);
+                                        })
+                                        .catch(reject);
+                                } else {
+                                    reject(new Error('Token not available and cannot be refreshed'));
+                                }
+                            });
+                        }
+                    });
+                });
+
+            return actionQueue.serie(getTokenPromiseCreator);
         },
 
         /**
          * Saves refresh token for later
-         * @param {string} refreshToken
-         * @returns {Promise<Boolean>} Promise of token store
+         * @param {String} refreshToken
+         * @returns {Promise<Boolean>} Promise of token is stored
          */
         storeRefreshToken(refreshToken) {
             return actionQueue.serie(() => {
@@ -128,8 +130,8 @@ export default function bearerTokenHandlerFactory(options = {}) {
 
         /**
          * Saves initial bearer token
-         * @param {string} bearerToken
-         * @returns {Promise<Boolean>} Promise of token store
+         * @param {String} bearerToken
+         * @returns {Promise<Boolean>} Promise of token is stored
          */
         storeBearerToken(bearerToken) {
             return actionQueue.serie(() => {
@@ -138,8 +140,8 @@ export default function bearerTokenHandlerFactory(options = {}) {
         },
 
         /**
-         * Clear store with all tokens
-         * @returns {Promise<Boolean>} Promise of store clear
+         * Clear all tokens from store
+         * @returns {Promise<Boolean>} Promise of store is cleared
          */
         clearStore() {
             return actionQueue.serie(() => {
@@ -149,10 +151,12 @@ export default function bearerTokenHandlerFactory(options = {}) {
 
         /**
          * Refresh Bearer token
-         * @returns {Promise<string>} Promise of new Bearer token
+         * @returns {Promise<String>} Promise of new Bearer token
          */
         refreshToken() {
             return actionQueue.serie(() => unQueuedRefreshToken());
         }
     };
-}
+};
+
+export default bearerTokenHandlerFactory;

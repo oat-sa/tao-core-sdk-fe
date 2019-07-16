@@ -17,7 +17,8 @@
  */
 
 /**
- * Implement store for Bearer token
+ * Implementation of store for Bearer token
+ * @module core/bearerTokenStore
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
@@ -32,11 +33,11 @@ const defaultOptions = {
 };
 
 /**
- * @param {Object} options={} Factory options
- * @param {string} options[namespace] Namespace of the store
+ * @param {Object} options={} - Factory options
+ * @param {string} options.namespace - Namespace of the store
  * @returns {Object} Store API
  */
-export default function bearerTokenStoreFactory(options = {}) {
+const bearerTokenStoreFactory = function bearerTokenStoreFactory(options = {}) {
     options = { ...defaultOptions, ...options };
 
     const { namespace } = options;
@@ -122,4 +123,6 @@ export default function bearerTokenStoreFactory(options = {}) {
             });
         }
     };
-}
+};
+
+export default bearerTokenStoreFactory;
