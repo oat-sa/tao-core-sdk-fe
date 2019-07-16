@@ -21,12 +21,12 @@
  *
  * @author Martin Nicholson <martin@taotesting.com>
  */
-define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(
+define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTokenHandler', 'jquery.mockjax'], function(
     $,
     _,
     request,
-    Promise,
-    tokenHandlerFactory
+    tokenHandlerFactory,
+    bearerTokenHandlerFactory
 ) {
     'use strict';
 
@@ -398,7 +398,6 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 err: new Error('0 : timeout'),
                 reuseToken: true
             }
-
         ])
         .test('request failure with ', function(caseData, assert) {
             var ready = assert.async();
@@ -514,7 +513,6 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 });
         });
 
-
     QUnit.module('errors');
 
     errors = {
@@ -614,4 +612,133 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         });
                 });
         });
+
+    QUnit.module('Bearer token', {
+        beforeEach: function() {
+            this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
+        },
+        afterEach: function() {
+            this.handler.clearStore();
+            $.mockjax.clear();
+        }
+    });
+
+    QUnit.test('Request contains Bearer token header', function(assert) {
+        assert.expect(2);
+
+        const done = assert.async();
+
+        const bearerToken = 'some bearer token';
+
+        $.mockjax([
+            {
+                url: /^\/\/200$/,
+                status: 200,
+                response: function(requestData) {
+                    assert.equal(
+                        requestData.headers.Authorization,
+                        `Bearer: ${bearerToken}`,
+                        'bearer token header is sent'
+                    );
+                    this.responseText = JSON.stringify({});
+                }
+            }
+        ]);
+
+        this.handler.storeBearerToken(bearerToken).then(setTokenResponse => {
+            assert.equal(setTokenResponse, true, 'token stored successfully');
+            request({ url: '//200', bearerTokenHandler: this.handler, noToken: true }).then(() => {
+                done();
+            });
+        });
+    });
+
+    QUnit.test('Token refreshing before request send', function(assert) {
+        assert.expect(3);
+
+        const done = assert.async();
+
+        const bearerToken = 'some bearer token';
+        const refreshToken = 'some refresh token';
+
+        $.mockjax([
+            {
+                url: /^\/\/200$/,
+                status: 200,
+                response: function(requestData) {
+                    assert.equal(
+                        requestData.headers.Authorization,
+                        `Bearer: ${bearerToken}`,
+                        'bearer token header is sent'
+                    );
+                    this.responseText = JSON.stringify({});
+                }
+            },
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(requestData) {
+                    const data = JSON.parse(requestData.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: bearerToken });
+                }
+            }
+        ]);
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResponse => {
+            assert.equal(setTokenResponse, true, 'token stored successfully');
+            request({ url: '//200', bearerTokenHandler: this.handler, noToken: true }).then(() => {
+                done();
+            });
+        });
+    });
+
+    QUnit.test('Token refreshing if API respond with 401', function(assert) {
+        assert.expect(5);
+
+        const done = assert.async();
+
+        const expiredBearerToken = 'invalid bearer token';
+        const validBearerToken = 'valid bearer token';
+        const refreshToken = 'some refresh token';
+
+        $.mockjax([
+            {
+                url: /^\/\/endpoint$/,
+                // status: 401,
+                response: function(requestData) {
+                    const authorizationHeader = requestData.headers.Authorization;
+                    if (authorizationHeader === `Bearer: ${expiredBearerToken}`) {
+                        assert.ok(true, 'called with expired bearer token');
+                        this.status = 401;
+                        this.responseText = JSON.stringify({});
+                    } else if (authorizationHeader === `Bearer: ${validBearerToken}`) {
+                        assert.ok(true, 'called with valid bearer token');
+                        this.status = 200;
+                        this.responseText = JSON.stringify({});
+                    }
+                }
+            },
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(requestData) {
+                    const data = JSON.parse(requestData.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: validBearerToken });
+                }
+            }
+        ]);
+
+        Promise.all([
+            this.handler.storeBearerToken(expiredBearerToken),
+            this.handler.storeRefreshToken(refreshToken)
+        ]).then(([setBearerTokenResponse, setRefreshTokenResponse]) => {
+            assert.equal(setBearerTokenResponse, true, true, 'bearer token stored successfully');
+            assert.equal(setRefreshTokenResponse, true, true, 'refresh token stored successfully');
+            request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }).then(() => {
+                done();
+            });
+        });
+    });
 });
