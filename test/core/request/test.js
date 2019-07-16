@@ -637,7 +637,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 response: function(requestData) {
                     assert.equal(
                         requestData.headers.Authorization,
-                        `Bearer: ${bearerToken}`,
+                        `Bearer ${bearerToken}`,
                         'bearer token header is sent'
                     );
                     this.responseText = JSON.stringify({});
@@ -668,7 +668,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 response: function(requestData) {
                     assert.equal(
                         requestData.headers.Authorization,
-                        `Bearer: ${bearerToken}`,
+                        `Bearer ${bearerToken}`,
                         'bearer token header is sent'
                     );
                     this.responseText = JSON.stringify({});
@@ -707,11 +707,11 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 url: /^\/\/endpoint$/,
                 response: function(requestData) {
                     const authorizationHeader = requestData.headers.Authorization;
-                    if (authorizationHeader === `Bearer: ${expiredBearerToken}`) {
+                    if (authorizationHeader === `Bearer ${expiredBearerToken}`) {
                         assert.ok(true, 'called with expired bearer token');
                         this.status = 401;
                         this.responseText = JSON.stringify({});
-                    } else if (authorizationHeader === `Bearer: ${validBearerToken}`) {
+                    } else if (authorizationHeader === `Bearer ${validBearerToken}`) {
                         assert.ok(true, 'called with valid bearer token');
                         this.status = 200;
                         this.responseText = JSON.stringify({});
@@ -760,7 +760,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 response: function(requestData) {
                     assert.equal(
                         requestData.headers.Authorization,
-                        `Bearer: ${expiredBearerToken}`,
+                        `Bearer ${expiredBearerToken}`,
                         'called with expired bearer token'
                     );
                     this.responseText = JSON.stringify(originalError);
@@ -807,7 +807,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 url: /^\/\/endpoint$/,
                 status: 401,
                 response: function(requestData) {
-                    assert.equal(requestData.headers.Authorization, `Bearer: ${expiredBearerToken}`);
+                    assert.equal(requestData.headers.Authorization, `Bearer ${expiredBearerToken}`);
                     this.responseText = JSON.stringify(originalError);
                 }
             },

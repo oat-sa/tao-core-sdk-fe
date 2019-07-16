@@ -130,7 +130,7 @@ export default function request(options) {
             const { bearerTokenHandler } = options;
             if (bearerTokenHandler) {
                 return bearerTokenHandler.getToken().then(token => ({
-                    Authorization: `Bearer: ${token}`
+                    Authorization: `Bearer ${token}`
                 }));
             }
             return Promise.resolve({});
