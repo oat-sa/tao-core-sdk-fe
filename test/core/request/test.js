@@ -705,7 +705,6 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
         $.mockjax([
             {
                 url: /^\/\/endpoint$/,
-                // status: 401,
                 response: function(requestData) {
                     const authorizationHeader = requestData.headers.Authorization;
                     if (authorizationHeader === `Bearer: ${expiredBearerToken}`) {
@@ -740,5 +739,59 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 done();
             });
         });
+    });
+
+    QUnit.test('Get back original error, if token refresh was not success', function(assert) {
+        assert.expect(6);
+
+        const done = assert.async();
+
+        const expiredBearerToken = 'invalid bearer token';
+        const refreshToken = 'some refresh token';
+        const originalError = {
+            error: 'some error'
+        };
+
+        $.mockjax([
+            {
+                url: /^\/\/endpoint$/,
+                status: 401,
+                response: function(requestData) {
+                    assert.equal(requestData.headers.Authorization, `Bearer: ${expiredBearerToken}`);
+                    this.responseText = JSON.stringify(originalError);
+                }
+            },
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 401,
+                response: function(requestData) {
+                    const data = JSON.parse(requestData.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                }
+            }
+        ]);
+
+        Promise.all([
+            this.handler.storeBearerToken(expiredBearerToken),
+            this.handler.storeRefreshToken(refreshToken)
+        ]).then(([setBearerTokenResponse, setRefreshTokenResponse]) => {
+            assert.equal(setBearerTokenResponse, true, true, 'bearer token stored successfully');
+            assert.equal(setRefreshTokenResponse, true, true, 'refresh token stored successfully');
+            request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }).catch(error => {
+                assert.equal(error.response.code, 401, 'should get back original status code');
+                assert.deepEqual(error.response.error, originalError.error, 'should get back original api error');
+                done();
+            });
+        });
+    });
+
+    QUnit.test('Get back token handler error, if token is not refreshable', function(assert) {
+        assert.expect(1);
+
+        assert.rejects(
+            request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }),
+            /Token not available and cannot be refreshed/i,
+            'request fails if token handler cannot provide bearer token'
+        );
     });
 });

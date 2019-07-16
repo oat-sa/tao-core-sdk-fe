@@ -273,6 +273,10 @@ export default function request(options) {
                                     $.ajax(ajaxParameters)
                                         .done(onDone)
                                         .fail(onFail);
+                                })
+                                // if refresh token was not success, fail with original error
+                                .catch(() => {
+                                    onFail(xhr, textStatus, errorThrown);
                                 });
                             return;
                         }
