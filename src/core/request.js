@@ -86,7 +86,7 @@ const createError = (response, fallbackMessage, httpCode, httpSent) => {
  * @param {Boolean} [options.background] - if true, the request should be done in the background, which in practice does not trigger the global handlers like ajaxStart or ajaxStop
  * @param {Boolean} [options.sequential] - if true, the request must join a queue to be run sequentially
  * @param {Number}  [options.timeout] - timeout in seconds for the AJAX request
- * @param {Object} [options.bearerTokenHandler] - Bearer token handler instance that handles Bearer token
+ * @param {Object} [options.jwtTokenHandler] - JWT token handler instance
  * @returns {Promise} resolves with response, or reject if something went wrong
  */
 export default function request(options) {
@@ -123,13 +123,13 @@ export default function request(options) {
         };
 
         /**
-         * Fetches a Bearer token if token handler is provided
-         * @returns {Promise<Object>} promise of Bearer token header
+         * Fetches a JWT token if token handler is provided
+         * @returns {Promise<Object>} promise of JWT token header
          */
-        const computeBearerTokenHeader = () => {
-            const { bearerTokenHandler } = options;
-            if (bearerTokenHandler) {
-                return bearerTokenHandler.getToken().then(token => ({
+        const computeJWTTokenHeader = () => {
+            const { jwtTokenHandler } = options;
+            if (jwtTokenHandler) {
+                return jwtTokenHandler.getToken().then(token => ({
                     Authorization: `Bearer ${token}`
                 }));
             }
@@ -141,11 +141,11 @@ export default function request(options) {
          * @returns {Promise<Object>} Promise of headers object
          */
         const computeHeaders = () => {
-            return Promise.all([computeCSRFTokenHeader(), computeBearerTokenHeader()]).then(
-                ([csrfTokenHeader, bearerTokenHeader]) => ({
+            return Promise.all([computeCSRFTokenHeader(), computeJWTTokenHeader()]).then(
+                ([csrfTokenHeader, jwtTokenHeader]) => ({
                     ...options.headers,
                     ...csrfTokenHeader,
-                    ...bearerTokenHeader
+                    ...jwtTokenHeader
                 })
             );
         };
@@ -182,7 +182,10 @@ export default function request(options) {
             return Promise.resolve();
         };
 
-        let isBearerTokenRefreshTried = false;
+        /**
+         * Contains the request already tried to refresh the invalid access token
+         */
+        let isAccessTokenRefreshTried = false;
         return computeHeaders().then(
             customHeaders =>
                 new Promise((resolve, reject) => {
@@ -257,19 +260,20 @@ export default function request(options) {
                     const onFail = (xhr, textStatus, errorThrown) => {
                         let response;
 
+                        const jwtTokenHandler = options.jwtTokenHandler;
                         /**
-                         * if bearer token expired then
+                         * if access token expired then
                          * get new token
                          * update header with new token
                          * retry request
                          *  */
-                        if (xhr.status === 401 && !isBearerTokenRefreshTried && options.bearerTokenHandler) {
-                            isBearerTokenRefreshTried = true;
-                            options.bearerTokenHandler
+                        if (xhr.status === 401 && !isAccessTokenRefreshTried && jwtTokenHandler) {
+                            isAccessTokenRefreshTried = true;
+                            jwtTokenHandler
                                 .refreshToken()
-                                .then(computeBearerTokenHeader)
-                                .then(bearerTokenHeaders => {
-                                    ajaxParameters.headers = { ...ajaxParameters.headers, ...bearerTokenHeaders };
+                                .then(computeJWTTokenHeader)
+                                .then(JWTTokenHeaders => {
+                                    ajaxParameters.headers = { ...ajaxParameters.headers, ...JWTTokenHeaders };
                                     $.ajax(ajaxParameters)
                                         .done(onDone)
                                         .fail(onFail);

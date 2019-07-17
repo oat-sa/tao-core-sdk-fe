@@ -20,22 +20,22 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenHandlerFactory) => {
+define(['jquery', 'core/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHandlerFactory) => {
     'use strict';
 
     QUnit.module('factory');
 
     QUnit.test('module', assert => {
         assert.expect(1);
-        assert.ok(typeof bearerTokenHandlerFactory === 'function', 'the module exposes a function');
+        assert.ok(typeof jwtTokenHandlerFactory === 'function', 'the module exposes a function');
     });
 
     QUnit.test('instantiate', assert => {
         assert.expect(2);
-        assert.ok(typeof bearerTokenHandlerFactory() === 'object', 'the factory produces an object');
+        assert.ok(typeof jwtTokenHandlerFactory() === 'object', 'the factory produces an object');
         assert.notEqual(
-            bearerTokenHandlerFactory(),
-            bearerTokenHandlerFactory(),
+            jwtTokenHandlerFactory(),
+            jwtTokenHandlerFactory(),
             'the factory produces a different object at each call'
         );
     });
@@ -46,7 +46,7 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
 
     QUnit.module('API', {
         beforeEach: function() {
-            this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
+            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
         },
         afterEach: function(assert) {
             const done = assert.async();
@@ -55,18 +55,18 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
         }
     });
 
-    QUnit.test('get bearer token', function(assert) {
+    QUnit.test('get access token', function(assert) {
         assert.expect(2);
 
         const done = assert.async();
 
         const token = 'some token';
 
-        this.handler.storeBearerToken(token).then(setResult => {
+        this.handler.storeAccessToken(token).then(setResult => {
             assert.equal(setResult, true, 'token is set');
 
             this.handler.getToken().then(storedToken => {
-                assert.equal(storedToken, token, 'get back stored bearer token');
+                assert.equal(storedToken, token, 'get back stored access token');
                 done();
             });
         });
@@ -78,10 +78,10 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
         const done = assert.async();
 
         Promise.all([
-            this.handler.storeBearerToken('some token'),
+            this.handler.storeAccessToken('some token'),
             this.handler.storeRefreshToken('some refresh token')
-        ]).then(([setBearerTokenResult, setRefreshTokenResult]) => {
-            assert.equal(setBearerTokenResult, true, 'token is set');
+        ]).then(([setAccessTokenResult, setRefreshTokenResult]) => {
+            assert.equal(setAccessTokenResult, true, 'access token is set');
             assert.equal(setRefreshTokenResult, true, 'refresh token is set');
             this.handler.clearStore().then(clearResult => {
                 assert.equal(clearResult, true, 'store cleared successfully');
@@ -110,7 +110,7 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
 
         const done = assert.async();
 
-        const bearerToken = 'some bearer token';
+        const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
         $.mockjax([
@@ -120,18 +120,18 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
                 response: function(request) {
                     const data = JSON.parse(request.data);
                     assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: bearerToken });
+                    this.responseText = JSON.stringify({ accessToken });
                 }
             }
         ]);
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
-            this.handler.getToken().then(refreshedBearerToken => {
-                assert.equal(refreshedBearerToken, bearerToken, 'get refreshed bearer token');
+            this.handler.getToken().then(refreshedAccessToken => {
+                assert.equal(refreshedAccessToken, accessToken, 'get refreshed access token');
 
-                this.handler.getToken().then(storedBearerToken => {
-                    assert.equal(storedBearerToken, bearerToken, 'get bearer token from store without refresh');
+                this.handler.getToken().then(storedAccessToken => {
+                    assert.equal(storedAccessToken, accessToken, 'get access token from store without refresh');
                     done();
                 });
             });
@@ -198,7 +198,7 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
 
     QUnit.module('Concurrency', {
         beforeEach: function() {
-            this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
+            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
         },
         afterEach: function(assert) {
             const done = assert.async();
@@ -212,7 +212,7 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
 
         const done = assert.async();
 
-        const bearerToken = 'some bearer token';
+        const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
         $.mockjax([
@@ -222,7 +222,7 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
                 response: function(request) {
                     const data = JSON.parse(request.data);
                     assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: bearerToken });
+                    this.responseText = JSON.stringify({ accessToken });
                 }
             }
         ]);
@@ -230,12 +230,12 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
 
-            const firstGetTokenPromise = this.handler.getToken().then(refreshedBearerToken => {
-                assert.equal(refreshedBearerToken, bearerToken, 'get refreshed bearer token');
+            const firstGetTokenPromise = this.handler.getToken().then(refreshedAccessToken => {
+                assert.equal(refreshedAccessToken, accessToken, 'get refreshed access token');
             });
 
-            const secondGetTokenPromise = this.handler.getToken().then(storedBearerToken => {
-                assert.equal(storedBearerToken, bearerToken, 'get bearer token from store without refresh');
+            const secondGetTokenPromise = this.handler.getToken().then(storedAccessToken => {
+                assert.equal(storedAccessToken, accessToken, 'get access token from store without refresh');
             });
 
             Promise.all([firstGetTokenPromise, secondGetTokenPromise]).then(done);
@@ -247,7 +247,7 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
 
         const done = assert.async();
 
-        const bearerToken = 'some bearer token';
+        const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
         $.mockjax([
@@ -257,7 +257,7 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
                 response: function(request) {
                     const data = JSON.parse(request.data);
                     assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: bearerToken });
+                    this.responseText = JSON.stringify({ accessToken });
                 }
             }
         ]);
@@ -265,12 +265,12 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
 
-            const refreshTokenPromise = this.handler.refreshToken().then(refreshedBearerToken => {
-                assert.equal(refreshedBearerToken, bearerToken, 'get refreshed bearer token');
+            const refreshTokenPromise = this.handler.refreshToken().then(refreshedAccessToken => {
+                assert.equal(refreshedAccessToken, accessToken, 'get refreshed access token');
             });
 
-            const getTokenPromise = this.handler.getToken().then(storedBearerToken => {
-                assert.equal(storedBearerToken, bearerToken, 'get bearer token from store without refresh');
+            const getTokenPromise = this.handler.getToken().then(storedAccessToken => {
+                assert.equal(storedAccessToken, accessToken, 'get access token from store without refresh');
             });
 
             Promise.all([refreshTokenPromise, getTokenPromise]).then(done);
@@ -282,8 +282,8 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
 
         const done = assert.async();
 
-        const bearerToken1 = 'some bearer token 1';
-        const bearerToken2 = 'some bearer token 2';
+        const accessToken1 = 'some access token 1';
+        const accessToken2 = 'some access token 2';
         const refreshToken = 'some refresh token';
 
         const setupSecondRequest = () => {
@@ -295,7 +295,7 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
                     response: function(request) {
                         const data = JSON.parse(request.data);
                         assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                        this.responseText = JSON.stringify({ accessToken: bearerToken2 });
+                        this.responseText = JSON.stringify({ accessToken: accessToken2 });
                         setupSecondRequest();
                     }
                 }
@@ -309,7 +309,7 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
                 response: function(request) {
                     const data = JSON.parse(request.data);
                     assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: bearerToken1 });
+                    this.responseText = JSON.stringify({ accessToken: accessToken1 });
                     setupSecondRequest();
                 }
             }
@@ -318,12 +318,12 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
 
-            const refreshTokenPromise1 = this.handler.refreshToken().then(refreshedBearerToken => {
-                assert.equal(refreshedBearerToken, bearerToken1, 'get refreshed bearer token');
+            const refreshTokenPromise1 = this.handler.refreshToken().then(refreshedAccessToken => {
+                assert.equal(refreshedAccessToken, accessToken1, 'get refreshed access token');
             });
 
-            const refreshTokenPromise2 = this.handler.refreshToken().then(storedBearerToken => {
-                assert.equal(storedBearerToken, bearerToken2, 'get bearer token from store without refresh');
+            const refreshTokenPromise2 = this.handler.refreshToken().then(storedAccessToken => {
+                assert.equal(storedAccessToken, accessToken2, 'get access token from store without refresh');
             });
 
             Promise.all([refreshTokenPromise1, refreshTokenPromise2]).then(done);

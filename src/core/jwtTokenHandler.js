@@ -17,12 +17,12 @@
  */
 
 /**
- * Give and refresh Bearer token
- * @module core/bearerTokenHandler
+ * Give and refresh JWT token
+ * @module core/jwtTokenHandler
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-import bearerTokenStoreFactory from 'core/bearerTokenStore';
+import jwtTokenStoreFactory from 'core/jwtTokenStore';
 import coreRequest from 'core/request';
 import promiseQueue from 'core/promiseQueue';
 
@@ -35,17 +35,17 @@ const defaultOptions = {
 };
 
 /**
- * Bearer token handler factory
- * @param {Object} options Options of bearer token handler
- * @param {String} options.serviceName Name of the service what Bearer token belongs to
- * @param {String} options.refreshTokenUrl Url where handler could refresh bearer token
+ * JWT token handler factory
+ * @param {Object} options Options of JWT token handler
+ * @param {String} options.serviceName Name of the service what JWT token belongs to
+ * @param {String} options.refreshTokenUrl Url where handler could refresh JWT token
  */
-const bearerTokenHandlerFactory = function bearerTokenHandlerFactory(options = {}) {
+const jwtTokenHandlerFactory = function jwtTokenHandlerFactory(options = {}) {
     options = { ...defaultOptions, ...options };
 
     const { serviceName, refreshTokenUrl } = options;
 
-    const tokenStorage = bearerTokenStoreFactory({
+    const tokenStorage = jwtTokenStoreFactory({
         namespace: serviceName
     });
 
@@ -89,8 +89,8 @@ const bearerTokenHandlerFactory = function bearerTokenHandlerFactory(options = {
 
     return {
         /**
-         * Get Bearer token
-         * @returns {Promise<String|null>} Promise of Bearer token
+         * Get access token
+         * @returns {Promise<String|null>} Promise of access token
          */
         getToken() {
             const getTokenPromiseCreator = () =>
@@ -129,13 +129,13 @@ const bearerTokenHandlerFactory = function bearerTokenHandlerFactory(options = {
         },
 
         /**
-         * Saves initial bearer token
-         * @param {String} bearerToken
+         * Saves initial access token
+         * @param {String} accessToken
          * @returns {Promise<Boolean>} Promise of token is stored
          */
-        storeBearerToken(bearerToken) {
+        storeAccessToken(accessToken) {
             return actionQueue.serie(() => {
-                return tokenStorage.setAccessToken(bearerToken);
+                return tokenStorage.setAccessToken(accessToken);
             });
         },
 
@@ -150,7 +150,7 @@ const bearerTokenHandlerFactory = function bearerTokenHandlerFactory(options = {
         },
 
         /**
-         * Refresh Bearer token
+         * Refresh access token
          * @returns {Promise<String>} Promise of new Bearer token
          */
         refreshToken() {
@@ -159,4 +159,4 @@ const bearerTokenHandlerFactory = function bearerTokenHandlerFactory(options = {
     };
 };
 
-export default bearerTokenHandlerFactory;
+export default jwtTokenHandlerFactory;

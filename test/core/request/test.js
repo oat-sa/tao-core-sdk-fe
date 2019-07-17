@@ -21,12 +21,12 @@
  *
  * @author Martin Nicholson <martin@taotesting.com>
  */
-define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTokenHandler', 'jquery.mockjax'], function(
+define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwtTokenHandler', 'jquery.mockjax'], function(
     $,
     _,
     request,
     tokenHandlerFactory,
-    bearerTokenHandlerFactory
+    jwtTokenHandlerFactory
 ) {
     'use strict';
 
@@ -613,9 +613,9 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 });
         });
 
-    QUnit.module('Bearer token', {
+    QUnit.module('JWT token', {
         beforeEach: function() {
-            this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
+            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
         },
         afterEach: function() {
             this.handler.clearStore();
@@ -623,12 +623,12 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
         }
     });
 
-    QUnit.test('Request contains Bearer token header', function(assert) {
+    QUnit.test('Request contains JWT token header', function(assert) {
         assert.expect(2);
 
         const done = assert.async();
 
-        const bearerToken = 'some bearer token';
+        const accessToken = 'some access token';
 
         $.mockjax([
             {
@@ -637,17 +637,17 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 response: function(requestData) {
                     assert.equal(
                         requestData.headers.Authorization,
-                        `Bearer ${bearerToken}`,
-                        'bearer token header is sent'
+                        `Bearer ${accessToken}`,
+                        'Authorization header is sent'
                     );
                     this.responseText = JSON.stringify({});
                 }
             }
         ]);
 
-        this.handler.storeBearerToken(bearerToken).then(setTokenResponse => {
+        this.handler.storeAccessToken(accessToken).then(setTokenResponse => {
             assert.equal(setTokenResponse, true, 'token stored successfully');
-            request({ url: '//200', bearerTokenHandler: this.handler, noToken: true }).then(() => {
+            request({ url: '//200', jwtTokenHandler: this.handler, noToken: true }).then(() => {
                 done();
             });
         });
@@ -658,7 +658,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
 
         const done = assert.async();
 
-        const bearerToken = 'some bearer token';
+        const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
         $.mockjax([
@@ -668,8 +668,8 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 response: function(requestData) {
                     assert.equal(
                         requestData.headers.Authorization,
-                        `Bearer ${bearerToken}`,
-                        'bearer token header is sent'
+                        `Bearer ${accessToken}`,
+                        'Authorization token header is sent'
                     );
                     this.responseText = JSON.stringify({});
                 }
@@ -680,14 +680,14 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 response: function(requestData) {
                     const data = JSON.parse(requestData.data);
                     assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: bearerToken });
+                    this.responseText = JSON.stringify({ accessToken: accessToken });
                 }
             }
         ]);
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResponse => {
             assert.equal(setTokenResponse, true, 'token stored successfully');
-            request({ url: '//200', bearerTokenHandler: this.handler, noToken: true }).then(() => {
+            request({ url: '//200', jwtTokenHandler: this.handler, noToken: true }).then(() => {
                 done();
             });
         });
@@ -698,8 +698,8 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
 
         const done = assert.async();
 
-        const expiredBearerToken = 'invalid bearer token';
-        const validBearerToken = 'valid bearer token';
+        const expiredAccessToken = 'invalid access token';
+        const validAccessToken = 'valid access token';
         const refreshToken = 'some refresh token';
 
         $.mockjax([
@@ -707,12 +707,12 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 url: /^\/\/endpoint$/,
                 response: function(requestData) {
                     const authorizationHeader = requestData.headers.Authorization;
-                    if (authorizationHeader === `Bearer ${expiredBearerToken}`) {
-                        assert.ok(true, 'called with expired bearer token');
+                    if (authorizationHeader === `Bearer ${expiredAccessToken}`) {
+                        assert.ok(true, 'called with expired access token');
                         this.status = 401;
                         this.responseText = JSON.stringify({});
-                    } else if (authorizationHeader === `Bearer ${validBearerToken}`) {
-                        assert.ok(true, 'called with valid bearer token');
+                    } else if (authorizationHeader === `Bearer ${validAccessToken}`) {
+                        assert.ok(true, 'called with valid access token');
                         this.status = 200;
                         this.responseText = JSON.stringify({});
                     }
@@ -724,18 +724,18 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 response: function(requestData) {
                     const data = JSON.parse(requestData.data);
                     assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: validBearerToken });
+                    this.responseText = JSON.stringify({ accessToken: validAccessToken });
                 }
             }
         ]);
 
         Promise.all([
-            this.handler.storeBearerToken(expiredBearerToken),
+            this.handler.storeAccessToken(expiredAccessToken),
             this.handler.storeRefreshToken(refreshToken)
-        ]).then(([setBearerTokenResponse, setRefreshTokenResponse]) => {
-            assert.equal(setBearerTokenResponse, true, 'bearer token stored successfully');
+        ]).then(([setAccessTokenResponse, setRefreshTokenResponse]) => {
+            assert.equal(setAccessTokenResponse, true, 'access token stored successfully');
             assert.equal(setRefreshTokenResponse, true, 'refresh token stored successfully');
-            request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }).then(() => {
+            request({ url: '//endpoint', jwtTokenHandler: this.handler, noToken: true }).then(() => {
                 done();
             });
         });
@@ -746,7 +746,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
 
         const done = assert.async();
 
-        const expiredBearerToken = 'invalid bearer token';
+        const expiredAccessToken = 'invalid access token';
         const refreshToken = 'some refresh token';
 
         const originalError = {
@@ -760,8 +760,8 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 response: function(requestData) {
                     assert.equal(
                         requestData.headers.Authorization,
-                        `Bearer ${expiredBearerToken}`,
-                        'called with expired bearer token'
+                        `Bearer ${expiredAccessToken}`,
+                        'called with expired access token'
                     );
                     this.responseText = JSON.stringify(originalError);
                 }
@@ -772,18 +772,18 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 response: function(requestData) {
                     const data = JSON.parse(requestData.data);
                     assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: expiredBearerToken });
+                    this.responseText = JSON.stringify({ accessToken: expiredAccessToken });
                 }
             }
         ]);
 
         Promise.all([
-            this.handler.storeBearerToken(expiredBearerToken),
+            this.handler.storeAccessToken(expiredAccessToken),
             this.handler.storeRefreshToken(refreshToken)
-        ]).then(([setBearerTokenResponse, setRefreshTokenResponse]) => {
-            assert.equal(setBearerTokenResponse, true, 'bearer token stored successfully');
+        ]).then(([setAccessTokenResponse, setRefreshTokenResponse]) => {
+            assert.equal(setAccessTokenResponse, true, 'access token stored successfully');
             assert.equal(setRefreshTokenResponse, true, 'refresh token stored successfully');
-            request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }).catch(error => {
+            request({ url: '//endpoint', jwtTokenHandler: this.handler, noToken: true }).catch(error => {
                 assert.equal(error.response.code, 401, 'should get back original status code');
                 assert.deepEqual(error.response.error, originalError.error, 'should get back original api error');
                 done();
@@ -796,7 +796,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
 
         const done = assert.async();
 
-        const expiredBearerToken = 'invalid bearer token';
+        const expiredAccessToken = 'invalid access token';
         const refreshToken = 'some refresh token';
         const originalError = {
             error: 'some error'
@@ -807,7 +807,11 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
                 url: /^\/\/endpoint$/,
                 status: 401,
                 response: function(requestData) {
-                    assert.equal(requestData.headers.Authorization, `Bearer ${expiredBearerToken}`);
+                    assert.equal(
+                        requestData.headers.Authorization,
+                        `Bearer ${expiredAccessToken}`,
+                        'enpoint called with expired access token'
+                    );
                     this.responseText = JSON.stringify(originalError);
                 }
             },
@@ -822,12 +826,12 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
         ]);
 
         Promise.all([
-            this.handler.storeBearerToken(expiredBearerToken),
+            this.handler.storeAccessToken(expiredAccessToken),
             this.handler.storeRefreshToken(refreshToken)
-        ]).then(([setBearerTokenResponse, setRefreshTokenResponse]) => {
-            assert.equal(setBearerTokenResponse, true, 'bearer token stored successfully');
+        ]).then(([setAccessTokenResponse, setRefreshTokenResponse]) => {
+            assert.equal(setAccessTokenResponse, true, 'access token stored successfully');
             assert.equal(setRefreshTokenResponse, true, 'refresh token stored successfully');
-            request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }).catch(error => {
+            request({ url: '//endpoint', jwtTokenHandler: this.handler, noToken: true }).catch(error => {
                 assert.equal(error.response.code, 401, 'should get back original status code');
                 assert.deepEqual(error.response.error, originalError.error, 'should get back original api error');
                 done();
@@ -839,9 +843,9 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/bearerTok
         assert.expect(1);
 
         assert.rejects(
-            request({ url: '//endpoint', bearerTokenHandler: this.handler, noToken: true }),
+            request({ url: '//endpoint', jwtTokenHandler: this.handler, noToken: true }),
             /Token not available and cannot be refreshed/i,
-            'request fails if token handler cannot provide bearer token'
+            'request fails if token handler cannot provide access token'
         );
     });
 });
