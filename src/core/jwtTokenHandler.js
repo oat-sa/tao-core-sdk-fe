@@ -72,8 +72,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory(options = {}) {
                         data: JSON.stringify({ refreshToken }),
                         dataType: 'json',
                         contentType: 'application/json',
-                        noToken: true,
-                        timeout: 3 // in seconds
+                        noToken: true
                     })
                         .then(({ accessToken }) => {
                             tokenStorage.setAccessToken(accessToken).then(() => {

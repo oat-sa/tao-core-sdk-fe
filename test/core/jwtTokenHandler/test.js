@@ -167,33 +167,6 @@ define(['jquery', 'core/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHandler
         });
     });
 
-    QUnit.test('refresh token timeout', function(assert) {
-        assert.expect(2);
-
-        const done = assert.async();
-
-        const refreshToken = 'some refresh token';
-
-        $.mockjax([
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 200,
-                responseTime: 3001,
-                response: function() {
-                    assert.ok(false, 'request should not be handled before timeout');
-                }
-            }
-        ]);
-
-        this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
-            assert.equal(setTokenResult, true, 'refresh token is set');
-            this.handler.refreshToken().catch(errorResponse => {
-                assert.equal(errorResponse.response.textStatus, 'timeout', 'should get back timeout error response');
-                done();
-            });
-        });
-    });
-
     QUnit.test('unsuccessful get token if refresh fails', function(assert) {
         assert.expect(3);
 
