@@ -48,9 +48,10 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
         beforeEach: function() {
             this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
         },
-        afterEach: function() {
-            this.handler.clearStore();
+        afterEach: function(assert) {
+            const done = assert.async();
             $.mockjax.clear();
+            this.handler.clearStore().then(done);
         }
     });
 
@@ -199,9 +200,10 @@ define(['jquery', 'core/bearerTokenHandler', 'jquery.mockjax'], ($, bearerTokenH
         beforeEach: function() {
             this.handler = bearerTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
         },
-        afterEach: function() {
-            this.handler.clearStore();
+        afterEach: function(assert) {
+            const done = assert.async();
             $.mockjax.clear();
+            this.handler.clearStore().then(done);
         }
     });
 

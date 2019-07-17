@@ -141,8 +141,12 @@ export default function request(options) {
          * @returns {Promise<Object>} Promise of headers object
          */
         const computeHeaders = () => {
-            return Promise.all([computeCSRFTokenHeader(), computeBearerTokenHeader()]).then(tokenHeaders =>
-                tokenHeaders.reduce((headers, tokenHeader) => ({ ...headers, ...tokenHeader }), options.headers)
+            return Promise.all([computeCSRFTokenHeader(), computeBearerTokenHeader()]).then(
+                ([csrfTokenHeader, bearerTokenHeader]) => ({
+                    ...options.headers,
+                    ...csrfTokenHeader,
+                    ...bearerTokenHeader
+                })
             );
         };
 
@@ -178,7 +182,7 @@ export default function request(options) {
             return Promise.resolve();
         };
 
-        let isAlreadyRetriedBecauseOfInvalidBearerToken = false;
+        let isBearerTokenRefreshTried = false;
         return computeHeaders().then(
             customHeaders =>
                 new Promise((resolve, reject) => {
@@ -259,12 +263,8 @@ export default function request(options) {
                          * update header with new token
                          * retry request
                          *  */
-                        if (
-                            xhr.status === 401 &&
-                            !isAlreadyRetriedBecauseOfInvalidBearerToken &&
-                            options.bearerTokenHandler
-                        ) {
-                            isAlreadyRetriedBecauseOfInvalidBearerToken = true;
+                        if (xhr.status === 401 && !isBearerTokenRefreshTried && options.bearerTokenHandler) {
+                            isBearerTokenRefreshTried = true;
                             options.bearerTokenHandler
                                 .refreshToken()
                                 .then(computeBearerTokenHeader)

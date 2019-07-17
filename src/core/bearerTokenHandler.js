@@ -73,7 +73,7 @@ const bearerTokenHandlerFactory = function bearerTokenHandlerFactory(options = {
                         dataType: 'json',
                         contentType: 'application/json',
                         noToken: true,
-                        timeout: 3000
+                        timeout: 3 // in seconds
                     })
                         .then(({ accessToken }) => {
                             tokenStorage.setAccessToken(accessToken).then(() => {
