@@ -20,29 +20,29 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
+define(['core/jwtTokenStore'], jwtTokenStoreFactory => {
     'use strict';
 
     QUnit.module('factory');
 
     QUnit.test('module', assert => {
         assert.expect(1);
-        assert.ok(typeof bearerTokenStoreFactory === 'function', 'the module exposes a function');
+        assert.ok(typeof jwtTokenStoreFactory === 'function', 'the module exposes a function');
     });
 
     QUnit.test('instantiate', assert => {
         assert.expect(2);
-        assert.ok(typeof bearerTokenStoreFactory() === 'object', 'the factory produces an object');
+        assert.ok(typeof jwtTokenStoreFactory() === 'object', 'the factory produces an object');
         assert.notEqual(
-            bearerTokenStoreFactory(),
-            bearerTokenStoreFactory(),
+            jwtTokenStoreFactory(),
+            jwtTokenStoreFactory(),
             'the factory produces a different object at each call'
         );
     });
 
     QUnit.module('API', {
         beforeEach: function() {
-            this.storage = bearerTokenStoreFactory();
+            this.storage = jwtTokenStoreFactory();
         },
         afterEach: function(assert) {
             const done = assert.async();
@@ -150,8 +150,8 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
 
     QUnit.module('Same namespace', {
         beforeEach: function() {
-            this.storage1 = bearerTokenStoreFactory({ namespace: 'namespace' });
-            this.storage2 = bearerTokenStoreFactory({ namespace: 'namespace' });
+            this.storage1 = jwtTokenStoreFactory({ namespace: 'namespace' });
+            this.storage2 = jwtTokenStoreFactory({ namespace: 'namespace' });
         },
         afterEach: function(assert) {
             const done = assert.async();
@@ -202,8 +202,8 @@ define(['core/bearerTokenStore'], bearerTokenStoreFactory => {
 
     QUnit.module('Different namespace', {
         beforeEach: function() {
-            this.storage1 = bearerTokenStoreFactory({ namespace: 'namespace1' });
-            this.storage2 = bearerTokenStoreFactory({ namespace: 'namespace2' });
+            this.storage1 = jwtTokenStoreFactory({ namespace: 'namespace1' });
+            this.storage2 = jwtTokenStoreFactory({ namespace: 'namespace2' });
         },
         afterEach: function(assert) {
             const done = assert.async();

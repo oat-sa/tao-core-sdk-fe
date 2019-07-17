@@ -17,8 +17,8 @@
  */
 
 /**
- * Implementation of store for Bearer token
- * @module core/bearerTokenStore
+ * Implementation of store for JWT token
+ * @module core/jwtTokenStore
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
@@ -37,11 +37,11 @@ const defaultOptions = {
  * @param {string} options.namespace - Namespace of the store
  * @returns {Object} Store API
  */
-const bearerTokenStoreFactory = function bearerTokenStoreFactory(options = {}) {
+const jwtTokenStoreFactory = function jwtTokenStoreFactory(options = {}) {
     options = { ...defaultOptions, ...options };
 
     const { namespace } = options;
-    const storeName = `bearer.${namespace}`;
+    const storeName = `jwt.${namespace}`;
     const accessTokenName = 'accessToken';
     const refreshTokenName = 'refreshToken';
 
@@ -125,4 +125,4 @@ const bearerTokenStoreFactory = function bearerTokenStoreFactory(options = {}) {
     };
 };
 
-export default bearerTokenStoreFactory;
+export default jwtTokenStoreFactory;
