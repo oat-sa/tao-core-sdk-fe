@@ -151,7 +151,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory(options = {}) {
 
         /**
          * Refresh access token
-         * @returns {Promise<String>} Promise of new Bearer token
+         * @returns {Promise<String>} Promise of new access token
          */
         refreshToken() {
             return actionQueue.serie(() => unQueuedRefreshToken());

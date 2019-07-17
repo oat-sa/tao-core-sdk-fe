@@ -2,12 +2,12 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>Test - Bearer Token Handler</title>
+        <title>Test - JWT Token Handler</title>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
-                    // mock bearer token store
+                    // mock jwt token store
                     define('core/jwtTokenStore', () => () => {
                         let accessToken = null;
                         let refreshToken = null;
