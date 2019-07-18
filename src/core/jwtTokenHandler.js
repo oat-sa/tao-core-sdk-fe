@@ -72,27 +72,18 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
          * @returns {Promise<String|null>} Promise of access token
          */
         getToken() {
-            const getTokenPromiseCreator = () => new Promise((resolve, reject) => {
-                tokenStorage.getAccessToken().then(accessToken => {
-                    if (accessToken) {
-                        resolve(accessToken);
+            return actionQueue.serie(() => tokenStorage.getAccessToken().then(accessToken => {
+                if (accessToken) {
+                    return accessToken;
+                }
+                return tokenStorage.getRefreshToken().then(refreshToken => {
+                    if (refreshToken) {
+                        return unQueuedRefreshToken();
                     } else {
-                        tokenStorage.getRefreshToken().then(refreshToken => {
-                            if (refreshToken) {
-                                unQueuedRefreshToken()
-                                        .then(token => {
-                                            resolve(token);
-                                        })
-                                        .catch(reject);
-                            } else {
-                                reject(new Error('Token not available and cannot be refreshed'));
-                            }
-                        });
+                        throw new Error('Token not available and cannot be refreshed');
                     }
                 });
-            });
-
-            return actionQueue.serie(getTokenPromiseCreator);
+            }));
         },
 
         /**
