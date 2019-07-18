@@ -265,8 +265,8 @@ export default function request(options) {
                         jwtTokenHandler
                                 .refreshToken()
                                 .then(computeJWTTokenHeader)
-                                .then(JWTTokenHeaders => {
-                                    Object.assign(ajaxParameters.headers, JWTTokenHeaders);
+                                .then(jwtTokenHeaders => {
+                                    Object.assign(ajaxParameters.headers, jwtTokenHeaders);
                                     $.ajax(ajaxParameters)
                                         .done(onDone)
                                         .fail(onFail);
