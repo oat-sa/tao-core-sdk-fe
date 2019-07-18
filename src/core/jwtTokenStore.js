@@ -25,25 +25,18 @@
 import store from 'core/store';
 
 /**
- * Default options for factory
- * @type {Object}
- */
-const defaultOptions = {
-    namespace: 'global'
-};
-
-/**
- * @param {Object} options={} - Factory options
+ * @param {Object} options - Factory options
  * @param {string} options.namespace - Namespace of the store
  * @returns {Object} Store API
  */
-const jwtTokenStoreFactory = function jwtTokenStoreFactory(options = {}) {
-    options = { ...defaultOptions, ...options };
-
-    const { namespace } = options;
+const jwtTokenStoreFactory = function jwtTokenStoreFactory({namespace = 'global'} = {}) {
     const storeName = `jwt.${namespace}`;
     const accessTokenName = 'accessToken';
     const refreshTokenName = 'refreshToken';
+
+    /**
+     * Do not change token stores, because of security reason.
+     */
 
     const getAccessTokenStore = () => store(storeName, store.backends.memory);
     const getRefreshTokenStore = () => store(storeName, store.backends.sessionStorage);
@@ -90,11 +83,7 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory(options = {}) {
          * @returns {Promise<Boolean>} Tokens successfully set
          */
         setTokens(accessToken, refreshToken) {
-            return new Promise(resolve => {
-                Promise.all([this.setAccessToken(accessToken), this.setRefreshToken(refreshToken)]).then(() =>
-                    resolve(true)
-                );
-            });
+            return Promise.all([this.setAccessToken(accessToken), this.setRefreshToken(refreshToken)]).then(() => true);
         },
 
         /**
@@ -118,9 +107,7 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory(options = {}) {
          * @returns {Promise<Boolean>} tokens successfully cleared
          */
         clear() {
-            return new Promise(resolve => {
-                Promise.all([this.clearAccessToken(), this.clearRefreshToken()]).then(() => resolve(true));
-            });
+            return Promise.all([this.clearAccessToken(), this.clearRefreshToken()]).then(() => true);
         }
     };
 };

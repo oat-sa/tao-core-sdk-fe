@@ -27,23 +27,13 @@ import coreRequest from 'core/request';
 import promiseQueue from 'core/promiseQueue';
 
 /**
- * Default options for factory
- * @type {Object}
- */
-const defaultOptions = {
-    serviceName: 'tao'
-};
-
-/**
  * JWT token handler factory
  * @param {Object} options Options of JWT token handler
  * @param {String} options.serviceName Name of the service what JWT token belongs to
  * @param {String} options.refreshTokenUrl Url where handler could refresh JWT token
+ * @returns {Object} JWT Token handler instance
  */
-const jwtTokenHandlerFactory = function jwtTokenHandlerFactory(options = {}) {
-    options = { ...defaultOptions, ...options };
-
-    const { serviceName, refreshTokenUrl } = options;
+const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 'tao', refreshTokenUrl} = {}) {
 
     const tokenStorage = jwtTokenStoreFactory({
         namespace: serviceName
@@ -60,31 +50,21 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory(options = {}) {
      * It will refresh the token from provided API and saves it for later use
      * @returns {Promise<String>} Promise of new token
      */
-    const unQueuedRefreshToken = () =>
-        new Promise((resolve, reject) => {
-            tokenStorage.getRefreshToken().then(refreshToken => {
-                if (!refreshToken) {
-                    reject(new Error('Refresh token is not available'));
-                } else {
-                    coreRequest({
-                        url: refreshTokenUrl,
-                        method: 'POST',
-                        data: JSON.stringify({ refreshToken }),
-                        dataType: 'json',
-                        contentType: 'application/json',
-                        noToken: true
-                    })
-                        .then(({ accessToken }) => {
-                            tokenStorage.setAccessToken(accessToken).then(() => {
-                                resolve(accessToken);
-                            });
-                        })
-                        .catch(error => {
-                            reject(error);
-                        });
-                }
-            });
-        });
+    const unQueuedRefreshToken = () => tokenStorage.getRefreshToken().then(refreshToken => {
+        if (!refreshToken) {
+            throw new Error('Refresh token is not available');
+        } else {
+            return coreRequest({
+                url: refreshTokenUrl,
+                method: 'POST',
+                data: JSON.stringify({ refreshToken }),
+                dataType: 'json',
+                contentType: 'application/json',
+                noToken: true
+            }).then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
+
+        }
+    });
 
     return {
         /**
@@ -92,26 +72,25 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory(options = {}) {
          * @returns {Promise<String|null>} Promise of access token
          */
         getToken() {
-            const getTokenPromiseCreator = () =>
-                new Promise((resolve, reject) => {
-                    tokenStorage.getAccessToken().then(accessToken => {
-                        if (accessToken) {
-                            resolve(accessToken);
-                        } else {
-                            tokenStorage.getRefreshToken().then(refreshToken => {
-                                if (refreshToken) {
-                                    unQueuedRefreshToken()
+            const getTokenPromiseCreator = () => new Promise((resolve, reject) => {
+                tokenStorage.getAccessToken().then(accessToken => {
+                    if (accessToken) {
+                        resolve(accessToken);
+                    } else {
+                        tokenStorage.getRefreshToken().then(refreshToken => {
+                            if (refreshToken) {
+                                unQueuedRefreshToken()
                                         .then(token => {
                                             resolve(token);
                                         })
                                         .catch(reject);
-                                } else {
-                                    reject(new Error('Token not available and cannot be refreshed'));
-                                }
-                            });
-                        }
-                    });
+                            } else {
+                                reject(new Error('Token not available and cannot be refreshed'));
+                            }
+                        });
+                    }
                 });
+            });
 
             return actionQueue.serie(getTokenPromiseCreator);
         },
@@ -122,9 +101,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory(options = {}) {
          * @returns {Promise<Boolean>} Promise of token is stored
          */
         storeRefreshToken(refreshToken) {
-            return actionQueue.serie(() => {
-                return tokenStorage.setRefreshToken(refreshToken);
-            });
+            return actionQueue.serie(() => tokenStorage.setRefreshToken(refreshToken));
         },
 
         /**
@@ -133,9 +110,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory(options = {}) {
          * @returns {Promise<Boolean>} Promise of token is stored
          */
         storeAccessToken(accessToken) {
-            return actionQueue.serie(() => {
-                return tokenStorage.setAccessToken(accessToken);
-            });
+            return actionQueue.serie(() => tokenStorage.setAccessToken(accessToken));
         },
 
         /**
@@ -143,9 +118,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory(options = {}) {
          * @returns {Promise<Boolean>} Promise of store is cleared
          */
         clearStore() {
-            return actionQueue.serie(() => {
-                return tokenStorage.clear();
-            });
+            return actionQueue.serie(() => tokenStorage.clear());
         },
 
         /**

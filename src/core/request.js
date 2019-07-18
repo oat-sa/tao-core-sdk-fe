@@ -140,15 +140,9 @@ export default function request(options) {
          * Extends header object with token headers
          * @returns {Promise<Object>} Promise of headers object
          */
-        const computeHeaders = () => {
-            return Promise.all([computeCSRFTokenHeader(), computeJWTTokenHeader()]).then(
-                ([csrfTokenHeader, jwtTokenHeader]) => ({
-                    ...options.headers,
-                    ...csrfTokenHeader,
-                    ...jwtTokenHeader
-                })
-            );
-        };
+        const computeHeaders = () => Promise.all([computeCSRFTokenHeader(), computeJWTTokenHeader()]).then(
+            ([csrfTokenHeader, jwtTokenHeader]) => Object.assign({}, options.headers, csrfTokenHeader, jwtTokenHeader)
+        );
 
         /**
          * Replaces the locally-stored tempToken into the tokenStore
@@ -187,33 +181,32 @@ export default function request(options) {
          */
         let isAccessTokenRefreshTried = false;
         return computeHeaders().then(
-            customHeaders =>
-                new Promise((resolve, reject) => {
-                    const noop = void 0;
+            customHeaders => new Promise((resolve, reject) => {
+                const noop = void 0;
 
-                    const ajaxParameters = {
-                        url: options.url,
-                        method: options.method || 'GET',
-                        headers: customHeaders,
-                        data: options.data,
-                        contentType: options.contentType || noop,
-                        dataType: options.dataType || 'json',
-                        async: true,
-                        timeout: options.timeout * 1000 || context.timeout * 1000 || 0,
-                        beforeSend() {
-                            if (!_.isEmpty(customHeaders)) {
-                                logger.debug(
-                                    'sending %s header %s',
-                                    tokenHeaderName,
-                                    customHeaders && customHeaders[tokenHeaderName]
-                                );
-                            }
-                        },
-                        global: !options.background //TODO fix this with TT-260
-                    };
+                const ajaxParameters = {
+                    url: options.url,
+                    method: options.method || 'GET',
+                    headers: customHeaders,
+                    data: options.data,
+                    contentType: options.contentType || noop,
+                    dataType: options.dataType || 'json',
+                    async: true,
+                    timeout: options.timeout * 1000 || context.timeout * 1000 || 0,
+                    beforeSend() {
+                        if (!_.isEmpty(customHeaders)) {
+                            logger.debug(
+                                'sending %s header %s',
+                                tokenHeaderName,
+                                customHeaders && customHeaders[tokenHeaderName]
+                            );
+                        }
+                    },
+                    global: !options.background //TODO fix this with TT-260
+                };
 
-                    const onDone = (response, status, xhr) => {
-                        setTokenFromXhr(xhr)
+                const onDone = (response, status, xhr) => {
+                    setTokenFromXhr(xhr)
                             .then(() => {
                                 if (
                                     xhr.status === 204 ||
@@ -255,25 +248,25 @@ export default function request(options) {
                                 logger.error(error);
                                 reject(createError(response, error, xhr.status, xhr.readyState > 0));
                             });
-                    };
+                };
 
-                    const onFail = (xhr, textStatus, errorThrown) => {
-                        let response;
+                const onFail = (xhr, textStatus, errorThrown) => {
+                    let response;
 
-                        const jwtTokenHandler = options.jwtTokenHandler;
-                        /**
+                    const jwtTokenHandler = options.jwtTokenHandler;
+                    /**
                          * if access token expired then
                          * get new token
                          * update header with new token
                          * retry request
                          *  */
-                        if (xhr.status === 401 && !isAccessTokenRefreshTried && jwtTokenHandler) {
-                            isAccessTokenRefreshTried = true;
-                            jwtTokenHandler
+                    if (xhr.status === 401 && !isAccessTokenRefreshTried && jwtTokenHandler) {
+                        isAccessTokenRefreshTried = true;
+                        jwtTokenHandler
                                 .refreshToken()
                                 .then(computeJWTTokenHeader)
                                 .then(JWTTokenHeaders => {
-                                    ajaxParameters.headers = { ...ajaxParameters.headers, ...JWTTokenHeaders };
+                                    Object.assign(ajaxParameters.headers, JWTTokenHeaders);
                                     $.ajax(ajaxParameters)
                                         .done(onDone)
                                         .fail(onFail);
@@ -282,39 +275,39 @@ export default function request(options) {
                                 .catch(() => {
                                     onFail(xhr, textStatus, errorThrown);
                                 });
-                            return;
-                        }
-                        try {
-                            response = JSON.parse(xhr.responseText);
-                        } catch (parseErr) {
-                            response = {};
-                        }
+                        return;
+                    }
+                    try {
+                        response = JSON.parse(xhr.responseText);
+                    } catch (parseErr) {
+                        response = {};
+                    }
 
-                        const responseExtras = {
-                            success: false,
-                            source: 'network',
-                            cause: options.url,
-                            purpose: 'proxy',
-                            context: this,
-                            code: xhr.status,
-                            sent: xhr.readyState > 0,
-                            type: 'error',
-                            textStatus: textStatus,
-                            message: errorThrown || __('An error occurred!')
-                        };
+                    const responseExtras = {
+                        success: false,
+                        source: 'network',
+                        cause: options.url,
+                        purpose: 'proxy',
+                        context: this,
+                        code: xhr.status,
+                        sent: xhr.readyState > 0,
+                        type: 'error',
+                        textStatus: textStatus,
+                        message: errorThrown || __('An error occurred!')
+                    };
 
-                        const enhancedResponse = { ...responseExtras, ...response };
+                    const enhancedResponse = Object.assign({}, responseExtras, response);
 
-                        // if the request failed because the browser is offline,
-                        // we need to recycle the used request token
-                        let tokenHandlerPromise;
-                        if (enhancedResponse.code === 0) {
-                            tokenHandlerPromise = reEnqueueTempToken();
-                        } else {
-                            tokenHandlerPromise = setTokenFromXhr(xhr);
-                        }
+                    // if the request failed because the browser is offline,
+                    // we need to recycle the used request token
+                    let tokenHandlerPromise;
+                    if (enhancedResponse.code === 0) {
+                        tokenHandlerPromise = reEnqueueTempToken();
+                    } else {
+                        tokenHandlerPromise = setTokenFromXhr(xhr);
+                    }
 
-                        tokenHandlerPromise
+                    tokenHandlerPromise
                             .then(() => {
                                 reject(
                                     createError(
@@ -329,12 +322,12 @@ export default function request(options) {
                                 logger.error(error);
                                 reject(createError(enhancedResponse, error, xhr.status, xhr.readyState > 0));
                             });
-                    };
+                };
 
-                    $.ajax(ajaxParameters)
+                $.ajax(ajaxParameters)
                         .done(onDone)
                         .fail(onFail);
-                })
+            })
         );
     };
 
