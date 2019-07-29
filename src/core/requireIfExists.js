@@ -46,7 +46,7 @@ function requireIfExists(uri) {
         }
 
         // require the module with error handling
-        require([uri], resolve, failed);
+        window.require([uri], resolve, failed);
     });
 }
 
