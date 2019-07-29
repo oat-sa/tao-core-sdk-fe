@@ -21,12 +21,12 @@
  *
  * @author Martin Nicholson <martin@taotesting.com>
  */
-define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(
+define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwtTokenHandler', 'jquery.mockjax'], function(
     $,
     _,
     request,
-    Promise,
-    tokenHandlerFactory
+    tokenHandlerFactory,
+    jwtTokenHandlerFactory
 ) {
     'use strict';
 
@@ -398,7 +398,6 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 err: new Error('0 : timeout'),
                 reuseToken: true
             }
-
         ])
         .test('request failure with ', function(caseData, assert) {
             var ready = assert.async();
@@ -514,7 +513,6 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                 });
         });
 
-
     QUnit.module('errors');
 
     errors = {
@@ -614,4 +612,240 @@ define(['jquery', 'lodash', 'core/request', 'core/promise', 'core/tokenHandler',
                         });
                 });
         });
+
+    QUnit.module('JWT token', {
+        beforeEach: function() {
+            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
+        },
+        afterEach: function() {
+            this.handler.clearStore();
+            $.mockjax.clear();
+        }
+    });
+
+    QUnit.test('Request contains JWT token header', function(assert) {
+        assert.expect(2);
+
+        const done = assert.async();
+
+        const accessToken = 'some access token';
+
+        $.mockjax([
+            {
+                url: /^\/\/200$/,
+                status: 200,
+                response: function(requestData) {
+                    assert.equal(
+                        requestData.headers.Authorization,
+                        `Bearer ${accessToken}`,
+                        'Authorization header is sent'
+                    );
+                    this.responseText = JSON.stringify({});
+                }
+            }
+        ]);
+
+        this.handler.storeAccessToken(accessToken).then(setTokenResponse => {
+            assert.equal(setTokenResponse, true, 'token stored successfully');
+            request({ url: '//200', jwtTokenHandler: this.handler, noToken: true }).then(() => {
+                done();
+            });
+        });
+    });
+
+    QUnit.test('Token refreshing before request send', function(assert) {
+        assert.expect(3);
+
+        const done = assert.async();
+
+        const accessToken = 'some access token';
+        const refreshToken = 'some refresh token';
+
+        $.mockjax([
+            {
+                url: /^\/\/200$/,
+                status: 200,
+                response: function(requestData) {
+                    assert.equal(
+                        requestData.headers.Authorization,
+                        `Bearer ${accessToken}`,
+                        'Authorization token header is sent'
+                    );
+                    this.responseText = JSON.stringify({});
+                }
+            },
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(requestData) {
+                    const data = JSON.parse(requestData.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: accessToken });
+                }
+            }
+        ]);
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResponse => {
+            assert.equal(setTokenResponse, true, 'token stored successfully');
+            request({ url: '//200', jwtTokenHandler: this.handler, noToken: true }).then(() => {
+                done();
+            });
+        });
+    });
+
+    QUnit.test('Token refreshing if API respond with 401', function(assert) {
+        assert.expect(5);
+
+        const done = assert.async();
+
+        const expiredAccessToken = 'invalid access token';
+        const validAccessToken = 'valid access token';
+        const refreshToken = 'some refresh token';
+
+        $.mockjax([
+            {
+                url: /^\/\/endpoint$/,
+                response: function(requestData) {
+                    const authorizationHeader = requestData.headers.Authorization;
+                    if (authorizationHeader === `Bearer ${expiredAccessToken}`) {
+                        assert.ok(true, 'called with expired access token');
+                        this.status = 401;
+                        this.responseText = JSON.stringify({});
+                    } else if (authorizationHeader === `Bearer ${validAccessToken}`) {
+                        assert.ok(true, 'called with valid access token');
+                        this.status = 200;
+                        this.responseText = JSON.stringify({});
+                    }
+                }
+            },
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(requestData) {
+                    const data = JSON.parse(requestData.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: validAccessToken });
+                }
+            }
+        ]);
+
+        Promise.all([
+            this.handler.storeAccessToken(expiredAccessToken),
+            this.handler.storeRefreshToken(refreshToken)
+        ]).then(([setAccessTokenResponse, setRefreshTokenResponse]) => {
+            assert.equal(setAccessTokenResponse, true, 'access token stored successfully');
+            assert.equal(setRefreshTokenResponse, true, 'refresh token stored successfully');
+            request({ url: '//endpoint', jwtTokenHandler: this.handler, noToken: true }).then(() => {
+                done();
+            });
+        });
+    });
+
+    QUnit.test('Token refreshing and retry only one time after 401', function(assert) {
+        assert.expect(7);
+
+        const done = assert.async();
+
+        const expiredAccessToken = 'invalid access token';
+        const refreshToken = 'some refresh token';
+
+        const originalError = {
+            error: 'some error'
+        };
+
+        $.mockjax([
+            {
+                url: /^\/\/endpoint$/,
+                status: 401,
+                response: function(requestData) {
+                    assert.equal(
+                        requestData.headers.Authorization,
+                        `Bearer ${expiredAccessToken}`,
+                        'called with expired access token'
+                    );
+                    this.responseText = JSON.stringify(originalError);
+                }
+            },
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 200,
+                response: function(requestData) {
+                    const data = JSON.parse(requestData.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                    this.responseText = JSON.stringify({ accessToken: expiredAccessToken });
+                }
+            }
+        ]);
+
+        Promise.all([
+            this.handler.storeAccessToken(expiredAccessToken),
+            this.handler.storeRefreshToken(refreshToken)
+        ]).then(([setAccessTokenResponse, setRefreshTokenResponse]) => {
+            assert.equal(setAccessTokenResponse, true, 'access token stored successfully');
+            assert.equal(setRefreshTokenResponse, true, 'refresh token stored successfully');
+            request({ url: '//endpoint', jwtTokenHandler: this.handler, noToken: true }).catch(error => {
+                assert.equal(error.response.code, 401, 'should get back original status code');
+                assert.deepEqual(error.response.error, originalError.error, 'should get back original api error');
+                done();
+            });
+        });
+    });
+
+    QUnit.test('Get back original error, if token refresh was not success', function(assert) {
+        assert.expect(6);
+
+        const done = assert.async();
+
+        const expiredAccessToken = 'invalid access token';
+        const refreshToken = 'some refresh token';
+        const originalError = {
+            error: 'some error'
+        };
+
+        $.mockjax([
+            {
+                url: /^\/\/endpoint$/,
+                status: 401,
+                response: function(requestData) {
+                    assert.equal(
+                        requestData.headers.Authorization,
+                        `Bearer ${expiredAccessToken}`,
+                        'enpoint called with expired access token'
+                    );
+                    this.responseText = JSON.stringify(originalError);
+                }
+            },
+            {
+                url: /^\/\/refreshUrl$/,
+                status: 401,
+                response: function(requestData) {
+                    const data = JSON.parse(requestData.data);
+                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                }
+            }
+        ]);
+
+        Promise.all([
+            this.handler.storeAccessToken(expiredAccessToken),
+            this.handler.storeRefreshToken(refreshToken)
+        ]).then(([setAccessTokenResponse, setRefreshTokenResponse]) => {
+            assert.equal(setAccessTokenResponse, true, 'access token stored successfully');
+            assert.equal(setRefreshTokenResponse, true, 'refresh token stored successfully');
+            request({ url: '//endpoint', jwtTokenHandler: this.handler, noToken: true }).catch(error => {
+                assert.equal(error.response.code, 401, 'should get back original status code');
+                assert.deepEqual(error.response.error, originalError.error, 'should get back original api error');
+                done();
+            });
+        });
+    });
+
+    QUnit.test('Get back token handler error, if token is not refreshable', function(assert) {
+        assert.expect(1);
+
+        assert.rejects(
+            request({ url: '//endpoint', jwtTokenHandler: this.handler, noToken: true }),
+            /Token not available and cannot be refreshed/i,
+            'request fails if token handler cannot provide access token'
+        );
+    });
 });
