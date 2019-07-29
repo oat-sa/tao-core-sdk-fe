@@ -23,6 +23,17 @@
 import _ from 'lodash';
 
 /**
+ * Check for iOS platform
+ * @type {Boolean}
+ */
+const iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+/**
+ * File type
+ * @type {string}
+ */
+const type = iOS ? 'data:application/octet-stream' : 'data:text/plain';
+
+/**
  * Make the browser start downloading a file
  * @param {String} filename
  * @param {String} content - String to write to the file
@@ -44,8 +55,14 @@ var download = function download(filename, content) {
         content = JSON.stringify(content);
     }
 
+    if (navigator.msSaveBlob) {
+        navigator.msSaveBlob(new Blob([content], { type: type }), filename);
+        return true;
+    }
+
     element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+    iOS && element.setAttribute('target', '_blank');
+    element.setAttribute('href', type + ';charset=utf-8,' + encodeURIComponent(content));
     element.setAttribute('download', filename);
     element.style.display = 'none';
     document.body.appendChild(element);
