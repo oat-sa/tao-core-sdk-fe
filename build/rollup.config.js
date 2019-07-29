@@ -45,6 +45,7 @@ export default inputs.map(input => {
         output: {
             dir: path.join(outputDir, dir),
             format: 'amd',
+            sourcemap: process.env.NODE_ENV === 'development',
             name
         },
         external: [

@@ -15,9 +15,10 @@
     "test:cov": "npm run build:cov && npx qunit-testrunner --cov",
     "coverage": "nyc report",
     "coverage:html": "nyc report --reporter=lcov && open-cli coverage/lcov-report/index.html",
+    "dev" : "npm run build:watch",
     "build": "rollup --config ./build/rollup.config.js",
     "build:cov": "rollup --config ./build/rollup.config.js --environment COVERAGE",
-    "build:watch": "rollup --config ./build/rollup.config.js --watch",
+    "build:watch": "NODE_ENV=development rollup --config ./build/rollup.config.js --watch",
     "lint": "eslint src/util src/core test",
     "prepare": "npm run build"
   },
