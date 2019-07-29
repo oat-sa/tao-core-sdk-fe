@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test - JWT Token Handler</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function() {
+                require(['qunitEnv'], function() {
+                    // mock jwt token store
+                    define('core/jwtTokenStore', () => () => {
+                        let accessToken = null;
+                        let refreshToken = null;
+                        return {
+                            setAccessToken(newAccessToken) {
+                                accessToken = newAccessToken;
+                                return Promise.resolve(true);
+                            },
+                            getAccessToken() {
+                                return Promise.resolve(accessToken);
+                            },
+                            setRefreshToken(newRefreshToken) {
+                                refreshToken = newRefreshToken;
+                                return Promise.resolve(true);
+                            },
+                            getRefreshToken(newAccessToken) {
+                                return Promise.resolve(refreshToken);
+                            },
+                            clear() {
+                                accessToken = refreshToken = null;
+                                return Promise.resolve(true);
+                            }
+                        };
+                    });
+                    require(['test/core/jwtTokenHandler/test'], function() {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>
