@@ -34,7 +34,7 @@ function requireIfExists(uri) {
             var failedId = err.requireModules && err.requireModules[0];
             if (failedId === uri) {
                 // fake the module, then ensure it is truly loaded
-                requirejs.undef(failedId);
+                window.requirejs.undef(failedId);
                 define(failedId, function() {
                     return null;
                 });
