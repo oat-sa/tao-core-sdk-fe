@@ -38,7 +38,7 @@ function requireIfExists(uri) {
                 define(failedId, function() {
                     return null;
                 });
-                require([failedId], resolve);
+                window.require([failedId], resolve);
             } else {
                 // others errors are not handled
                 throw err;
