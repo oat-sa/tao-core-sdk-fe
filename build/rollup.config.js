@@ -27,6 +27,8 @@ import istanbul from 'rollup-plugin-istanbul';
 
 const { srcDir, outputDir } = require('./path');
 
+const isDev = process.env.NODE_ENV === 'development';
+
 const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
 
 const localExternals = inputs.map(input => (
@@ -45,7 +47,11 @@ export default inputs.map(input => {
         output: {
             dir: path.join(outputDir, dir),
             format: 'amd',
+            sourcemap: isDev,
             name
+        },
+        watch: {
+            clearScreen : false
         },
         external: [
             ...localExternals,
