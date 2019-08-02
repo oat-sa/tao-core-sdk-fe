@@ -16,50 +16,43 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
  */
 
-requirejs.config({
-    baseUrl: '/',
-    paths: {
-        css: '/node_modules/require-css/css',
-        json: '/node_modules/requirejs-plugins/src/json',
-        text: '/node_modules/requirejs-plugins/lib/text',
+define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(libPathDefinition) {
+    requirejs.config({
+        baseUrl: '/',
+        paths: Object.assign({}, {
+            css: '/node_modules/require-css/css',
+            json: '/node_modules/requirejs-plugins/src/json',
+            text: '/node_modules/requirejs-plugins/lib/text',
 
-        'qunit-parameterize': '/environment/qunit2-parameterize',
-        'jquery.simulate': '/node_modules/jquery-simulate/jquery.simulate',
-        qunit: '/node_modules/qunit/qunit',
-        test: '/test',
+            'qunit-parameterize': '/environment/qunit2-parameterize',
+            'jquery.simulate': '/node_modules/jquery-simulate/jquery.simulate',
+            qunit: '/node_modules/qunit/qunit',
+            test: '/test',
 
-        core: '/dist/core',
-        util: '/dist/util',
+            core: '/dist/core',
+            util: '/dist/util',
 
-        jquery: '/node_modules/jquery/jquery',
-        lodash: '/node_modules/lodash/lodash',
-        moment: '/node_modules/moment/moment',
-        handlebars: '/node_modules/handlebars/dist/handlebars.amd',
-        'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
-
-        'lib/uuid': '/node_modules/@oat-sa/tao-core-libs/dist/uuid',
-        'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
-        'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle',
-        'async': '/node_modules/async/lib/async',
-        'webcrypto-shim': '/node_modules/webcrypto-shim/webcrypto-shim',
-        'idb-wrapper': '/node_modules/idb-wrapper/idbstore'
-    },
-    shim: {
-        'jquery.simulate': {
-            deps: ['jquery']
+            'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
+            'webcrypto-shim': '/node_modules/webcrypto-shim/webcrypto-shim',
+            'idb-wrapper': '/node_modules/idb-wrapper/idbstore'
+        }, libPathDefinition),
+        shim: {
+            'jquery.simulate': {
+                deps: ['jquery']
+            },
+            'qunit-parameterize': {
+                deps: ['qunit/qunit']
+            }
         },
-        'qunit-parameterize': {
-            deps: ['qunit/qunit']
-        }
-    },
-    waitSeconds: 15
+        waitSeconds: 15
+    });
+
+    define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
+    define('qunitEnv', ['qunitLibs', 'qunit-parameterize']);
+
+    define('context', ['module'], function(module) {
+        return module.config();
+    });
+
+    define('i18n', [], () => text => text);
 });
-
-define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
-define('qunitEnv', ['qunitLibs', 'qunit-parameterize']);
-
-define('context', ['module'], function(module) {
-    return module.config();
-});
-
-define('i18n', [], () => text => text);
