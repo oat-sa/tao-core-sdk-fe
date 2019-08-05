@@ -21,9 +21,7 @@
                     });
                     require(['test/core/eventifier/test'], function() {
                         //moving test execution out of the call stack context
-                        setTimeout(function() {
-                            QUnit.start();
-                        });
+                        setTimeout(() => QUnit.start(), 250);
                     });
                 });
             });

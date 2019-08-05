@@ -35,7 +35,7 @@
  */
 import _ from 'lodash';
 import format from 'core/format';
-import Promise from 'core/promise';
+import moduleLoader from 'core/moduleLoader';
 
 /**
  * The default level
@@ -141,6 +141,7 @@ var loggerFactory = function loggerFactory(name, minLevel, fields) {
      * @typedef logger
      */
     logger = {
+
         /**
          * Log messages by delegating to the provider
          *
@@ -253,31 +254,26 @@ loggerFactory.providers = false;
  * @returns {Promise} resolves once modules are registered
  */
 loggerFactory.load = function load(providerConfigs) {
-    var self = this;
-    var modules = [];
     this.providers = [];
 
-    return new Promise(function(resolve, reject) {
-        //we can load the loggers dynamically
-        _.forEach(providerConfigs, function(providerConfig, providerName) {
-            modules.push(providerName);
-        });
-        require(modules, function() {
-            var loadedProviders = [].slice.call(arguments);
-            _.forEach(loadedProviders, function(provider, moduleKey) {
-                try {
-                    self.register(provider, providerConfigs[modules[moduleKey]]);
-                } catch (err) {
-                    reject(err);
-                }
+    //we can load the loggers dynamically
+    const modules = Object.keys(providerConfigs || {})
+        .map( module => ({
+            module,
+            category: 'logger'
+        }));
+
+    return moduleLoader()
+        .addList(modules)
+        .load()
+        .then( loadedProviders => {
+            loadedProviders.forEach( (provider, moduleKey) => {
+                const providerConfig = modules[moduleKey] && modules[moduleKey].module && providerConfigs[modules[moduleKey].module];
+                this.register(provider, providerConfig);
             });
-
-            //flush messages that arrived before the providers are there
-            self.flush();
-
-            resolve();
-        }, reject);
-    });
+        })
+        //flush messages that arrived before the providers are there
+        .then( () => this.flush());
 };
 
 /**
@@ -308,7 +304,7 @@ loggerFactory.flush = function flush() {
         _.forEach(logQueue, function(message) {
             //forward to the providers
             _.forEach(loggerFactory.providers, function(provider) {
-                provider.log.call(provider, message);
+                provider.log(message);
             });
         });
         //clear the queue

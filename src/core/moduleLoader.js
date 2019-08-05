@@ -173,15 +173,25 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
              */
             var loadModules = function loadModules(amdModules = []) {
                 if (_.isArray(amdModules) && amdModules.length) {
-                    return new Promise((resolve, reject) => {
-                        require(
-                            amdModules,
-                            (...loadedModules) => resolve(loadedModules),
-                            err => {
-                                reject(err);
-                            }
-                        );
-                    });
+                    if (typeof define === 'function' && define.amd) {
+                        return new Promise((resolve, reject) => {
+                            window.require(
+                                amdModules,
+                                (...loadedModules) => resolve(loadedModules),
+                                err => {
+                                    reject(err);
+                                }
+                            );
+                        });
+                    } else {
+                        return Promise
+                            .all( amdModules.map( module => (
+                                //eslint-disable
+                                import(/* webpackIgnore: true */ `${module}`)
+                                //eslint-enable
+                            )))
+                            .then( loadedModules => Promise.resolve(...loadModules) );
+                    }
                 }
                 return Promise.resolve();
             };

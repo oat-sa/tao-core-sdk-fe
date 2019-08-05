@@ -34,11 +34,11 @@ function requireIfExists(uri) {
             var failedId = err.requireModules && err.requireModules[0];
             if (failedId === uri) {
                 // fake the module, then ensure it is truly loaded
-                requirejs.undef(failedId);
+                window.requirejs.undef(failedId);
                 define(failedId, function() {
                     return null;
                 });
-                require([failedId], resolve);
+                window.require([failedId], resolve);
             } else {
                 // others errors are not handled
                 throw err;
@@ -46,7 +46,7 @@ function requireIfExists(uri) {
         }
 
         // require the module with error handling
-        require([uri], resolve, failed);
+        window.require([uri], resolve, failed);
     });
 }
 
