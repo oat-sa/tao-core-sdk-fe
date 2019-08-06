@@ -77,6 +77,7 @@ var defaults = {
  * @param {Number} [config.interval] - The poll interval, in milliseconds (default: 30000)
  * @param {Number} [config.throttle] - Gather several calls to send() by throttle period, in milliseconds (default: 1000)
  * @param {String} [config.token] - An optional initial security token
+ * @param {Object} [config.jwtTokenHandler] - A core/jwtTokenHandler instance
  * @type {Object}
  */
 const pollProvider = {
@@ -128,6 +129,7 @@ const pollProvider = {
                     contentType: 'application/json',
                     sequential: true,
                     noToken: false,
+                    jwtTokenHandler: config.jwtTokenHandler || null,
                     timeout: config.timeout
                 })
                     .then(function(response) {
