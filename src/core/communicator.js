@@ -47,6 +47,7 @@ var defaults = {
  * @param {Object} [config] - Optional config set
  * @param {String} [config.service] - The address of the remote service to request
  * @param {Number} [config.timeout] - The communication timeout, in milliseconds (default: 30000)
+ * @param {Object} [config.jwtTokenHandler] - A core/jwtTokenHandler instance (passed through to request provider)
  * @returns {communicator}
  */
 function communicatorFactory(providerName, config) {
