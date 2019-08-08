@@ -47,7 +47,8 @@ var defaults = {
  * @param {Object} [config] - Optional config set
  * @param {String} [config.service] - The address of the remote service to request
  * @param {Number} [config.timeout] - The communication timeout, in milliseconds (default: 30000)
- * @param {Object} [config.jwtTokenHandler] - A core/jwtTokenHandler instance (passed through to request provider)
+ * @param {Object} [config.requestParams] - Extra params to override the defaults of the request
+ * @param {Object} [config.requestParams.jwtTokenHandler] - core/jwtTokenHandler instance to be used for JWT authentication
  * @returns {communicator}
  */
 function communicatorFactory(providerName, config) {
