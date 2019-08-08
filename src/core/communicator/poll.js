@@ -77,6 +77,8 @@ var defaults = {
  * @param {Number} [config.interval] - The poll interval, in milliseconds (default: 30000)
  * @param {Number} [config.throttle] - Gather several calls to send() by throttle period, in milliseconds (default: 1000)
  * @param {String} [config.token] - An optional initial security token
+ * @param {Object} [config.requestParams] - Extra params to override the defaults of the request
+ * @param {Object} [config.requestParams.jwtTokenHandler] - core/jwtTokenHandler instance to be used for JWT authentication
  * @type {Object}
  */
 const pollProvider = {
@@ -105,10 +107,7 @@ const pollProvider = {
 
         this.request = function request() {
             return new Promise(function(resolve) {
-                var headers = {};
-
                 // split promises and their related messages
-                // then reset the list of pending messages
                 var promises = [];
                 var req = _.map(self.messagesQueue, function(msg) {
                     promises.push(msg.promise);
@@ -117,19 +116,23 @@ const pollProvider = {
                         message: msg.message
                     };
                 });
-                self.messagesQueue = [];
-
-                coreRequest({
+                var defaultRequestParams = {
                     url: config.service,
                     method: 'POST',
-                    headers: headers,
+                    headers: {},
                     data: JSON.stringify(req),
                     dataType: 'json',
                     contentType: 'application/json',
                     sequential: true,
                     noToken: false,
                     timeout: config.timeout
-                })
+                };
+                var extendedRequestParams = Object.assign({}, defaultRequestParams, config.requestParams);
+
+                // then reset the list of pending messages
+                self.messagesQueue = [];
+
+                coreRequest(extendedRequestParams)
                     .then(function(response) {
                         // resolve each message promises
                         _.forEach(promises, function(promise, idx) {
