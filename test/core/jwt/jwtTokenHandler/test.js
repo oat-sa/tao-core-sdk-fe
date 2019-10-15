@@ -20,7 +20,7 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-define(['jquery', 'core/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHandlerFactory) => {
+define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHandlerFactory) => {
     'use strict';
 
     QUnit.module('factory');

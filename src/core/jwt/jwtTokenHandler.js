@@ -22,7 +22,7 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-import jwtTokenStoreFactory from 'core/jwtTokenStore';
+import jwtTokenStoreFactory from 'core/jwt/jwtTokenStore';
 import coreRequest from 'core/request';
 import promiseQueue from 'core/promiseQueue';
 
