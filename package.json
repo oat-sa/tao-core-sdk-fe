@@ -1,6 +1,6 @@
 {
   "name": "@oat-sa/tao-core-sdk",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "displayName": "TAO Core SDK",
   "description": "Core libraries of TAO",
   "homepage": "https://github.com/oat-sa/tao-core-sdk-fe#readme",
