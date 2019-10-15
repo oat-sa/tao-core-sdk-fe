@@ -55,6 +55,16 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHan
         }
     });
 
+    QUnit.test('get service name', function(assert) {
+        assert.expect(2);
+
+        // default
+        assert.strictEqual(this.handler.serviceName, 'tao', 'default service name is tao');
+
+        const handler = jwtTokenHandlerFactory({serviceName: 'foo'});
+        assert.strictEqual(handler.serviceName, 'foo', 'return with the provided service name');
+    });
+
     QUnit.test('get access token', function(assert) {
         assert.expect(2);
 

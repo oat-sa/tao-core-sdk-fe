@@ -68,6 +68,11 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
 
     return {
         /**
+         * service name of token handler
+         */
+        serviceName,
+
+        /**
          * Get access token
          * @returns {Promise<String|null>} Promise of access token
          */
