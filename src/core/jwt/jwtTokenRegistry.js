@@ -27,16 +27,15 @@ const registry = new Map();
 export default {
     /**
      * Register a token handler for a service
-     * @param {string} serviceName - name of the service
      * @param {JWTTokenHandler} tokenHandler - token handler instance
      */
-    register(serviceName = 'tao', tokenHandler) {
-        registry.set(serviceName, tokenHandler);
+    register(tokenHandler) {
+        registry.set(tokenHandler.serviceName, tokenHandler);
     },
 
     /**
      * Request a token handler based on service
-     * @param {string} serviceName - name of the service of which token handler is requested
+     * @param {string} serviceName - name of the token handler's service
      * @returns {JWTTokenHandler} token handler of the service
      */
     get(serviceName = 'tao') {
@@ -45,7 +44,7 @@ export default {
 
     /**
      * Unregister a token handler for a service
-     * @param {string} serviceName - name of the service of which token handler should be unregistered
+     * @param {string} serviceName - name of the token handler's service
      */
     unregister(serviceName = 'tao') {
         registry.delete(serviceName);
