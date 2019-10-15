@@ -52,8 +52,8 @@ export default {
 
     /**
      * Check token handler is registered for the given service name
-     * @param {string} serviceName - name of the service of which token handler existence should be checked
-     * @returns {boolean} Token handler is registered for the given service name or not
+     * @param {string} serviceName - name of the token handler's service
+     * @returns {boolean} Is token handler registered for the given service name or not
      */
     has(serviceName = 'tao') {
         return registry.has(serviceName);
