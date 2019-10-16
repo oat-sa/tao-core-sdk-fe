@@ -8,7 +8,7 @@
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
                     // mock jwt token store
-                    define('core/jwtTokenStore', () => () => {
+                    define('core/jwt/jwtTokenStore', () => () => {
                         let accessToken = null;
                         let refreshToken = null;
                         return {
@@ -32,7 +32,7 @@
                             }
                         };
                     });
-                    require(['test/core/jwtTokenHandler/test'], function() {
+                    require(['test/core/jwt/jwtTokenHandler/test'], function() {
                         QUnit.start();
                     });
                 });
