@@ -20,7 +20,7 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-define(['core/jwtTokenStore'], jwtTokenStoreFactory => {
+define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
     'use strict';
 
     QUnit.module('factory');

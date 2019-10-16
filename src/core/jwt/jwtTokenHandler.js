@@ -22,7 +22,7 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-import jwtTokenStoreFactory from 'core/jwtTokenStore';
+import jwtTokenStoreFactory from 'core/jwt/jwtTokenStore';
 import coreRequest from 'core/request';
 import promiseQueue from 'core/promiseQueue';
 
@@ -67,6 +67,11 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
     });
 
     return {
+        /**
+         * service name of token handler
+         */
+        serviceName,
+
         /**
          * Get access token
          * @returns {Promise<String|null>} Promise of access token

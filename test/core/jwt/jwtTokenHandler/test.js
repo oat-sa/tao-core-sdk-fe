@@ -20,7 +20,7 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-define(['jquery', 'core/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHandlerFactory) => {
+define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHandlerFactory) => {
     'use strict';
 
     QUnit.module('factory');
@@ -53,6 +53,16 @@ define(['jquery', 'core/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHandler
             $.mockjax.clear();
             this.handler.clearStore().then(done);
         }
+    });
+
+    QUnit.test('get service name', function(assert) {
+        assert.expect(2);
+
+        // default
+        assert.strictEqual(this.handler.serviceName, 'tao', 'default service name is tao');
+
+        const handler = jwtTokenHandlerFactory({serviceName: 'foo'});
+        assert.strictEqual(handler.serviceName, 'foo', 'return with the provided service name');
     });
 
     QUnit.test('get access token', function(assert) {
