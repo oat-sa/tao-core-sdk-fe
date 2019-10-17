@@ -34,6 +34,11 @@ var urlParts = ['hash', 'host', 'hostname', 'pathname', 'port', 'protocol', 'sea
 
 /**
  * Parse an URL and gives you access to its parts
+ *
+ * @deprecated
+ * @see {URL} https://developer.mozilla.org/en-US/docs/Web/API/URL browser-native URL API
+ * @see {url-polyfill} https://www.npmjs.com/package/url-polyfill  package to cover other browsers
+ *
  * @exports urlParser
  * @constructor
  * @param {String} url
