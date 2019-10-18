@@ -34,6 +34,11 @@ var urlParts = ['hash', 'host', 'hostname', 'pathname', 'port', 'protocol', 'sea
 
 /**
  * Parse an URL and gives you access to its parts
+ *
+ * @deprecated - at least most parts - see individual methods
+ * @see {URL} https://developer.mozilla.org/en-US/docs/Web/API/URL browser-native URL API
+ * @see {url-polyfill} https://www.npmjs.com/package/url-polyfill  package to cover other browsers
+ *
  * @exports urlParser
  * @constructor
  * @param {String} url
@@ -52,6 +57,7 @@ function UrlParser(url) {
 
 /**
  * Get an object that represents query params from the search string
+ * @deprecated
  * @memberOf UrlParser
  * @param {String} search
  * @returns {Object} key : value
@@ -66,6 +72,7 @@ UrlParser.extractParams = function(search) {
 
 /**
  * Get a part of the url
+ * @deprecated
  * @memberOf UrlParser
  * @param {string} what - in 'hash', 'host', 'hostname', 'pathname', 'port', 'protocol', 'search'
  * @returns {String|Boolean} the requested url part or false
@@ -76,6 +83,7 @@ UrlParser.prototype.get = function(what) {
 
 /**
  * Get an object that represents the URL's query params
+ * @deprecated
  * @memberOf UrlParser
  * @returns {Object} key : value
  */
@@ -85,6 +93,7 @@ UrlParser.prototype.getParams = function() {
 
 /**
  * Replace  the parameter set
+ * @deprecated
  * @memberOf UrlParser
  * @param {Object} params - of key:value
  */
@@ -96,6 +105,7 @@ UrlParser.prototype.setParams = function(params) {
 
 /**
  * Add a new parameter
+ * @deprecated
  * @memberOf UrlParser
  * @param {String} key
  * @param {String} value
@@ -117,7 +127,8 @@ UrlParser.prototype.getPaths = function() {
 
 /**
  * Get the URL
- * @param {Array} [exclude} - url parts to exclude in hosts, params and hash
+ * @deprecated
+ * @param {Array} [exclude] - url parts to exclude in hosts, params and hash
  * @returns {String} the url
  */
 UrlParser.prototype.getUrl = function(exclude) {
@@ -154,6 +165,7 @@ UrlParser.prototype.getUrl = function(exclude) {
 
 /**
  * Get the URL without parameters, hash and file if
+ * @deprecated
  * @returns {String} the url
  */
 UrlParser.prototype.getBaseUrl = function() {
@@ -173,7 +185,7 @@ UrlParser.prototype.getBaseUrl = function() {
  * is the current URL in the same domain than the one in paramter
  * based on Cross Origin Resource Sharing rules.
  * @memberOf UrlParser
- * @param {String|UrlParser} [url = window.location] - to compare with
+ * @param {String|UrlParser} [url=window.location] - to compare with
  * @returns {Boolean} true if same domain
  * @throws {TypeError} with wrong parameters
  */
