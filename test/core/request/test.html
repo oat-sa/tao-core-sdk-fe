@@ -7,6 +7,24 @@
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
+                    define('core/logger', () => {
+                        const logger = {
+                            child() {
+                                return logger;
+                            },
+                            level(level) {
+                                logger.loggerLevel = level;
+                            },
+                            trace() {},
+                            debug() {},
+                            info() {},
+                            error() {},
+                            fatal() {},
+                            warn() {}
+                        };
+                        return () => logger;
+                    });
+                        
                     require(['test/core/request/test'], function() {
                         QUnit.start();
                     });

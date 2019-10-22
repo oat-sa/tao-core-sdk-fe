@@ -21,12 +21,13 @@
  *
  * @author Martin Nicholson <martin@taotesting.com>
  */
-define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], function(
+define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTokenHandler', 'core/logger', 'jquery.mockjax'], function(
     $,
     _,
     request,
     tokenHandlerFactory,
-    jwtTokenHandlerFactory
+    jwtTokenHandlerFactory,
+    loggerFactory
 ) {
     'use strict';
 
@@ -847,5 +848,29 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
             /Token not available and cannot be refreshed/i,
             'request fails if token handler cannot provide access token'
         );
+    });
+
+    QUnit.module('request logger', {
+        afterEach: function() {
+            $.mockjax.clear();
+        }
+    });
+
+    QUnit.cases.init(['warn', 'error', 'fatal']).test('request logger min level is set based on config', (logLevel, assert) => {
+        const done = assert.async();
+        assert.expect(1);
+
+        $.mockjax([
+            {
+                url: '//endpoint',
+                status: 200,
+                responseText: JSON.stringify({})
+            }
+        ]);
+
+        request({ url: '//endpoint', noToken: true, logLevel }).then(() => {
+            assert.equal(loggerFactory().loggerLevel, logLevel, `loggel level should be ${logLevel} based on config`);
+            done();
+        });
     });
 });
