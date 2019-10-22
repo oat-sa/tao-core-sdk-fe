@@ -102,7 +102,7 @@ export default function request(options) {
 
     // Request logger
     const requestLogger = logger.child({ url: options.url });
-    const logLevel = {options};
+    const { logLevel } = options;
     if (logLevel) {
         requestLogger.level(logLevel);
     }
