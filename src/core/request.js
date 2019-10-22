@@ -87,6 +87,7 @@ const createError = (response, fallbackMessage, httpCode, httpSent) => {
  * @param {Boolean} [options.sequential] - if true, the request must join a queue to be run sequentially
  * @param {Number}  [options.timeout] - timeout in seconds for the AJAX request
  * @param {Object} [options.jwtTokenHandler] - JWT token handler instance
+ * @param {string} [options.logLevel] - Minimum log level for request
  * @returns {Promise} resolves with response, or reject if something went wrong
  */
 export default function request(options) {
@@ -97,6 +98,13 @@ export default function request(options) {
 
     if (_.isEmpty(options.url)) {
         throw new TypeError('At least give a URL...');
+    }
+
+    // Request logger
+    const requestLogger = logger.child({ url: options.url });
+    const logLevel = {options};
+    if (logLevel) {
+        requestLogger.level(logLevel);
     }
 
     /**
@@ -151,7 +159,7 @@ export default function request(options) {
          */
         const reEnqueueTempToken = () => {
             if (tempToken) {
-                logger.debug('re-enqueueing %s token %s', tokenHeaderName, tempToken);
+                requestLogger.debug('re-enqueueing %s token %s', tokenHeaderName, tempToken);
                 return tokenHandler.setToken(tempToken).then(() => {
                     tempToken = null;
                 });
@@ -167,7 +175,7 @@ export default function request(options) {
         const setTokenFromXhr = xhr => {
             if (_.isFunction(xhr.getResponseHeader)) {
                 const token = xhr.getResponseHeader(tokenHeaderName);
-                logger.debug('received %s header %s', tokenHeaderName, token);
+                requestLogger.debug('received %s header %s', tokenHeaderName, token);
 
                 if (token) {
                     return tokenHandler.setToken(token);
@@ -195,7 +203,7 @@ export default function request(options) {
                     timeout: options.timeout * 1000 || context.timeout * 1000 || 0,
                     beforeSend() {
                         if (!_.isEmpty(customHeaders)) {
-                            logger.debug(
+                            requestLogger.debug(
                                 'sending %s header %s',
                                 tokenHeaderName,
                                 customHeaders && customHeaders[tokenHeaderName]
@@ -245,7 +253,7 @@ export default function request(options) {
                                 );
                             })
                             .catch(error => {
-                                logger.error(error);
+                                requestLogger.error(error);
                                 reject(createError(response, error, xhr.status, xhr.readyState > 0));
                             });
                 };
@@ -319,7 +327,7 @@ export default function request(options) {
                                 );
                             })
                             .catch(error => {
-                                logger.error(error);
+                                requestLogger.error(error);
                                 reject(createError(enhancedResponse, error, xhr.status, xhr.readyState > 0));
                             });
                 };
