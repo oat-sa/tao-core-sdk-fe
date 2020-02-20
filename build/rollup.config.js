@@ -51,7 +51,7 @@ export default inputs.map(input => {
             name
         },
         watch: {
-            clearScreen : false
+            clearScreen: false
         },
         external: [
             ...localExternals,
@@ -66,7 +66,8 @@ export default inputs.map(input => {
             'lib/uuid',
             'lodash',
             'module',
-            'moment'
+            'moment',
+            'fastestsmallesttextencoderdecoder'
         ],
         plugins: [
             resolve(),
@@ -81,11 +82,14 @@ export default inputs.map(input => {
             }),
             ...(process.env.COVERAGE ? [istanbul()] : []),
             babel({
-                presets: [[
-                    '@babel/env', {
-                        useBuiltIns: false
-                    }
-                ]]
+                presets: [
+                    [
+                        '@babel/env',
+                        {
+                            useBuiltIns: false
+                        }
+                    ]
+                ]
             })
         ]
     };
