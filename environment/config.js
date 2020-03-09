@@ -19,23 +19,29 @@
 define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(libPathDefinition) {
     requirejs.config({
         baseUrl: '/',
-        paths: Object.assign({}, {
-            css: '/node_modules/require-css/css',
-            json: '/node_modules/requirejs-plugins/src/json',
-            text: '/node_modules/requirejs-plugins/lib/text',
+        paths: Object.assign(
+            {},
+            {
+                css: '/node_modules/require-css/css',
+                json: '/node_modules/requirejs-plugins/src/json',
+                text: '/node_modules/requirejs-plugins/lib/text',
 
-            'qunit-parameterize': '/environment/qunit2-parameterize',
-            'jquery.simulate': '/node_modules/jquery-simulate/jquery.simulate',
-            qunit: '/node_modules/qunit/qunit',
-            test: '/test',
+                'qunit-parameterize': '/environment/qunit2-parameterize',
+                'jquery.simulate': '/node_modules/jquery-simulate/jquery.simulate',
+                qunit: '/node_modules/qunit/qunit',
+                test: '/test',
 
-            core: '/dist/core',
-            util: '/dist/util',
+                core: '/dist/core',
+                util: '/dist/util',
 
-            'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
-            'webcrypto-shim': '/node_modules/webcrypto-shim/webcrypto-shim',
-            'idb-wrapper': '/node_modules/idb-wrapper/idbstore'
-        }, libPathDefinition),
+                'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
+                'webcrypto-shim': '/node_modules/webcrypto-shim/webcrypto-shim',
+                'idb-wrapper': '/node_modules/idb-wrapper/idbstore',
+                fastestsmallesttextencoderdecoder:
+                    '/node_modules/fastestsmallesttextencoderdecoder/NodeJS/EncoderAndDecoderNodeJS.min'
+            },
+            libPathDefinition
+        ),
         shim: {
             'jquery.simulate': {
                 deps: ['jquery']
