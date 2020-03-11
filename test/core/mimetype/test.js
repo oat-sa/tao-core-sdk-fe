@@ -96,34 +96,6 @@ define(['core/mimetype'], function(mimeType) {
                 mime: 'application/octet-stream',
                 equals: 'application/octet-stream',
                 title: 'application/octet-stream bz2'
-            },
-            {
-                filename: 'filename.bz2',
-                mime: 'application/octet-stream',
-                equals: 'application/octet-stream',
-                title: 'application/octet-stream bz2'
-            },
-            {
-                filename: 'filename.odt',
-                mime: 'application/vnd.oasis.opendocument.text',
-                equals: 'application/vnd.oasis.opendocument.text',
-                title: 'application/vnd.oasis.opendocument.text odt'
-            },
-            {
-                filename: 'filename.ods',
-                mime: 'application/vnd.oasis.opendocument.spreadsheet',
-                equals: 'application/vnd.oasis.opendocument.spreadsheet',
-                title: 'application/vnd.oasis.opendocument.spreadsheet ods'
-            },
-            {
-                filename: 'filename.cpp',
-                equals: 'text/x-c',
-                title: 'text/x-c cpp'
-            },
-            {
-                filename: 'filename.pas',
-                equals: 'text/pascal',
-                title: 'text/pascal pas'
             }
         ])
         .test('getMimeType', function(data, assert) {
