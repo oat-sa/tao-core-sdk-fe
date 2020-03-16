@@ -36,9 +36,7 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
 
                 'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
                 'webcrypto-shim': '/node_modules/webcrypto-shim/webcrypto-shim',
-                'idb-wrapper': '/node_modules/idb-wrapper/idbstore',
-                fastestsmallesttextencoderdecoder:
-                    '/node_modules/fastestsmallesttextencoderdecoder/NodeJS/EncoderAndDecoderNodeJS.min'
+                'idb-wrapper': '/node_modules/idb-wrapper/idbstore'
             },
             libPathDefinition
         ),

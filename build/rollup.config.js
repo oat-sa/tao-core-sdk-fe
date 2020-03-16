@@ -66,11 +66,10 @@ export default inputs.map(input => {
             'lib/uuid',
             'lodash',
             'module',
-            'moment',
-            'fastestsmallesttextencoderdecoder'
+            'moment'
         ],
         plugins: [
-            resolve(),
+            resolve({ mainFields: ['main'] }),
             commonJS(),
             alias({
                 resolve: ['.js', '.json'],
