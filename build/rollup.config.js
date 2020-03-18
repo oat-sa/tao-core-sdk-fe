@@ -66,12 +66,15 @@ export default inputs.map(input => {
             'lib/uuid',
             'lodash',
             'module',
-            'moment',
-            'fastestsmallesttextencoderdecoder'
+            'moment'
         ],
         plugins: [
-            resolve(),
-            commonJS(),
+            resolve({ mainFields: ['main'] }),
+            commonJS({
+                namedExports: {
+                    fastestsmallesttextencoderdecoder: ['TextEncoder']
+                }
+            }),
             alias({
                 resolve: ['.js', '.json'],
                 core: path.resolve(srcDir, 'core'),
