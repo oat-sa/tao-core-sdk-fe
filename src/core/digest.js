@@ -26,9 +26,7 @@
  */
 import _ from 'lodash';
 import 'webcrypto-shim';
-import TextEncoderPolyfill from 'fastestsmallesttextencoderdecoder';
-
-const { TextEncoder } = TextEncoderPolyfill;
+import { TextEncoder } from 'fastestsmallesttextencoderdecoder';
 
 //get the native implementation of the CryptoSubtle
 var subtle = window.crypto.subtle || window.crypto.webkitSubtle;

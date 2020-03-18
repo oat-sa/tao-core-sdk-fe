@@ -70,7 +70,11 @@ export default inputs.map(input => {
         ],
         plugins: [
             resolve({ mainFields: ['main'] }),
-            commonJS(),
+            commonJS({
+                namedExports: {
+                    fastestsmallesttextencoderdecoder: ['TextEncoder']
+                }
+            }),
             alias({
                 resolve: ['.js', '.json'],
                 core: path.resolve(srcDir, 'core'),
