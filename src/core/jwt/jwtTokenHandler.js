@@ -18,6 +18,8 @@
 
 /**
  * Give and refresh JWT token
+ * !!! The module uses native fetch request to refresh token.
+ * !!! IE11 requires polyfill https://www.npmjs.com/package/whatwg-fetch
  * @module core/jwtTokenHandler
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
