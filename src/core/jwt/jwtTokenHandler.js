@@ -23,7 +23,6 @@
  */
 
 import jwtTokenStoreFactory from 'core/jwt/jwtTokenStore';
-import coreRequest from 'core/request';
 import promiseQueue from 'core/promiseQueue';
 
 /**
@@ -54,14 +53,20 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
         if (!refreshToken) {
             throw new Error('Refresh token is not available');
         } else {
-            return coreRequest({
-                url: refreshTokenUrl,
+            return fetch(refreshTokenUrl, {
                 method: 'POST',
-                data: JSON.stringify({ refreshToken }),
-                dataType: 'json',
-                contentType: 'application/json',
-                noToken: true
-            }).then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ refreshToken })
+            })
+                .then(response => {
+                    if (response.status < 300) {
+                        return response.json();
+                    }
+                    return Promise.reject(response);
+                })
+                .then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
 
         }
     });
