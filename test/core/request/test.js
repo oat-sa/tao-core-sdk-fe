@@ -21,7 +21,7 @@
  *
  * @author Martin Nicholson <martin@taotesting.com>
  */
-define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTokenHandler', 'core/logger', 'jquery.mockjax'], function(
+define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTokenHandler', 'core/logger', 'fetch-mock', 'jquery.mockjax'], function(
     $,
     _,
     request,
