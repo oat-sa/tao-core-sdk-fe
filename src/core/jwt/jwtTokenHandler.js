@@ -62,12 +62,9 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
                 },
                 body: JSON.stringify({ refreshToken })
             })
-                .then(response => {
-                    if (response.status < 300) {
-                        return response.json();
-                    }
-                    return Promise.reject(response);
-                })
+                .then(response => response.json().catch(() => {
+                    throw response;
+                }))
                 .then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
 
         }

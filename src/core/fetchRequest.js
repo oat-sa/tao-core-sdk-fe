@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -22,7 +22,7 @@
  * every response will be parsed as json.
  * It is extended with the following parameters:
  *  - timeout         : request will be rejected, when the timout will be reached  (default: 5000)
- *  - jwtTokenHandel  : jwt token handler, that should be used for the request
+ *  - jwtTokenHandler : jwt token handler, that should be used for the request
  */
 
 const requestFactory = (url, options) => {
@@ -70,12 +70,33 @@ const requestFactory = (url, options) => {
         });
     }
 
+    let originalResponse;
+    let responseCode;
+
     flow = flow.then(response => {
-        if (response.status < 300) {
-            return response.json();
+        originalResponse = response;
+        responseCode = response.status;
+        return response.json().catch(() => ({}));
+    })
+    .then(response => {
+        // successful request
+        if (responseCode === 200 || response.success === true) {
+            return response;
         }
 
-        return Promise.reject(response);
+        if (responseCode === 204) {
+            return null;
+        }
+
+        // create error
+        let err;
+        if (response.errorCode) {
+            err = new Error(`${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`);
+        } else {
+            err = new Error(`${responseCode} : Request error`);
+        }
+        err.response = originalResponse;
+        throw err;
     });
 
     return flow;
