@@ -17,12 +17,13 @@
  */
 
 /**
+ * !!! IE11 requires polyfill https://www.npmjs.com/package/whatwg-fetch
  * Request is based on fetch, so behaviour and parameters are the same, except
  * every response where response code is not 2xx will be rejected and
  * every response will be parsed as json.
  * It is extended with the following parameters:
  *  - timeout         : request will be rejected, when the timout will be reached  (default: 5000)
- *  - jwtTokenHandler : jwt token handler, that should be used for the request
+ *  - jwtTokenHandler : core/jwt/jwtTokenHandler instance, that should be used for the request
  */
 
 const requestFactory = (url, options) => {
@@ -59,11 +60,10 @@ const requestFactory = (url, options) => {
                 return options.jwtTokenHandler
                     .refreshToken()
                     .then(options.jwtTokenHandler.getToken)
-                    .then(token => ({
-                        Authorization: `Bearer ${token}`
-                    }))
-                    .then(headers => Object.assign({}, options, { headers }))
-                    .then(newOptions => fetch(url, newOptions));
+                    .then(token => {
+                        options.headers.Authorization = `Bearer ${token}`;
+                        return fetch(url, options);
+                    });
             }
 
             return Promise.resolve(response);

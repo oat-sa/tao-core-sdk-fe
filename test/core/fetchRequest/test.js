@@ -109,18 +109,18 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         const done = assert.async();
 
         const mockResponse = { foo: 'bar' };
-        const authToken = 'someToken';
+        const accessToken = 'someToken';
         const url = '/bar';
 
         fetchMock.mock(url, (uri, opts) => {
             assert.deepEqual(opts.headers, {
-                Authorization: `Bearer ${authToken}`
+                Authorization: `Bearer ${accessToken}`
             });
             return mockResponse;
         });
 
         this.jwtTokenHandler
-            .storeAccessToken(authToken)
+            .storeAccessToken(accessToken)
             .then(() => request(url, { jwtTokenHandler: this.jwtTokenHandler }))
             .then(response => {
                 assert.deepEqual(response, mockResponse);
@@ -134,7 +134,7 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
 
         const mockResponse = { response: 2 };
         const refreshToken = 'refreshToken';
-        const newAuthToken = 'newAuthToken';
+        const newAccessToken = 'newAccessToken';
         const url = '/api/request';
 
         fetchMock.mock('/refresh-token', (uri, opts) => {
@@ -142,11 +142,11 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
             assert.equal(opts.headers['Content-Type'], 'application/json');
             assert.equal(opts.method, 'POST');
             assert.deepEqual(data, { refreshToken });
-            return JSON.stringify({ accessToken: newAuthToken });
+            return JSON.stringify({ accessToken: newAccessToken });
         });
 
         fetchMock.mock(url, (uri, opts) => {
-            assert.equal(opts.headers.Authorization, `Bearer ${newAuthToken}`);
+            assert.equal(opts.headers.Authorization, `Bearer ${newAccessToken}`);
             return JSON.stringify(mockResponse);
         });
 
@@ -166,12 +166,12 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         const mockResponse = { response: 2 };
         const refreshToken = 'refreshToken';
         const accessToken = 'invalidAccessToken';
-        const newAuthToken = 'newAuthToken';
+        const newAccessToken = 'newAccessToken';
         const url = '/api/request';
 
         const setupSecondRequest = () => {
             fetchMock.mock(url, function (uri, opts) {
-                assert.equal(opts.headers.Authorization, `Bearer ${newAuthToken}`);
+                assert.equal(opts.headers.Authorization, `Bearer ${newAccessToken}`);
                 return JSON.stringify(mockResponse);
             });
         };
@@ -187,7 +187,7 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
             assert.equal(opts.method, 'POST');
             assert.equal(opts.headers['Content-Type'], 'application/json');
             assert.deepEqual(data, { refreshToken });
-            return JSON.stringify({ accessToken: newAuthToken });
+            return JSON.stringify({ accessToken: newAccessToken });
         });
 
         this.jwtTokenHandler
@@ -234,11 +234,11 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
 
         const refreshToken = 'refreshToken';
         const accessToken = 'invalidAccessToken';
-        const newAuthToken = 'stillInvalidAccessToken';
+        const newAccessToken = 'stillInvalidAccessToken';
         const url = '/api/request';
 
         fetchMock.mock(url, 401);
-        fetchMock.mock('/refresh-token', JSON.stringify({ accessToken: newAuthToken }));
+        fetchMock.mock('/refresh-token', JSON.stringify({ accessToken: newAccessToken }));
 
         this.jwtTokenHandler
             .storeRefreshToken(refreshToken)
