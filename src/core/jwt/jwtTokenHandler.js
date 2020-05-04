@@ -66,7 +66,9 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
                     if (response.status === 200) {
                         return response.json();
                     }
-                    return Promise.reject(response);
+                    const error = new Error('Unsuccessful token refresh');
+                    error.response = response;
+                    return Promise.reject(error);
                 })
                 .then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
 

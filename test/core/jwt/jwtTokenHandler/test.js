@@ -139,7 +139,7 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandler
     });
 
     QUnit.test('unsuccessful refresh token', function(assert) {
-        assert.expect(3);
+        assert.expect(5);
 
         const done = assert.async();
 
@@ -155,7 +155,11 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandler
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
             this.handler.refreshToken()
-            .catch(errorResponse => errorResponse.json())
+            .catch(e => {
+                assert.equal(e instanceof Error, true, 'rejects with error');
+                assert.equal(e.response instanceof Response, true, 'passes response');
+                return e.response.json();
+            })
             .then(errorResponse => {
                 assert.equal(errorResponse.error, error, 'should get back api error message');
                 done();
@@ -164,7 +168,7 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandler
     });
 
     QUnit.test('unsuccessful get token if refresh fails', function(assert) {
-        assert.expect(3);
+        assert.expect(5);
 
         const done = assert.async();
 
@@ -180,7 +184,11 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandler
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
             this.handler.getToken()
-            .catch(errorResponse => errorResponse.json())
+            .catch(e => {
+                assert.equal(e instanceof Error, true, 'rejects with error');
+                assert.equal(e.response instanceof Response, true, 'passes response');
+                return e.response.json();
+            })
             .then(errorResponse => {
                 assert.equal(errorResponse.error, error, 'should get back api error message');
                 done();
