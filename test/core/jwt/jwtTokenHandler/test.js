@@ -20,7 +20,7 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHandlerFactory) => {
+define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandlerFactory, fetchMock) => {
     'use strict';
 
     QUnit.module('factory');
@@ -40,17 +40,13 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHan
         );
     });
 
-    // prevent the AJAX mocks to pollute the logs
-    $.mockjaxSettings.logger = null;
-    $.mockjaxSettings.responseTime = 1;
-
     QUnit.module('API', {
         beforeEach: function() {
-            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
+            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '/refreshUrl' });
         },
         afterEach: function(assert) {
             const done = assert.async();
-            $.mockjax.clear();
+            fetchMock.restore();
             this.handler.clearStore().then(done);
         }
     });
@@ -123,17 +119,11 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHan
         const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
-        $.mockjax([
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 200,
-                response: function(request) {
-                    const data = JSON.parse(request.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken });
-                }
-            }
-        ]);
+        fetchMock.mock('/refreshUrl', function(url, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return JSON.stringify({ accessToken });
+        });
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
@@ -149,58 +139,58 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHan
     });
 
     QUnit.test('unsuccessful refresh token', function(assert) {
-        assert.expect(3);
+        assert.expect(5);
 
         const done = assert.async();
 
         const error = 'some backend error';
         const refreshToken = 'some refresh token';
 
-        $.mockjax([
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 401,
-                response: function(request) {
-                    const data = JSON.parse(request.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ error });
-                }
-            }
-        ]);
+        fetchMock.mock('/refreshUrl', function(url, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return new Response(JSON.stringify({error}), { status: 401 });
+        });
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
-            this.handler.refreshToken().catch(errorResponse => {
-                assert.equal(errorResponse.response.error, error, 'should get back api error message');
+            this.handler.refreshToken()
+            .catch(e => {
+                assert.equal(e instanceof Error, true, 'rejects with error');
+                assert.equal(e.response instanceof Response, true, 'passes response');
+                return e.response.json();
+            })
+            .then(errorResponse => {
+                assert.equal(errorResponse.error, error, 'should get back api error message');
                 done();
             });
         });
     });
 
     QUnit.test('unsuccessful get token if refresh fails', function(assert) {
-        assert.expect(3);
+        assert.expect(5);
 
         const done = assert.async();
 
         const error = 'some backend error';
         const refreshToken = 'some refresh token';
 
-        $.mockjax([
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 401,
-                response: function(request) {
-                    const data = JSON.parse(request.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ error });
-                }
-            }
-        ]);
+        fetchMock.mock('/refreshUrl', function(url, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return new Response(JSON.stringify({error}), { status: 401 });
+        });
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
-            this.handler.getToken().catch(errorResponse => {
-                assert.equal(errorResponse.response.error, error, 'should get back api error message');
+            this.handler.getToken()
+            .catch(e => {
+                assert.equal(e instanceof Error, true, 'rejects with error');
+                assert.equal(e.response instanceof Response, true, 'passes response');
+                return e.response.json();
+            })
+            .then(errorResponse => {
+                assert.equal(errorResponse.error, error, 'should get back api error message');
                 done();
             });
         });
@@ -208,11 +198,11 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHan
 
     QUnit.module('Concurrency', {
         beforeEach: function() {
-            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
+            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '/refreshUrl' });
         },
         afterEach: function(assert) {
             const done = assert.async();
-            $.mockjax.clear();
+            fetchMock.restore();
             this.handler.clearStore().then(done);
         }
     });
@@ -225,17 +215,11 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHan
         const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
-        $.mockjax([
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 200,
-                response: function(request) {
-                    const data = JSON.parse(request.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken });
-                }
-            }
-        ]);
+        fetchMock.mock('/refreshUrl', function(url, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return JSON.stringify({accessToken});
+        });
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
@@ -260,17 +244,11 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHan
         const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
-        $.mockjax([
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 200,
-                response: function(request) {
-                    const data = JSON.parse(request.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken });
-                }
-            }
-        ]);
+        fetchMock.mock('/refreshUrl', function(url, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return JSON.stringify({accessToken});
+        });
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
@@ -297,33 +275,20 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'jquery.mockjax'], ($, jwtTokenHan
         const refreshToken = 'some refresh token';
 
         const setupSecondRequest = () => {
-            $.mockjax.clear();
-            $.mockjax([
-                {
-                    url: /^\/\/refreshUrl$/,
-                    status: 200,
-                    response: function(request) {
-                        const data = JSON.parse(request.data);
-                        assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                        this.responseText = JSON.stringify({ accessToken: accessToken2 });
-                        setupSecondRequest();
-                    }
-                }
-            ]);
+            fetchMock.restore();
+            fetchMock.mock('/refreshUrl', function(url, opts) {
+                const data = JSON.parse(opts.body);
+                assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+                return JSON.stringify({accessToken: accessToken2});
+            });
         };
 
-        $.mockjax([
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 200,
-                response: function(request) {
-                    const data = JSON.parse(request.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: accessToken1 });
-                    setupSecondRequest();
-                }
-            }
-        ]);
+        fetchMock.mock('/refreshUrl', function(url, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            setupSecondRequest();
+            return JSON.stringify({accessToken: accessToken1});
+        });
 
         this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
             assert.equal(setTokenResult, true, 'refresh token is set');
