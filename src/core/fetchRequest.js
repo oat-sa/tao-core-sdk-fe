@@ -18,14 +18,16 @@
 
 /**
  * !!! IE11 requires polyfill https://www.npmjs.com/package/whatwg-fetch
+ * Creates an HTTP request to the url based on the provided parameters
  * Request is based on fetch, so behaviour and parameters are the same, except
- * every response where response code is not 2xx will be rejected and
- * every response will be parsed as json.
- * It is extended with the following parameters:
- *  - timeout         : request will be rejected, when the timout will be reached  (default: 5000)
- *  - jwtTokenHandler : core/jwt/jwtTokenHandler instance, that should be used for the request
+ *   - every response where response code is not 2xx will be rejected and
+ *   - every response will be parsed as json.
+ * @param {string} url - url that should be requested
+ * @param {object} options - fetch request options that implements RequestInit (https://fetch.spec.whatwg.org/#requestinit)
+ * @param {integer} [options.timeout] - (default: 5000) if timeout reached, the request will be rejected
+ * @param {object} [options.jwtTokenHandler] - core/jwt/jwtTokenHandler instance that should be used during request
+ * @returns {Promise<Response>} resolves with http Response object
  */
-
 const requestFactory = (url, options) => {
     options = Object.assign(
         {
@@ -70,7 +72,13 @@ const requestFactory = (url, options) => {
         });
     }
 
+    /**
+     * Stores the original response
+     */
     let originalResponse;
+    /**
+     * Stores the response code
+     */
     let responseCode;
 
     flow = flow.then(response => {
