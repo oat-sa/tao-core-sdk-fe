@@ -117,13 +117,13 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         fetchMock.mock(
             '/foo',
             new Response(JSON.stringify({ success: false, errorCode: 'ABC123', errorMessage: 'Cannot trigger ABC' }), {
-                status: 201
+                status: 406
             })
         );
 
         request('/foo').catch(error => {
             assert.equal(error.message, 'ABC123 : Cannot trigger ABC');
-            assert.equal(error.response.status, 201);
+            assert.equal(error.response.status, 406);
             done();
         });
     });
