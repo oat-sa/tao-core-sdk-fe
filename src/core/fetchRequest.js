@@ -90,12 +90,12 @@ const requestFactory = (url, options) => {
             return response.json().catch(() => ({}));
         })
         .then(response => {
-            if (responseCode === 204 || responseCode === 202) {
+            if (responseCode === 204) {
                 return null;
             }
 
             // successful request
-            if (responseCode === 200 || response.success === true) {
+            if (responseCode >= 200 || responseCode <= 299 || response.success === true) {
                 return response;
             }
 
