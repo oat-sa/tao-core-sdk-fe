@@ -73,6 +73,30 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         });
     });
 
+    QUnit.test('request returns with correct response if status code is 2XX with response payload', assert => {
+        assert.expect(1);
+        const done = assert.async();
+
+        fetchMock.mock('/foo', new Response(JSON.stringify({ success: true, data: { ping: 123 } }), { status: 206 }));
+
+        request('/foo').then(response => {
+            assert.deepEqual(response.data, { ping: 123 });
+            done();
+        });
+    });
+
+    QUnit.test('request returns with correct response if status code is 2XX with empty response payload', assert => {
+        assert.expect(1);
+        const done = assert.async();
+
+        fetchMock.mock('/foo', new Response({}, { status: 202 }));
+
+        request('/foo').then(response => {
+            assert.deepEqual(response, {});
+            done();
+        });
+    });
+
     QUnit.test('request returns with a correct error response', assert => {
         assert.expect(2);
         const done = assert.async();
@@ -93,13 +117,13 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         fetchMock.mock(
             '/foo',
             new Response(JSON.stringify({ success: false, errorCode: 'ABC123', errorMessage: 'Cannot trigger ABC' }), {
-                status: 201
+                status: 406
             })
         );
 
         request('/foo').catch(error => {
             assert.equal(error.message, 'ABC123 : Cannot trigger ABC');
-            assert.equal(error.response.status, 201);
+            assert.equal(error.response.status, 406);
             done();
         });
     });
