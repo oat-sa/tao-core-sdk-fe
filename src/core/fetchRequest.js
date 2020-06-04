@@ -49,12 +49,14 @@ const requestFactory = (url, options) => {
             });
     }
 
-    flow = flow.then(() => Promise.race([
-        fetch(url, options),
-        new Promise((resolve, reject) => {
-            setTimeout(() => reject(new Error('Timeout')), options.timeout);
-        })
-    ]));
+    flow = flow.then(() =>
+        Promise.race([
+            fetch(url, options),
+            new Promise((resolve, reject) => {
+                setTimeout(() => reject(new Error('Timeout')), options.timeout);
+            })
+        ])
+    );
 
     if (options.jwtTokenHandler) {
         flow = flow.then(response => {
@@ -81,31 +83,34 @@ const requestFactory = (url, options) => {
      */
     let responseCode;
 
-    flow = flow.then(response => {
-        originalResponse = response;
-        responseCode = response.status;
-        return response.json().catch(() => ({}));
-    })
-    .then(response => {
-        // successful request
-        if (responseCode === 200 || response.success === true) {
-            return response;
-        }
+    flow = flow
+        .then(response => {
+            originalResponse = response;
+            responseCode = response.status;
+            return response.json().catch(() => ({}));
+        })
+        .then(response => {
+            if (responseCode === 204 || responseCode === 202) {
+                return null;
+            }
 
-        if (responseCode === 204) {
-            return null;
-        }
+            // successful request
+            if (responseCode === 200 || response.success === true) {
+                return response;
+            }
 
-        // create error
-        let err;
-        if (response.errorCode) {
-            err = new Error(`${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`);
-        } else {
-            err = new Error(`${responseCode} : Request error`);
-        }
-        err.response = originalResponse;
-        throw err;
-    });
+            // create error
+            let err;
+            if (response.errorCode) {
+                err = new Error(
+                    `${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`
+                );
+            } else {
+                err = new Error(`${responseCode} : Request error`);
+            }
+            err.response = originalResponse;
+            throw err;
+        });
 
     return flow;
 };
