@@ -77,7 +77,7 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         assert.expect(1);
         const done = assert.async();
 
-        fetchMock.mock('/foo', new Response(JSON.stringify({ success: true, data: { ping: 123 } }), { status: 202 }));
+        fetchMock.mock('/foo', new Response(JSON.stringify({ success: true, data: { ping: 123 } }), { status: 206 }));
 
         request('/foo').then(response => {
             assert.deepEqual(response.data, { ping: 123 });
@@ -89,7 +89,7 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         assert.expect(1);
         const done = assert.async();
 
-        fetchMock.mock('/foo', new Response({}, { status: 250 }));
+        fetchMock.mock('/foo', new Response({}, { status: 202 }));
 
         request('/foo').then(response => {
             assert.deepEqual(response, {});

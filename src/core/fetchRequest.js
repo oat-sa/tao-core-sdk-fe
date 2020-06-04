@@ -95,7 +95,7 @@ const requestFactory = (url, options) => {
             }
 
             // successful request
-            if (responseCode >= 200 || responseCode <= 299 || response.success === true) {
+            if ((responseCode >= 200 && responseCode <= 226) || (response && response.success === true)) {
                 return response;
             }
 
