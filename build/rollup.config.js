@@ -18,11 +18,11 @@
 
 import path from 'path';
 import glob from 'glob';
-import alias from 'rollup-plugin-alias';
-import json from 'rollup-plugin-json';
-import resolve from 'rollup-plugin-node-resolve';
-import commonJS from 'rollup-plugin-commonjs';
-import babel from 'rollup-plugin-babel';
+import alias from '@rollup/plugin-alias';
+import json from '@rollup/plugin-json';
+import resolve from '@rollup/plugin-node-resolve';
+import commonJS from '@rollup/plugin-commonjs';
+import babel from '@rollup/plugin-babel';
 import istanbul from 'rollup-plugin-istanbul';
 
 const { srcDir, outputDir } = require('./path');
@@ -70,17 +70,16 @@ export default inputs.map(input => {
         ],
         plugins: [
             resolve({ mainFields: ['main'] }),
-            commonJS({
-                namedExports: {
-                    fastestsmallesttextencoderdecoder: ['TextEncoder']
+            commonJS(),
+            alias({
+                entries: {
+                    resolve: ['.js', '.json'],
+                    core: path.resolve(srcDir, 'core'),
+                    util: path.resolve(srcDir, 'util')
                 }
             }),
-            alias({
-                resolve: ['.js', '.json'],
-                core: path.resolve(srcDir, 'core'),
-                util: path.resolve(srcDir, 'util')
-            }),
             json({
+                namedExports: false,
                 preferConst: false
             }),
             ...(process.env.COVERAGE ? [istanbul()] : []),
@@ -92,7 +91,8 @@ export default inputs.map(input => {
                             useBuiltIns: false
                         }
                     ]
-                ]
+                ],
+                babelHelpers: 'bundled'
             })
         ]
     };
