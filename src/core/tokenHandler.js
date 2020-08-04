@@ -24,6 +24,7 @@ import module from 'module';
 import tokenStoreFactory from 'core/tokenStore';
 import promiseQueue from 'core/promiseQueue';
 
+let validateTokensOpt = true;
 let clientConfigFetched = false;
 
 const defaults = {
@@ -89,7 +90,10 @@ export default function tokenHandlerFactory(options) {
                     if (queueSize > 0) {
                         // Token available, use it
                         return getFirstTokenValue();
-                    } else if (!clientConfigFetched) {
+                    } else if (!validateTokensOpt) {
+                        return this.getClientConfigTokens()
+                            .then(getFirstTokenValue);
+                    }else if (!clientConfigFetched) {
                         // Client Config allowed! (first and only time)
                         return this.getClientConfigTokens()
                             .then(getFirstTokenValue);
@@ -115,15 +119,16 @@ export default function tokenHandlerFactory(options) {
          * @returns {Promise<Boolean>} - resolves true when completed
          */
         getClientConfigTokens() {
-            const {tokens} = module.config();
+            const {tokens, validateTokens} = module.config();
             const clientTokens = (tokens || []).map(serverToken => ({
                 value: serverToken,
                 receivedAt: Date.now()
             }));
+            // set validateToken options from the config
+            validateTokensOpt = validateTokens;
 
             // Record that this function ran:
             clientConfigFetched = true;
-
             return Promise.resolve(clientTokens)
                 .then(newTokens => {
                     // Add the fetched tokens to the store
