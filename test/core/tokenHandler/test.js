@@ -270,10 +270,7 @@ define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise
 
         assert.expect(6);
 
-        Promise.all([])
-            .then(function() {
-                return tokenHandler.getToken();
-            })
+        tokenHandler.getToken()
             .then(function($token) {
                 assert.equal($token, 'token1', 'The token1 is correct');
                 return tokenHandler.getToken();
