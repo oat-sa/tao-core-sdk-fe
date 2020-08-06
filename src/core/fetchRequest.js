@@ -85,7 +85,7 @@ const requestFactory = (url, options) => {
 
     flow = flow
         .then(response => {
-            originalResponse = response;
+            originalResponse = response.clone();
             responseCode = response.status;
             return response.json().catch(() => ({}));
         })
