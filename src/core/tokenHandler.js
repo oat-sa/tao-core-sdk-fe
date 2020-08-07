@@ -85,21 +85,25 @@ export default function tokenHandlerFactory(options) {
             // Some async checks before we go for the token:
             return tokenStore
                 .expireOldTokens()
-                .then(() => tokenStore.getSize())
-                .then(queueSize => {
-                    if (queueSize > 0) {
-                        // Token available, use it
-                        return getFirstTokenValue();
-                    } else if (!validateTokensOpt) {
+                .then(() => {
+                    if (!validateTokensOpt) {
                         return this.getClientConfigTokens()
                             .then(getFirstTokenValue);
-                    }else if (!clientConfigFetched) {
+                    } else if (!clientConfigFetched) {
                         // Client Config allowed! (first and only time)
                         return this.getClientConfigTokens()
                             .then(getFirstTokenValue);
                     } else {
-                        // No more token options, refresh needed
-                        return Promise.reject(new Error('No tokens available. Please refresh the page.'));
+                        return tokenStore.getSize()
+                            .then(queueSize => {
+                                if (queueSize > 0) {
+                                    // Token available, use it
+                                    return getFirstTokenValue();
+                                } else {
+                                    // No more token options, refresh needed
+                                    return Promise.reject(new Error('No tokens available. Please refresh the page.'));
+                                }
+                            });
                     }
                 });
         },
