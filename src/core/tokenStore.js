@@ -31,12 +31,10 @@ import store from 'core/store';
  * @property {Number} receivedAt - Creation timestamp
  */
 
-/**
- * The default number of tokens to store
- */
 const defaultConfig = {
-    maxSize: 6,
-    tokenTimeLimit: 1000 * 60 * 24
+    maxSize: 6, // Default number of tokens to store
+    tokenTimeLimit: 1000 * 60 * 24, // Default token TTL (24 minutes)
+    store: 'memory' // In memory storage is preferred by default over the indexeddb or localStorage implementations
 };
 
 /**
@@ -49,9 +47,9 @@ const defaultConfig = {
 export default function tokenStoreFactory(options) {
     const config = _.defaults(options || {}, defaultConfig);
 
-    // In memory storage
-    // For security reasons, this is preferred over the indexeddb or localStorage implementations
-    const getStore = () => store('tokenStore.tokens', store.backends.memory);
+    const getStoreBackend = () => store.backends[config.store] || store.backends[defaultConfig.store];
+
+    const getStore = () => store('tokenStore.tokens', getStoreBackend());
 
     /**
      * @typedef tokenStore
