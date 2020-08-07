@@ -110,6 +110,25 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         });
     });
 
+    QUnit.test('error response can be read', assert => {
+        assert.expect(1);
+        const done = assert.async();
+
+        fetchMock.mock(
+            '/foo',
+            new Response(JSON.stringify({ success: false, errorCode: 'ABC123', errorMessage: 'Cannot trigger ABC' }), {
+                status: 400
+            })
+        );
+
+        request('/foo').catch(error => {
+            error.response.json().then(error => {
+                assert.equal(error.errorMessage, 'Cannot trigger ABC');
+                done();
+            });
+        });
+    });
+
     QUnit.test('request returns with a correct error response if success false', assert => {
         assert.expect(2);
         const done = assert.async();
