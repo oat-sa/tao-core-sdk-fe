@@ -151,6 +151,10 @@ function historyRouterFactory() {
         })
     );
 
+    router.on('destroy', () => {
+        historyRouter.trigger('destroy');
+    })
+
     // ensure the current route is in the history
     window.history.replaceState({ url: location }, '', location);
 
