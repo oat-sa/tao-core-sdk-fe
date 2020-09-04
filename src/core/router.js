@@ -34,6 +34,7 @@ import context from 'context';
 import UrlParser from 'util/urlParser';
 import loggerFactory from 'core/logger';
 import Promise from 'core/promise';
+import eventifier from 'core/eventifier';
 
 var logger = loggerFactory('router');
 
@@ -46,7 +47,8 @@ var logger = loggerFactory('router');
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  * @exports router
  */
-var router = {
+var router = eventifier({
+    activeController: null,
     /**
      * Routing dispatching: execute the controller for the given URL.
      * If more than one URL is provided, we try to dispatch until a valid routing if found
@@ -231,9 +233,16 @@ var router = {
                         window.require(
                             dependencies,
                             function() {
+                                if(_.has(self.activeController, 'destroy')){
+                                    self.activeController.destroy();
+                                }
+
+                                self.trigger('destroy');
+
                                 _.forEach(arguments, function(dependency) {
                                     if (dependency && _.isFunction(dependency.start)) {
                                         dependency.start();
+                                        self.activeController = dependency;
                                     }
                                 });
 
@@ -246,6 +255,6 @@ var router = {
                 }
             });
     }
-};
+});
 
 export default router;
