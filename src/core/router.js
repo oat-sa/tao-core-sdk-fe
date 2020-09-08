@@ -38,7 +38,7 @@ import eventifier from 'core/eventifier';
 
 const logger = loggerFactory('router');
 
-let currentControllerDependency = null;
+let currentControllerDependency = [];
 
 /**
  * The router helps you to execute a controller when an URL maps a defined route.
@@ -69,6 +69,8 @@ const router = eventifier({
         if (!_.isArray(urls)) {
             urls = [urls];
         }
+
+        this.destroyCurrentRoute();
 
         return Promise.all(
             urls.map(function (url) {
@@ -239,13 +241,13 @@ const router = eventifier({
                         window.require(
                             dependencies,
                             function () {
-                                self.destroyCurrentRoute();
-
-                                currentControllerDependency = arguments;
-                                
                                 _.forEach(arguments, function (dependency) {
                                     if (dependency && _.isFunction(dependency.start)) {
                                         dependency.start();
+                                    }
+
+                                    if (dependency && _.isFunction(dependency.destroy)){
+                                        currentControllerDependency.push(dependency);
                                     }
                                 });
 
@@ -270,7 +272,8 @@ const router = eventifier({
             }
         });
 
-        self.trigger('destroy');
+        currentControllerDependency = [];
+        this.trigger('destroy');
     }
 });
 
