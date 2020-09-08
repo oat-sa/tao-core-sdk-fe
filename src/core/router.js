@@ -36,7 +36,9 @@ import loggerFactory from 'core/logger';
 import Promise from 'core/promise';
 import eventifier from 'core/eventifier';
 
-var logger = loggerFactory('router');
+const logger = loggerFactory('router');
+
+let currentControllerDependency = null;
 
 /**
  * The router helps you to execute a controller when an URL maps a defined route.
@@ -47,8 +49,12 @@ var logger = loggerFactory('router');
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  * @exports router
  */
-var router = eventifier({
-    activeController: null,
+
+/**
+ * The connectivity module
+ * @typedef {Router}
+ */
+const router = eventifier({
     /**
      * Routing dispatching: execute the controller for the given URL.
      * If more than one URL is provided, we try to dispatch until a valid routing if found
@@ -57,7 +63,7 @@ var router = eventifier({
      * @param {Array|String} url - the urls to try to dispatch
      * @param {Function} cb - a callback executed once dispatched
      */
-    dispatch: function dispatch(urls, cb) {
+    dispatch(urls, cb) {
         var self = this;
 
         if (!_.isArray(urls)) {
@@ -65,16 +71,16 @@ var router = eventifier({
         }
 
         return Promise.all(
-            urls.map(function(url) {
+            urls.map(function (url) {
                 return self.dispatchUrl(url);
             })
         )
-            .then(function() {
+            .then(function () {
                 if (_.isFunction(cb)) {
                     cb();
                 }
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 logger.error(err);
             });
     },
@@ -84,7 +90,7 @@ var router = eventifier({
      * @param {String} url - the URL to parse
      * @returns {Object} the route structure
      */
-    parseMvcUrl: function parseMvcUrl(url) {
+    parseMvcUrl(url) {
         var route = null;
         var parser;
         var paths;
@@ -110,13 +116,13 @@ var router = eventifier({
      * @param {String} route.extension
      * @returns {Promise} once loaded
      */
-    loadRouteBundle: function loadRouteBundle(route) {
+    loadRouteBundle(route) {
         //only for bundle mode and route which are not TAO (self contained)
         if (route && route.extension && context.bundle && route.extension !== 'tao') {
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
                 var routeBundle = route.extension + '/loader/' + route.extension + '.min';
 
-                window.require([routeBundle], resolve, function(err) {
+                window.require([routeBundle], resolve, function (err) {
                     //do not break in case of error, module loading will take over
                     logger.warn('Unable to load ' + routeBundle + ' : ' + err.message);
 
@@ -134,9 +140,9 @@ var router = eventifier({
      * @param {String} route.extension
      * @returns {Promise<Object>} resolves with the routes data
      */
-    loadRoute: function loadRoute(route) {
+    loadRoute(route) {
         if (route && route.extension) {
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 var routeModule =
                     route.extension === 'tao' ? 'controller/routes' : route.extension + '/controller/routes';
 
@@ -156,7 +162,7 @@ var router = eventifier({
      *  - execute the start method of those controllers
      * @param {String} url - the
      */
-    dispatchUrl: function dispatchUrl(url) {
+    dispatchUrl(url) {
         var self = this;
 
         //parse the URL
@@ -165,10 +171,10 @@ var router = eventifier({
         logger.debug('Dispatch URL ' + url);
 
         return this.loadRouteBundle(route)
-            .then(function() {
+            .then(function () {
                 return self.loadRoute(route);
             })
-            .then(function(routes) {
+            .then(function (routes) {
                 var moduleRoutes;
                 var dependencies = [];
                 var styles = [];
@@ -206,13 +212,13 @@ var router = eventifier({
                     }
 
                     //alias controller/ to extension/controller
-                    dependencies = _.map(dependencies, function(dep) {
+                    dependencies = _.map(dependencies, function (dep) {
                         return /^controller/.test(dep) && route.extension !== 'tao' ? route.extension + '/' + dep : dep;
                     });
 
                     //URL parameters are given by default to the required module (through module.confid())
                     if (!_.isEmpty(route.params)) {
-                        _.forEach(dependencies, function(dependency) {
+                        _.forEach(dependencies, function (dependency) {
                             //inject parameters using the curent requirejs contex. This rely on a private api...
                             moduleConfig[dependency] = _.merge(
                                 _.clone(window.requirejs.s.contexts._.config.config[dependency] || {}),
@@ -224,25 +230,22 @@ var router = eventifier({
                 }
                 return dependencies;
             })
-            .then(function(dependencies) {
+            .then(function (dependencies) {
                 if (dependencies && dependencies.length) {
                     logger.debug('Load controllers : ' + dependencies.join(', '));
 
                     //loads module and action's dependencies and start the controllers.
-                    return new Promise(function(resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         window.require(
                             dependencies,
-                            function() {
-                                if(_.has(self.activeController, 'destroy')){
-                                    self.activeController.destroy();
-                                }
+                            function () {
+                                self.destroyCurrentRoute();
 
-                                self.trigger('destroy');
-
-                                _.forEach(arguments, function(dependency) {
+                                currentControllerDependency = arguments;
+                                
+                                _.forEach(arguments, function (dependency) {
                                     if (dependency && _.isFunction(dependency.start)) {
                                         dependency.start();
-                                        self.activeController = dependency;
                                     }
                                 });
 
@@ -254,6 +257,20 @@ var router = eventifier({
                     });
                 }
             });
+    },
+
+    /**
+     * Call destroy method on active controllers
+     * @fires Router#destroy
+     */
+    destroyCurrentRoute() {
+        _.forEach(currentControllerDependency, controller => {
+            if (controller && _.isFunction(controller.destroy)) {
+                controller.destroy();
+            }
+        });
+
+        self.trigger('destroy');
     }
 });
 
