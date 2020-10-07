@@ -38,8 +38,8 @@ const supportedAlgorithms = [
 
 /**
  * Encode a buffer to an hexadecimal string
- * @param {Number[]|ArrayBuffer} buffer
- * @returns {String} the hex representation of the buffer
+ * @param {number[]|ArrayBuffer} buffer
+ * @returns {string} the hex representation of the buffer
  */
 function bufferToHexString(buffer) {
     return [...new Uint8Array(buffer)]
