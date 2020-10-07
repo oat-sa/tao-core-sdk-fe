@@ -83,7 +83,7 @@
     "tooltip.js": "1.3.2"
   },
   "dependencies": {
-    "fastestsmallesttextencoderdecoder": "^1.0.14",
+    "fastestsmallesttextencoderdecoder": "1.0.14",
     "idb-wrapper": "1.7.0",
     "webcrypto-shim": "0.1.4"
   },
