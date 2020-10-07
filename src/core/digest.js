@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018-2019 (original work) Open Assessment Technologies SA
+ * Copyright (c) 2018-2020 (original work) Open Assessment Technologies SA
  *
  */
 
@@ -24,13 +24,12 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import _ from 'lodash';
 import 'webcrypto-shim';
 import { TextEncoder } from 'fastestsmallesttextencoderdecoder';
 
 //get the native implementation of the CryptoSubtle
-var subtle = window.crypto.subtle || window.crypto.webkitSubtle;
-var supportedAlgorithms = [
+const subtle = window.crypto.subtle || window.crypto.webkitSubtle;
+const supportedAlgorithms = [
     'SHA-1', //considered as not safe anymore
     'SHA-256',
     'SHA-384',
@@ -42,33 +41,28 @@ var supportedAlgorithms = [
  * @param {Number[]|ArrayBuffer} buffer
  * @returns {String} the hex representation of the buffer
  */
-var bufferToHexString = function bufferToHexString(buffer) {
-    return [].map
-        .call(new Uint8Array(buffer), function(val) {
-            return ('00' + val.toString(16)).slice(-2);
-        })
+function bufferToHexString(buffer) {
+    return [...new Uint8Array(buffer)]
+        .map(val => `00${val.toString(16)}`.slice(-2))
         .join('');
-};
+}
 
 /**
  * Create a hash/checksum from a given string
- * @param {String} utf8String - the string to hash
- * @param {String} [selectedAlgorithm = 'SHA-256'] - how to hash
+ * @param {string} utf8String - the string to hash
+ * @param {string} [selectedAlgorithm] - hashing algorithm
  * @returns {Promise<String>} resolves with the hash of the string
  * @throws {TypeError} if the algorithm is not available or the input string is missing
  */
-export default function digest(utf8String, selectedAlgorithm) {
-    var algorithm;
-    if (!_.isString(selectedAlgorithm)) {
-        selectedAlgorithm = 'SHA-256';
+export default function digest(utf8String, selectedAlgorithm = 'SHA-256') {
+    let algorithm = selectedAlgorithm.toUpperCase();
+    if (!supportedAlgorithms.includes(algorithm)) {
+        throw new TypeError(`Unsupported digest algorithm : ${algorithm}`);
     }
-    algorithm = selectedAlgorithm.toUpperCase();
-    if (!_.contains(supportedAlgorithms, algorithm)) {
-        throw new TypeError('Unsupported digest algorithm : ' + algorithm);
+    if (typeof utf8String !== 'string') {
+        throw new TypeError(`Please encode a string, not a ${typeof utf8String}`);
     }
-    if (!_.isString(utf8String)) {
-        throw new TypeError('Please encode a string, not a ' + typeof utf8String);
-    }
+
     return subtle.digest(algorithm, new TextEncoder('utf-8').encode(utf8String)).then(function(buffer) {
         return bufferToHexString(buffer);
     });
