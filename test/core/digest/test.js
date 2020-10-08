@@ -25,35 +25,39 @@
 define(['core/digest'], function(digest) {
     'use strict';
 
+    const hello = new Uint8Array([72, 101, 108, 108, 111]); // "Hello" in binary
+    const blob = new Blob([hello], { type: 'text/plain' });
+    const file = new File([hello], 'hello.txt',  { type: 'text/plain' });
+
     QUnit.module('API');
 
-    QUnit.test('module', function(assert) {
+    QUnit.test('module', assert => {
         assert.equal(typeof digest, 'function', 'The module exposes an function');
     });
 
     QUnit.module('Behavior');
 
-    QUnit.test('valid inputs', function(assert) {
+    QUnit.test('valid inputs', assert => {
         assert.throws(
-            function() {
-                digest();
-            },
+            () => digest(),
             TypeError,
             'An input string is required'
         );
 
         assert.throws(
-            function() {
-                digest({});
-            },
+            () => digest({}),
             TypeError,
             'An input string is required'
         );
 
         assert.throws(
-            function() {
-                digest('foo', 'MD5');
-            },
+            () => digest(null),
+            TypeError,
+            'A valid input is required'
+        );
+
+        assert.throws(
+            () => digest('foo', 'MD5'),
             TypeError,
             'A valid algorithm is required'
         );
@@ -93,7 +97,31 @@ define(['core/digest'], function(digest) {
                 algo: 'SHA-512',
                 output:
                     '00d7c8367e02fb59989bb05fa86421d7afbbf397b0babc2d2f2fb02da9ec65092e782242ac47a912de2d9e6979c543c1b42a93f2ca258a07f0095e67d28571e6'
-            }
+            },
+            {
+                title: 'sha256 from blob',
+                input: blob,
+                algo: 'SHA-256',
+                output: '185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969'
+            },
+            {
+                title: 'sha256 from file',
+                input: file,
+                algo: 'SHA-256',
+                output: '185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969'
+            },
+            {
+                title: 'sha256 from ArrayBuffer',
+                input: hello.buffer,
+                algo: 'SHA-256',
+                output: '6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d'
+            },
+            {
+                title: 'sha256 from Uint8Array',
+                input: hello,
+                algo: 'SHA-256',
+                output: '185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969'
+            },
         ])
         .test('digest', function(data, assert) {
             var ready = assert.async();

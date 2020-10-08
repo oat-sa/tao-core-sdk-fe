@@ -48,22 +48,38 @@ function bufferToHexString(buffer) {
 }
 
 /**
- * Create a hash/checksum from a given string
- * @param {string} utf8String - the string to hash
+ * Create a hash/checksum from a given string, blob or buffer
+ * @param {string|Blob|ArrayBuffer|Uint8Array} data - the data to hash
  * @param {string} [selectedAlgorithm] - hashing algorithm
  * @returns {Promise<String>} resolves with the hash of the string
  * @throws {TypeError} if the algorithm is not available or the input string is missing
  */
-export default function digest(utf8String, selectedAlgorithm = 'SHA-256') {
+export default function digest(data, selectedAlgorithm = 'SHA-256') {
     let algorithm = selectedAlgorithm.toUpperCase();
     if (!supportedAlgorithms.includes(algorithm)) {
         throw new TypeError(`Unsupported digest algorithm : ${algorithm}`);
     }
-    if (typeof utf8String !== 'string') {
-        throw new TypeError(`Please encode a string, not a ${typeof utf8String}`);
+
+    let dataPromise;
+    if(data instanceof Uint8Array) {
+        dataPromise = Promise.resolve(data);
+    } else if(data instanceof ArrayBuffer) {
+        dataPromise = Promise.resolve(new Uint8Array([data]));
+    } else if(data instanceof Blob) {
+        dataPromise = new Promise( (resolve, reject) => {
+            const reader = new FileReader();
+            reader.addEventListener('loadend', () => resolve(reader.result));
+            reader.addEventListener('abort', reject);
+            reader.addEventListener('error', reject);
+            reader.readAsArrayBuffer(data);
+        });
+    } else if(typeof data === 'string'){
+        dataPromise = Promise.resolve(new TextEncoder('utf-8').encode(data));
+    } else {
+        throw new TypeError(`Unsupported data type to digest with ${algorithm}`);
     }
 
-    return subtle.digest(algorithm, new TextEncoder('utf-8').encode(utf8String)).then(function(buffer) {
-        return bufferToHexString(buffer);
-    });
+    return dataPromise
+        .then( rawData =>  subtle.digest(algorithm, rawData) )
+        .then( buffer => bufferToHexString(buffer));
 }
