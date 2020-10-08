@@ -42,9 +42,7 @@ const supportedAlgorithms = [
  * @returns {string} the hex representation of the buffer
  */
 function bufferToHexString(buffer) {
-    return [...new Uint8Array(buffer)]
-        .map(val => `00${val.toString(16)}`.slice(-2))
-        .join('');
+    return [...new Uint8Array(buffer)].map(val => `00${val.toString(16)}`.slice(-2)).join('');
 }
 
 /**
@@ -61,25 +59,23 @@ export default function digest(data, selectedAlgorithm = 'SHA-256') {
     }
 
     let dataPromise;
-    if(data instanceof Uint8Array) {
+    if (data instanceof Uint8Array) {
         dataPromise = Promise.resolve(data);
-    } else if(data instanceof ArrayBuffer) {
+    } else if (data instanceof ArrayBuffer) {
         dataPromise = Promise.resolve(new Uint8Array([data]));
-    } else if(data instanceof Blob) {
-        dataPromise = new Promise( (resolve, reject) => {
+    } else if (data instanceof Blob) {
+        dataPromise = new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.addEventListener('loadend', () => resolve(reader.result));
             reader.addEventListener('abort', reject);
             reader.addEventListener('error', reject);
             reader.readAsArrayBuffer(data);
         });
-    } else if(typeof data === 'string'){
+    } else if (typeof data === 'string') {
         dataPromise = Promise.resolve(new TextEncoder('utf-8').encode(data));
     } else {
         throw new TypeError(`Unsupported data type to digest with ${algorithm}`);
     }
 
-    return dataPromise
-        .then( rawData =>  subtle.digest(algorithm, rawData) )
-        .then( buffer => bufferToHexString(buffer));
+    return dataPromise.then(rawData => subtle.digest(algorithm, rawData)).then(buffer => bufferToHexString(buffer));
 }
