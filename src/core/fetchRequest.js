@@ -16,6 +16,9 @@
  * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 
+import errorTypes from 'core/error/types';
+import TimeoutError from 'core/error/TimeoutError';
+
 /**
  * !!! IE11 requires polyfill https://www.npmjs.com/package/whatwg-fetch
  * Creates an HTTP request to the url based on the provided parameters
@@ -105,10 +108,16 @@ const requestFactory = (url, options) => {
                 err = new Error(
                     `${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`
                 );
+                err.type = errorTypes.api;
             } else {
                 err = new Error(`${responseCode} : Request error`);
+                err.type = errorTypes.network;
             }
             err.response = originalResponse;
+            throw err;
+        })
+        .catch( err => {
+            err.type = errorTypes.network;
             throw err;
         });
 
