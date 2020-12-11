@@ -121,6 +121,10 @@ const requestFactory = (url, options) => {
                 );
             }
             throw err;
+        })
+        .catch(err => {
+            //offline, CORS, etc.
+            throw new NetworkError(err.message, 0);
         });
 
     return flow;
