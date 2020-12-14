@@ -123,8 +123,11 @@ const requestFactory = (url, options) => {
             throw err;
         })
         .catch(err => {
-            //offline, CORS, etc.
-            throw new NetworkError(err.message, 0);
+            if(!err.type){
+                //offline, CORS, etc.
+                return Promise.reject(new NetworkError(err.message, 0));
+            }
+            return Promise.reject(err);
         });
 
     return flow;
