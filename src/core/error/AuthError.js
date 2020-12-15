@@ -23,9 +23,10 @@ import errorTypes from 'core/error/types';
  */
 //eslint-disable-next-line
 export default class AuthError extends Error {
+
     /**
      * Instantiate an error
-     * @param {string} message]- the error message
+     * @param {string} [message] - the error message
      * @param {Boolean} [recoverable] - can the user recover after having such error ?
      * @param {...} params - additional error parameters (line, etc.)
      */
