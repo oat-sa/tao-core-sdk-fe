@@ -23,11 +23,12 @@ import errorTypes from 'core/error/types';
  */
 //eslint-disable-next-line
 export default class TimeoutError extends Error {
+
     /**
      * Instantiate an error
-     * @param {string} message]- the error message
+     * @param {string} message - the error message
      * @param {number} timeout - the timeout value
-     * @param {boolean} [recoverable] - can the user recover after having such error ?
+     * @param {boolean} [recoverable=true] - can the user recover after having such error ?
      * @param {...} params - additional error parameters (line, etc.)
      */
     constructor(message, timeout, recoverable = true, ...params) {

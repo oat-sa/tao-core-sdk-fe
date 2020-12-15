@@ -23,12 +23,13 @@ import errorTypes from 'core/error/types';
  */
 //eslint-disable-next-line
 export default class NetworkError extends Error {
+
     /**
      * Instantiate an error
-     * @param {string} message- the error message
+     * @param {string} message - the error message
      * @param {number} [errorCode] - the HTTP status if any
      * @param {Object} [response] - the full response object if any
-     * @param {boolean} [recoverable] - can the user recover after having such error ?
+     * @param {boolean} [recoverable=true] - can the user recover after having such error ?
      * @param {...} params - additional error parameters (line, etc.)
      */
     constructor(message, errorCode, response, recoverable = true, ...params) {

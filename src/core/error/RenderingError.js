@@ -26,8 +26,8 @@ export default class RenderingError extends Error {
 
     /**
      * Instantiate an error
-     * @param {string} message]- the error message
-     * @param {Boolean} [recoverable] - can the user recover after having such error ?
+     * @param {string} message - the error message
+     * @param {Boolean} [recoverable=true] - can the user recover after having such error ?
      * @param {...} params - additional error parameters (line, etc.)
      */
     constructor(message, recoverable = true, ...params) {

@@ -23,10 +23,11 @@ import errorTypes from 'core/error/types';
  */
 //eslint-disable-next-line
 export default class UserError extends Error {
+
     /**
      * Instantiate an error
-     * @param {string} message]- the error message
-     * @param {boolean} [recoverable] - can the user recover after having such error ?
+     * @param {string} message - the error message
+     * @param {boolean} [recoverable=true] - can the user recover after having such error ?
      * @param {...} params - additional error parameters (line, etc.)
      */
     constructor(message, recoverable = true, ...params) {
