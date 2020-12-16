@@ -16,10 +16,13 @@
  * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 
-define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
+define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/ApiError','core/error/NetworkError',  'core/error/TimeoutError'], (
     request,
     jwtTokenHandlerFactory,
-    fetchMock
+    fetchMock,
+    ApiError,
+    NetworkError,
+    TimeoutError
 ) => {
     'use strict';
 
@@ -130,7 +133,7 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
     });
 
     QUnit.test('request returns with a correct error response if success false', assert => {
-        assert.expect(2);
+        assert.expect(4);
         const done = assert.async();
 
         fetchMock.mock(
@@ -141,8 +144,10 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         );
 
         request('/foo').catch(error => {
+            assert.ok(error instanceof ApiError);
             assert.equal(error.message, 'ABC123 : Cannot trigger ABC');
             assert.equal(error.response.status, 406);
+            assert.equal(error.errorCode, 'ABC123');
             done();
         });
     });
@@ -272,7 +277,7 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
     );
 
     QUnit.test('request fails if token is refreshed and is still not valid', function (assert) {
-        assert.expect(2);
+        assert.expect(4);
         const done = assert.async();
 
         const refreshToken = 'refreshToken';
@@ -288,8 +293,10 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
             .then(() => this.jwtTokenHandler.storeAccessToken(accessToken))
             .then(() => request(url, { jwtTokenHandler: this.jwtTokenHandler }))
             .catch(error => {
+                assert.ok(error instanceof NetworkError);
                 assert.equal(error.message, '401 : Request error');
                 assert.equal(error.response.status, 401);
+                assert.equal(error.errorCode, 401);
                 done();
             });
     });
@@ -298,6 +305,6 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock'], (
         assert.expect(1);
         fetchMock.mock('/', new Promise(resolve => setTimeout(resolve, 2000)));
 
-        assert.rejects(request('/', { timeout: 1000 }), /Timeout/);
+        assert.rejects(request('/', { timeout: 1000 }), TimeoutError);
     });
 });

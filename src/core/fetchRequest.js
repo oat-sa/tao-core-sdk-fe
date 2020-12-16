@@ -16,6 +16,10 @@
  * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 
+import ApiError from 'core/error/ApiError';
+import NetworkError from 'core/error/NetworkError';
+import TimeoutError from 'core/error/TimeoutError';
+
 /**
  * !!! IE11 requires polyfill https://www.npmjs.com/package/whatwg-fetch
  * Creates an HTTP request to the url based on the provided parameters
@@ -49,14 +53,16 @@ const requestFactory = (url, options) => {
             });
     }
 
-    flow = flow.then(() =>
+    flow = flow.then(() => (
         Promise.race([
             fetch(url, options),
             new Promise((resolve, reject) => {
-                setTimeout(() => reject(new Error('Timeout')), options.timeout);
+                setTimeout(() => {
+                    reject(new TimeoutError('Timeout', options.timeout));
+                }, options.timeout);
             })
         ])
-    );
+    ));
 
     if (options.jwtTokenHandler) {
         flow = flow.then(response => {
@@ -102,14 +108,26 @@ const requestFactory = (url, options) => {
             // create error
             let err;
             if (response.errorCode) {
-                err = new Error(
-                    `${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`
+                err = new ApiError(
+                    `${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`,
+                    response.errorCode,
+                    originalResponse
                 );
             } else {
-                err = new Error(`${responseCode} : Request error`);
+                err = new NetworkError(
+                    `${responseCode} : Request error`,
+                    responseCode || 0,
+                    originalResponse
+                );
             }
-            err.response = originalResponse;
             throw err;
+        })
+        .catch(err => {
+            if(!err.type){
+                //offline, CORS, etc.
+                return Promise.reject(new NetworkError(err.message, 0));
+            }
+            return Promise.reject(err);
         });
 
     return flow;
