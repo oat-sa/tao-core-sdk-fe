@@ -27,7 +27,7 @@ export default class ApiError extends Error {
     /**
      * Instantiate an error
      * @param {string} message - the error message
-     * @param {number} errorCode - the HTTP status or custom error code
+     * @param {number} errorCode - the API error code
      * @param {Object} response - the full response object
      * @param {boolean} [recoverable=true] - can the user recover after having such error ?
      * @param {...} params - additional error parameters (line, etc.)
