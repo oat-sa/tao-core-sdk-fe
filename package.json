@@ -1,6 +1,6 @@
 {
   "name": "@oat-sa/tao-core-sdk",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "displayName": "TAO Core SDK",
   "description": "Core libraries of TAO",
   "homepage": "https://github.com/oat-sa/tao-core-sdk-fe#readme",
@@ -72,7 +72,7 @@
     "prettier": "^2.1.2",
     "promise-limit": "^2.7.0",
     "qunit": "^2.9.2",
-    "raphael": "2.1.4",
+    "raphael": "^2.2.2",
     "require-css": "^0.1.10",
     "requirejs-plugins": "^1.0.2",
     "rollup": "^1.16.7",
