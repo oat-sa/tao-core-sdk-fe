@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -32,10 +32,14 @@ import promiseQueue from 'core/promiseQueue';
  * @param {Object} options Options of JWT token handler
  * @param {String} options.serviceName Name of the service what JWT token belongs to
  * @param {String} options.refreshTokenUrl Url where handler could refresh JWT token
+ * @param {Boolean} [options.useCredentials] refreshToken stored in cookie instead of store
  * @returns {Object} JWT Token handler instance
  */
-const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 'tao', refreshTokenUrl} = {}) {
-
+const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
+    serviceName = 'tao',
+    refreshTokenUrl,
+    useCredentials = false
+} = {}) {
     const tokenStorage = jwtTokenStoreFactory({
         namespace: serviceName
     });
@@ -51,29 +55,42 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
      * It will refresh the token from provided API and saves it for later use
      * @returns {Promise<String>} Promise of new token
      */
-    const unQueuedRefreshToken = () => tokenStorage.getRefreshToken().then(refreshToken => {
-        if (!refreshToken) {
-            throw new Error('Refresh token is not available');
+    const unQueuedRefreshToken = () => {
+        let body;
+        let credentials;
+        let flow;
+
+        if (useCredentials) {
+            credentials = 'include';
+            flow = Promise.resolve();
         } else {
-            return fetch(refreshTokenUrl, {
+            flow = tokenStorage.getRefreshToken().then(refreshToken => {
+                if (!refreshToken) {
+                    throw new Error('Refresh token is not available');
+                } else {
+                    body = JSON.stringify({ refreshToken });
+                }
+            });
+        }
+
+        return flow.then(() => fetch(refreshTokenUrl, {
                 method: 'POST',
+                credentials,
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ refreshToken })
+                body
+        }))
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                const error = new Error('Unsuccessful token refresh');
+                error.response = response;
+                return Promise.reject(error);
             })
-                .then(response => {
-                    if (response.status === 200) {
-                        return response.json();
-                    }
-                    const error = new Error('Unsuccessful token refresh');
-                    error.response = response;
-                    return Promise.reject(error);
-                })
-                .then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
-
-        }
-    });
+            .then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
+    };
 
     return {
         /**
@@ -89,6 +106,10 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
             return actionQueue.serie(() => tokenStorage.getAccessToken().then(accessToken => {
                 if (accessToken) {
                     return accessToken;
+                }
+
+                if (useCredentials) {
+                    return unQueuedRefreshToken();
                 }
                 return tokenStorage.getRefreshToken().then(refreshToken => {
                     if (refreshToken) {
@@ -106,6 +127,9 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
          * @returns {Promise<Boolean>} Promise of token is stored
          */
         storeRefreshToken(refreshToken) {
+            if (useCredentials) {
+                return Promise.resolve(false);
+            }
             return actionQueue.serie(() => tokenStorage.setRefreshToken(refreshToken));
         },
 
