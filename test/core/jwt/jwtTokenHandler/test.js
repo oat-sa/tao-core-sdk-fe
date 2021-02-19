@@ -304,4 +304,49 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandler
             Promise.all([refreshTokenPromise1, refreshTokenPromise2]).then(done);
         });
     });
+
+    QUnit.module('useCredential', {
+        beforeEach: function() {
+            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '/refreshUrl', useCredentials: true });
+        },
+        afterEach: function(assert) {
+            const done = assert.async();
+            fetchMock.restore();
+            this.handler.clearStore().then(done);
+        }
+    });
+
+    QUnit.test('refresh token', function(assert) {
+        assert.expect(4);
+
+        const done = assert.async();
+
+        const accessToken = 'some access token';
+
+        fetchMock.mock('/refreshUrl', function(url, opts) {
+            assert.equal(opts.credentials, 'include', 'credentials are sent to the api');
+            assert.equal(typeof opts.body, 'undefined', 'body is undefined');
+            return JSON.stringify({ accessToken });
+        });
+
+        this.handler.getToken().then(refreshedAccessToken => {
+            assert.equal(refreshedAccessToken, accessToken, 'get refreshed access token');
+
+            this.handler.getToken().then(storedAccessToken => {
+                assert.equal(storedAccessToken, accessToken, 'get access token from store without refresh');
+                done();
+            });
+        });
+    });
+
+    QUnit.test('cannot set refresh token', function(assert) {
+        assert.expect(1);
+
+        const done = assert.async();
+
+        this.handler.storeRefreshToken('refreshToken').then(setTokenResult => {
+            assert.equal(setTokenResult, false, 'refresh token is not set');
+            done();
+        });
+    });
 });
