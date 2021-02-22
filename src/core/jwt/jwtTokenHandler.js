@@ -32,6 +32,7 @@ import promiseQueue from 'core/promiseQueue';
  * @param {Object} options Options of JWT token handler
  * @param {String} options.serviceName Name of the service what JWT token belongs to
  * @param {String} options.refreshTokenUrl Url where handler could refresh JWT token
+ * @param {Number} [options.accessTokenTTL] Set accessToken TTL in ms for token store
  * @param {Boolean} [options.useCredentials] refreshToken stored in cookie instead of store
  * @returns {Object} JWT Token handler instance
  */
