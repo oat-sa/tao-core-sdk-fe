@@ -68,22 +68,24 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
             flow = Promise.resolve();
         } else {
             flow = tokenStorage.getRefreshToken().then(refreshToken => {
-                if (!refreshToken) {
+                if (refreshToken) {
                     throw new Error('Refresh token is not available');
-                } else {
-                    body = JSON.stringify({ refreshToken });
                 }
+                body = JSON.stringify({ refreshToken });
             });
         }
 
-        return flow.then(() => fetch(refreshTokenUrl, {
-                method: 'POST',
-                credentials,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body
-        }))
+        return flow
+            .then(() =>
+                fetch(refreshTokenUrl, {
+                    method: 'POST',
+                    credentials,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body
+                })
+            )
             .then(response => {
                 if (response.status === 200) {
                     return response.json();
