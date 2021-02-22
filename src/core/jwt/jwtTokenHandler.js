@@ -38,10 +38,12 @@ import promiseQueue from 'core/promiseQueue';
 const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
     serviceName = 'tao',
     refreshTokenUrl,
+    accessTokenTTL,
     useCredentials = false
 } = {}) {
     const tokenStorage = jwtTokenStoreFactory({
-        namespace: serviceName
+        namespace: serviceName,
+        accessTokenTTL
     });
 
     /**
@@ -156,6 +158,14 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
          */
         refreshToken() {
             return actionQueue.serie(() => unQueuedRefreshToken());
+        },
+
+        /**
+         * Set accessToken TTL
+         * @param {Number} accessTokenTTL - accessToken TTL in ms
+         */
+        setAccessTokenTTL(accessTokenTTL) {
+            tokenStorage.setAccessTokenTTL(accessTokenTTL);
         }
     };
 };
