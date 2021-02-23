@@ -68,7 +68,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
             flow = Promise.resolve();
         } else {
             flow = tokenStorage.getRefreshToken().then(refreshToken => {
-                if (refreshToken) {
+                if (!refreshToken) {
                     throw new Error('Refresh token is not available');
                 }
                 body = JSON.stringify({ refreshToken });
