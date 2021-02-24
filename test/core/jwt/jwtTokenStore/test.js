@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -41,10 +41,10 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
     });
 
     QUnit.module('API', {
-        beforeEach: function() {
+        beforeEach: function () {
             this.storage = jwtTokenStoreFactory();
         },
-        afterEach: function(assert) {
+        afterEach: function (assert) {
             const done = assert.async();
             this.storage.clear().then(done);
         }
@@ -52,7 +52,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
 
     const exampleTokens = ['foo', 'bar', 'baz'];
 
-    QUnit.cases.init(exampleTokens).test('set access token', function(token, assert) {
+    QUnit.cases.init(exampleTokens).test('set access token', function (token, assert) {
         assert.expect(2);
         const done = assert.async();
 
@@ -65,7 +65,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         });
     });
 
-    QUnit.cases.init(exampleTokens).test('set refresh token', function(token, assert) {
+    QUnit.cases.init(exampleTokens).test('set refresh token', function (token, assert) {
         assert.expect(2);
         const done = assert.async();
 
@@ -78,7 +78,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         });
     });
 
-    QUnit.test('set tokens', function(assert) {
+    QUnit.test('set tokens', function (assert) {
         assert.expect(3);
         const done = assert.async();
 
@@ -97,7 +97,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         });
     });
 
-    QUnit.test('clear access token', function(assert) {
+    QUnit.test('clear access token', function (assert) {
         assert.expect(3);
         const done = assert.async();
 
@@ -113,7 +113,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         });
     });
 
-    QUnit.test('clear refresh token', function(assert) {
+    QUnit.test('clear refresh token', function (assert) {
         assert.expect(3);
         const done = assert.async();
 
@@ -129,7 +129,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         });
     });
 
-    QUnit.test('clear tokens', function(assert) {
+    QUnit.test('clear tokens', function (assert) {
         assert.expect(4);
         const done = assert.async();
 
@@ -148,18 +148,73 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         });
     });
 
+    QUnit.test('accessTokenTTL in constructor', function (assert) {
+        const done = assert.async();
+        assert.expect(3);
+
+        const accessToken = 'foo';
+
+        const storage = jwtTokenStoreFactory({
+            accessTokenTTL: 500
+        });
+
+        storage
+            .setAccessToken(accessToken)
+            .then(storeResult => {
+                assert.ok(storeResult, 'accessToken is stored');
+                return storage.getAccessToken();
+            })
+            .then(storedAccessToken => {
+                assert.equal(storedAccessToken, accessToken, 'accessToken can be received before ttl');
+                return new Promise(resolve => setTimeout(resolve, 500));
+            })
+            .then(storage.getAccessToken)
+            .then(storedAccessToken => {
+                assert.equal(storedAccessToken, null, 'accessToken cannot be received after ttl');
+                done();
+            });
+    });
+
+    QUnit.test('setAccessTokenTTL', function (assert) {
+        const done = assert.async();
+        assert.expect(3);
+
+        const accessToken = 'foo';
+
+        const storage = jwtTokenStoreFactory({
+            accessTokenTTL: 1000
+        });
+
+        storage
+            .setAccessToken(accessToken)
+            .then(storeResult => {
+                assert.ok(storeResult, 'accessToken is stored');
+                return storage.getAccessToken();
+            })
+            .then(storedAccessToken => {
+                assert.equal(storedAccessToken, accessToken, 'accessToken can be received before ttl');
+                storage.setAccessTokenTTL(100);
+                return new Promise(resolve => setTimeout(resolve, 100));
+            })
+            .then(storage.getAccessToken)
+            .then(storedAccessToken => {
+                assert.equal(storedAccessToken, null, 'accessToken cannot be received after ttl');
+                done();
+            });
+    });
+
     QUnit.module('Same namespace', {
-        beforeEach: function() {
+        beforeEach: function () {
             this.storage1 = jwtTokenStoreFactory({ namespace: 'namespace' });
             this.storage2 = jwtTokenStoreFactory({ namespace: 'namespace' });
         },
-        afterEach: function(assert) {
+        afterEach: function (assert) {
             const done = assert.async();
             Promise.all([this.storage1.clear(), this.storage2.clear()]).then(done);
         }
     });
 
-    QUnit.test('stores could access to same tokens', function(assert) {
+    QUnit.test('stores could access to same tokens', function (assert) {
         assert.expect(3);
         const done = assert.async();
 
@@ -178,7 +233,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         });
     });
 
-    QUnit.test('store will be empty if other store will be cleared', function(assert) {
+    QUnit.test('store will be empty if other store will be cleared', function (assert) {
         assert.expect(4);
         const done = assert.async();
 
@@ -201,17 +256,17 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
     });
 
     QUnit.module('Different namespace', {
-        beforeEach: function() {
+        beforeEach: function () {
             this.storage1 = jwtTokenStoreFactory({ namespace: 'namespace1' });
             this.storage2 = jwtTokenStoreFactory({ namespace: 'namespace2' });
         },
-        afterEach: function(assert) {
+        afterEach: function (assert) {
             const done = assert.async();
             Promise.all([this.storage1.clear(), this.storage2.clear()]).then(done);
         }
     });
 
-    QUnit.test('stores could not access to same tokens', function(assert) {
+    QUnit.test('stores could not access to same tokens', function (assert) {
         assert.expect(6);
         const done = assert.async();
 
@@ -242,7 +297,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         });
     });
 
-    QUnit.test('store content will be kept if other store will be cleared', function(assert) {
+    QUnit.test('store content will be kept if other store will be cleared', function (assert) {
         assert.expect(4);
         const done = assert.async();
 

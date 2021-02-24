@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -27,12 +27,19 @@ import store from 'core/store';
 /**
  * @param {Object} options - Factory options
  * @param {string} options.namespace - Namespace of the store
+ * @param {Number} options.accessTokenTTL - TTL of accessToken in ms
  * @returns {Object} Store API
  */
-const jwtTokenStoreFactory = function jwtTokenStoreFactory({namespace = 'global'} = {}) {
+const jwtTokenStoreFactory = function jwtTokenStoreFactory({
+    namespace = 'global',
+    accessTokenTTL: accessTokenTTLParam
+} = {}) {
     const storeName = `jwt.${namespace}`;
     const accessTokenName = 'accessToken';
     const refreshTokenName = 'refreshToken';
+
+    let accessTokenTTL = accessTokenTTLParam;
+    let accessTokenStoredAt = 0;
 
     /**
      * Do not change token stores, because of security reason.
@@ -48,6 +55,7 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({namespace = 'global'
          * @returns {Promise<Boolean>} token successfully set
          */
         setAccessToken(token) {
+            accessTokenStoredAt = Date.now();
             return getAccessTokenStore().then(storage => storage.setItem(accessTokenName, token));
         },
 
@@ -56,6 +64,9 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({namespace = 'global'
          * @returns {Promise<string|null>} stored access token
          */
         getAccessToken() {
+            if (accessTokenTTL && accessTokenStoredAt + accessTokenTTL < Date.now()) {
+                return Promise.resolve(null);
+            }
             return getAccessTokenStore().then(storage => storage.getItem(accessTokenName));
         },
 
@@ -108,6 +119,15 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({namespace = 'global'
          */
         clear() {
             return Promise.all([this.clearAccessToken(), this.clearRefreshToken()]).then(() => true);
+        },
+
+        /**
+         * Set a new TTL value for accessToken
+         * @param {Number} newAccessTokenTTL - accessToken TTL in ms
+         * @returns {void}
+         */
+        setAccessTokenTTL(newAccessTokenTTL) {
+            accessTokenTTL = newAccessTokenTTL;
         }
     };
 };
