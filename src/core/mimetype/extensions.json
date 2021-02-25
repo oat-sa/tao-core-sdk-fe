@@ -90,5 +90,6 @@
     "wri": "application/x-mswrite",
     "xlsb": "application/vnd.ms-excel.sheet.binary.macroEnabled.12",
     "xlsm": "application/vnd.ms-excel.sheet.macroEnabled.12",
-    "zipx": "application/zip"
+    "zipx": "application/zip",
+    "xps": "application/vnd.ms-xpsdocument"
 }
