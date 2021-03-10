@@ -34,12 +34,14 @@ import promiseQueue from 'core/promiseQueue';
  * @param {String} options.refreshTokenUrl Url where handler could refresh JWT token
  * @param {Number} [options.accessTokenTTL] Set accessToken TTL in ms for token store
  * @param {Boolean} [options.useCredentials] refreshToken stored in cookie instead of store
+ * @param {Object} [options.refreshTokenParameters] Parameters that should be send in refreshToken call
  * @returns {Object} JWT Token handler instance
  */
 const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
     serviceName = 'tao',
     refreshTokenUrl,
     accessTokenTTL,
+    refreshTokenParameters,
     useCredentials = false
 } = {}) {
     const tokenStorage = jwtTokenStoreFactory({
@@ -63,6 +65,10 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
         let credentials;
         let flow;
 
+        if (refreshTokenParameters) {
+            body = { ...refreshTokenParameters };
+        }
+
         if (useCredentials) {
             credentials = 'include';
             flow = Promise.resolve();
@@ -71,21 +77,24 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 if (!refreshToken) {
                     throw new Error('Refresh token is not available');
                 }
-                body = JSON.stringify({ refreshToken });
+                body = { ...body, refreshToken };
             });
         }
 
         return flow
-            .then(() =>
-                fetch(refreshTokenUrl, {
+            .then(() => {
+                if (body) {
+                    body = JSON.stringify(body);
+                }
+                return fetch(refreshTokenUrl, {
                     method: 'POST',
                     credentials,
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body
-                })
-            )
+                });
+            })
             .then(response => {
                 if (response.status === 200) {
                     return response.json();
