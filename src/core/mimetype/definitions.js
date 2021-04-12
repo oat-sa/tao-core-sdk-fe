@@ -441,7 +441,8 @@ export default {
             },
             {
                 mime: 'video/*',
-                label: __('all videos')
+                label: __('all videos'),
+                equivalent: ['.flv', '.mkv', '.3gp']
             },
             {
                 mime: 'audio/*',
