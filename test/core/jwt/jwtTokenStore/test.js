@@ -166,7 +166,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
             })
             .then(storedAccessToken => {
                 assert.equal(storedAccessToken, accessToken, 'accessToken can be received before ttl');
-                return new Promise(resolve => setTimeout(resolve, 500));
+                return new Promise(resolve => setTimeout(resolve, 520));
             })
             .then(storage.getAccessToken)
             .then(storedAccessToken => {
@@ -194,7 +194,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
             .then(storedAccessToken => {
                 assert.equal(storedAccessToken, accessToken, 'accessToken can be received before ttl');
                 storage.setAccessTokenTTL(100);
-                return new Promise(resolve => setTimeout(resolve, 100));
+                return new Promise(resolve => setTimeout(resolve, 120));
             })
             .then(storage.getAccessToken)
             .then(storedAccessToken => {
