@@ -16,8 +16,6 @@
  * Copyright (c) 2021 (original work) Open Assessment Technologies SA;
  */
 
-import __ from 'i18n';
-
 /**
  * @typedef {Object} MimeObject
  * @property {string} mime - the common mime-type for this type, IANA-defined if possible
@@ -29,9 +27,13 @@ import __ from 'i18n';
 export default {
     /**
      * Gets the list of defined mime-type objects
+     * @param {function} __ a translation function ({string} -> {string}), by default an identity function
      * @returns {MimeObject[]}
      */
-    getList() {
+    getList(__ = text => text) {
+        if (typeof __ !== 'function') {
+            throw new TypeError('The parameter __ must be a function');
+        }
         return [
             /**
              * TAO AUTHORABLE MIMETYPES
