@@ -182,19 +182,19 @@ export default {
             {
                 mime: 'text/x-c',
                 label: __('C++ file (.cpp)'),
-                equivalent: ['text/plain', '.cpp'],
+                equivalent: ['.cpp'],
                 extensionsLabels: ['.cpp']
             },
             {
                 mime: 'text/x-csrc',
                 label: __('C file'),
-                equivalent: ['text/plain', '.c'],
+                equivalent: ['.c'],
                 extensionsLabels: ['.c']
             },
             {
                 mime: 'text/pascal',
                 label: __('Pascal file (.pas)'),
-                equivalent: ['text/plain', '.pas'],
+                equivalent: ['.pas'],
                 extensionsLabels: ['.pas']
             },
             {
@@ -227,7 +227,7 @@ export default {
             {
                 mime: 'text/x-h',
                 label: __('Header file with extensionsLabels'),
-                equivalent: ['text/plain', '.x-h', '.h'],
+                equivalent: ['.x-h', '.h'],
                 extensionsLabels: ['.h']
             },
             {
