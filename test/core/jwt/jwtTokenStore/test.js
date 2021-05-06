@@ -148,14 +148,15 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         });
     });
 
-    QUnit.test('accessTokenTTL in constructor', function (assert) {
+    QUnit.test('accessTokenTTL + accessTokenTTLBuffer in constructor', function (assert) {
         const done = assert.async();
-        assert.expect(3);
+        assert.expect(4);
 
         const accessToken = 'foo';
 
         const storage = jwtTokenStoreFactory({
-            accessTokenTTL: 500
+            accessTokenTTL: 500,
+            accessTokenTTLBuffer: 50
         });
 
         storage
@@ -165,24 +166,31 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
                 return storage.getAccessToken();
             })
             .then(storedAccessToken => {
-                assert.equal(storedAccessToken, accessToken, 'accessToken can be received before ttl');
-                return new Promise(resolve => setTimeout(resolve, 520));
+                assert.equal(storedAccessToken, accessToken, 'accessToken can be retrieved before buffer before ttl');
+
+                return new Promise(resolve => setTimeout(resolve, 460));
             })
             .then(storage.getAccessToken)
             .then(storedAccessToken => {
-                assert.equal(storedAccessToken, null, 'accessToken cannot be received after ttl');
+                assert.equal(storedAccessToken, null, 'accessToken cannot be retrieved within buffer before ttl');
+
+                return new Promise(resolve => setTimeout(resolve, 100));
+            })
+            .then(storage.getAccessToken)
+            .then(storedAccessToken => {
+                assert.equal(storedAccessToken, null, 'accessToken cannot be retrieved after ttl');
                 done();
             });
     });
 
     QUnit.test('setAccessTokenTTL', function (assert) {
         const done = assert.async();
-        assert.expect(3);
+        assert.expect(4);
 
         const accessToken = 'foo';
 
         const storage = jwtTokenStoreFactory({
-            accessTokenTTL: 1000
+            accessTokenTTL: 15000
         });
 
         storage
@@ -192,13 +200,20 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
                 return storage.getAccessToken();
             })
             .then(storedAccessToken => {
-                assert.equal(storedAccessToken, accessToken, 'accessToken can be received before ttl');
-                storage.setAccessTokenTTL(100);
-                return new Promise(resolve => setTimeout(resolve, 120));
+                assert.equal(storedAccessToken, accessToken, 'accessToken can be retrieved before buffer before ttl');
+
+                storage.setAccessTokenTTL(200, 50);
+                return new Promise(resolve => setTimeout(resolve, 170));
             })
             .then(storage.getAccessToken)
             .then(storedAccessToken => {
-                assert.equal(storedAccessToken, null, 'accessToken cannot be received after ttl');
+                assert.equal(storedAccessToken, null, 'accessToken cannot be retrieved within buffer before ttl');
+
+                return new Promise(resolve => setTimeout(resolve, 40));
+            })
+            .then(storage.getAccessToken)
+            .then(storedAccessToken => {
+                assert.equal(storedAccessToken, null, 'accessToken cannot be retrieved after ttl');
                 done();
             });
     });
