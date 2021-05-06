@@ -28,17 +28,25 @@ import store from 'core/store';
  * @param {Object} options - Factory options
  * @param {string} options.namespace - Namespace of the store
  * @param {Number} options.accessTokenTTL - TTL of accessToken in ms
+ * @param {Number} options.accessTokenTTLBuffer - TTL buffer value in ms
  * @returns {Object} Store API
  */
 const jwtTokenStoreFactory = function jwtTokenStoreFactory({
     namespace = 'global',
-    accessTokenTTL: accessTokenTTLParam
+    accessTokenTTL: accessTokenTTLParam,
+    accessTokenTTLBuffer: accessTokenTTLBufferParam = 10000
 } = {}) {
     const storeName = `jwt.${namespace}`;
     const accessTokenName = 'accessToken';
     const refreshTokenName = 'refreshToken';
 
     let accessTokenTTL = accessTokenTTLParam;
+
+    // Buffer value is subtracted from configured accessTokenTTL to account for network latency.
+    // So if we receive a token with a TTL of 5 minutes, only consider it usable for 4m50s.
+    // User is trusted to set appropriate buffer not exceeding the TTL.
+    let accessTokenTTLBuffer = accessTokenTTLBufferParam;
+
     let accessTokenStoredAt = 0;
 
     /**
@@ -64,7 +72,8 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({
          * @returns {Promise<string|null>} stored access token
          */
         getAccessToken() {
-            if (accessTokenTTL && accessTokenStoredAt + accessTokenTTL < Date.now()) {
+            if (accessTokenTTL &&
+                accessTokenStoredAt + accessTokenTTL - accessTokenTTLBuffer < Date.now()) {
                 return Promise.resolve(null);
             }
             return getAccessTokenStore().then(storage => storage.getItem(accessTokenName));
@@ -124,10 +133,15 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({
         /**
          * Set a new TTL value for accessToken
          * @param {Number} newAccessTokenTTL - accessToken TTL in ms
+         * @param {Number} newAccessTokenTTLBuffer - accessToken TTL buffer value in ms
          * @returns {void}
          */
-        setAccessTokenTTL(newAccessTokenTTL) {
+        setAccessTokenTTL(newAccessTokenTTL, newAccessTokenTTLBuffer) {
             accessTokenTTL = newAccessTokenTTL;
+
+            if (typeof newAccessTokenTTLBuffer === 'number') {
+                accessTokenTTLBuffer = newAccessTokenTTLBuffer;
+            }
         }
     };
 };
