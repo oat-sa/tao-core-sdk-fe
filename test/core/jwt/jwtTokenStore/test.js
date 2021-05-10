@@ -203,6 +203,35 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
             });
     });
 
+    QUnit.test('usePerTokenTTL', function (assert) {
+        const done = assert.async();
+        assert.expect(3);
+
+        // exp - iat = 11 seconds
+        // TTL will be 1 second
+        const accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2MjA2NTUzNzksImV4cCI6MTYyMDY1NTM5MCwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiIn0.WTLwqVo9ZEkUM-zLGG1MTjF7zgQaLTfCcHxyAV2xgCo';
+
+        const storage = jwtTokenStoreFactory({
+            usePerTokenTTL: true
+        });
+
+        storage
+            .setAccessToken(accessToken)
+            .then(storeResult => {
+                assert.ok(storeResult, 'accessToken is stored');
+                return storage.getAccessToken();
+            })
+            .then(storedAccessToken => {
+                assert.equal(storedAccessToken, accessToken, 'accessToken can be received before its embedded ttl');
+                return new Promise(resolve => setTimeout(resolve, 1000));
+            })
+            .then(storage.getAccessToken)
+            .then(storedAccessToken => {
+                assert.equal(storedAccessToken, null, 'accessToken cannot be received after its embedded ttl');
+                done();
+            });
+    });
+
     QUnit.module('Same namespace', {
         beforeEach: function () {
             this.storage1 = jwtTokenStoreFactory({ namespace: 'namespace' });
