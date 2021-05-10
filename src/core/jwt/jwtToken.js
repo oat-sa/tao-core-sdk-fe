@@ -18,13 +18,15 @@
 
 /**
  * JWT token helper collection
+ * This is only a minimal set of tools for the parts we currently need
+ * @see https://tools.ietf.org/html/rfc7519
  * @module core/jwtToken
  */
 
 /**
  * Decodes the payload (middle section) of a JWT token
- * @param {String} token - JWT token, xxxxx.yyyyy.zzzzz format
- * @returns {Object}
+ * @param {String} token - JWT token, 'xxxxx.yyyyy.zzzzz' format
+ * @returns {Object} JWT payload
  */
 export function parseJwtPayload(token) {
     try {
@@ -37,18 +39,13 @@ export function parseJwtPayload(token) {
 /**
  * Calculates TTL of a token based on its claims
  * @param {Object} payload - parsed JWT object
- * @param {Number} payload.iat - "issued at time" timestamp
- * @param {Number} payload.exp - "expiration" timestamp
- * @param {Number} defaultTTL - fallback TTL from configuration, in ms
- * @param {Number} latency - desired network latency to account for, in ms
- * @returns {Number} TTL, in ms
+ * @param {Number} payload.iat - "issued at time", as timestamp
+ * @param {Number} payload.exp - "expiration", as timestamp
+ * @returns {Number|null} TTL, in ms
  */
-export function getJwtTTL(payload, defaultTTL = 500000, latency = 10000) {
-    let ttl = 0;
+export function getJwtTTL(payload) {
     if (payload && payload.exp && payload.iat) {
-        ttl = (payload.exp - payload.iat) * 1000;
-    } else {
-        ttl = defaultTTL;
+        return (payload.exp - payload.iat) * 1000;
     }
-    return ttl - latency;
+    return null;
 }

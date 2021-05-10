@@ -23,7 +23,7 @@
  */
 
 import store from 'core/store';
-import { parseJwtPayload, getJwtTTL } from './jwtToken.js';
+import { parseJwtPayload, getJwtTTL } from 'core/jwt/jwtToken';
 
 /**
  * @param {Object} options - Factory options
@@ -34,13 +34,14 @@ import { parseJwtPayload, getJwtTTL } from './jwtToken.js';
  */
 const jwtTokenStoreFactory = function jwtTokenStoreFactory({
     namespace = 'global',
-    accessTokenTTL: defaultAccessTokenTTL,
+    accessTokenTTL: accessTokenTTLParam = 0,
     usePerTokenTTL = false
 } = {}) {
     const storeName = `jwt.${namespace}`;
     const accessTokenName = 'accessToken';
     const refreshTokenName = 'refreshToken';
 
+    let defaultAccessTokenTTL = accessTokenTTLParam;
     let accessTokenStoredAt = 0;
     let currentAccessTokenTTL = 0;
 
@@ -60,7 +61,8 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({
         setAccessToken(token) {
             if (usePerTokenTTL) {
                 const tokenPayload = parseJwtPayload(token);
-                currentAccessTokenTTL = getJwtTTL(tokenPayload, defaultAccessTokenTTL);
+                const buffer = 10000;
+                currentAccessTokenTTL = (getJwtTTL(tokenPayload) || defaultAccessTokenTTL) - buffer;
             }
             accessTokenStoredAt = Date.now();
             return getAccessTokenStore().then(storage => storage.setItem(accessTokenName, token));
@@ -71,8 +73,15 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({
          * @returns {Promise<string|null>} stored access token
          */
         getAccessToken() {
-            const expiryTime = accessTokenStoredAt + (usePerTokenTTL && currentAccessTokenTTL) ? currentAccessTokenTTL : defaultAccessTokenTTL;
-            if (expiryTime < Date.now()) {
+            let expiryTime = 0;
+
+            if (usePerTokenTTL && currentAccessTokenTTL) {
+                expiryTime = accessTokenStoredAt + currentAccessTokenTTL;
+            } else if (defaultAccessTokenTTL) {
+                expiryTime = accessTokenStoredAt + defaultAccessTokenTTL;
+            }
+
+            if (expiryTime && expiryTime < Date.now()) {
                 return Promise.resolve(null);
             }
             return getAccessTokenStore().then(storage => storage.getItem(accessTokenName));
@@ -131,11 +140,11 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({
 
         /**
          * Set a new TTL value for accessToken
-         * @param {Number} newAccessTokenTTL - accessToken TTL in ms
+         * @param {Number} accessTokenTTL - accessToken TTL in ms
          * @returns {void}
          */
-        setAccessTokenTTL(newAccessTokenTTL) {
-            defaultAccessTokenTTL = newAccessTokenTTL;
+        setAccessTokenTTL(accessTokenTTL) {
+            defaultAccessTokenTTL = accessTokenTTL;
         }
     };
 };
