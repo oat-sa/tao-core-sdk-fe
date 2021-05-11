@@ -35,17 +35,17 @@ define(['core/jwt/jwtToken'], jwtToken => {
         assert.expect(4);
         const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2MjA2NTM1NDgsImV4cCI6MTYyMDY1NDc2MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiIn0.3j-2RN4OVgDYUVxP9VIaOnpkno8I4LDDzouSzgAdUsw';
         const result = parseJwtPayload(token);
-        assert.ok(typeof result === 'object');
-        assert.equal(result.iat, 1620653548);
-        assert.equal(result.exp, 1620654762);
-        assert.equal(result.aud, 'www.example.com', 'audience correctly parsed');
+        assert.ok(typeof result === 'object', 'parsed payload is an object');
+        assert.equal(result.iat, 1620653548, 'iat correctly parsed');
+        assert.equal(result.exp, 1620654762, 'exp correctly parsed');
+        assert.equal(result.aud, 'www.example.com', 'aud correctly parsed');
     });
 
     QUnit.test('returns null for bad or missing token', assert => {
         assert.expect(2);
         const badtoken = 'xxxxx.yyyyy.zzzzz';
-        assert.equal(parseJwtPayload(badtoken), null);
-        assert.equal(parseJwtPayload(), null);
+        assert.equal(parseJwtPayload(badtoken), null, 'invalid token returns null');
+        assert.equal(parseJwtPayload(), null, 'missing token returns null');
     });
 
     QUnit.module('getJwtTTL');

@@ -140,11 +140,11 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({
 
         /**
          * Set a new TTL value for accessToken
-         * @param {Number} accessTokenTTL - accessToken TTL in ms
+         * @param {Number} newAccessTokenTTL - accessToken TTL in ms
          * @returns {void}
          */
-        setAccessTokenTTL(accessTokenTTL) {
-            defaultAccessTokenTTL = accessTokenTTL;
+        setAccessTokenTTL(newAccessTokenTTL) {
+            defaultAccessTokenTTL = newAccessTokenTTL;
         }
     };
 };
