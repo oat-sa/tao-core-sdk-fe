@@ -41,6 +41,12 @@ define(['core/jwt/jwtToken'], jwtToken => {
         assert.equal(result.aud, 'www.example.com', 'audience correctly parsed');
     });
 
+    QUnit.test('returns null for bad or missing token', assert => {
+        assert.expect(2);
+        const badtoken = 'xxxxx.yyyyy.zzzzz';
+        assert.equal(parseJwtPayload(badtoken), null);
+        assert.equal(parseJwtPayload(), null);
+    });
 
     QUnit.module('getJwtTTL');
 
