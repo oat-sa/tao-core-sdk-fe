@@ -223,7 +223,7 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
             })
             .then(storedAccessToken => {
                 assert.equal(storedAccessToken, accessToken, 'accessToken can be received before its embedded ttl');
-                return new Promise(resolve => setTimeout(resolve, 1000));
+                return new Promise(resolve => setTimeout(resolve, 1020));
             })
             .then(storage.getAccessToken)
             .then(storedAccessToken => {
