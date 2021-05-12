@@ -207,9 +207,8 @@ define(['core/jwt/jwtTokenStore'], jwtTokenStoreFactory => {
         const done = assert.async();
         assert.expect(3);
 
-        // exp - iat = 11 seconds
-        // TTL will be 1 second
-        const accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2MjA2NTUzNzksImV4cCI6MTYyMDY1NTM5MCwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiIn0.WTLwqVo9ZEkUM-zLGG1MTjF7zgQaLTfCcHxyAV2xgCo';
+        // exp - iat = 1 second
+        const accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2MjA2NTUzNzksImV4cCI6MTYyMDY1NTM4MCwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiIiwicXdlcnR5dWlvcGFzZGZnaGprbHp4Y3Zibm0xMjM0NTYiOiJKb2hubnkiLCJTdXJuYW1lIjoiUm9ja2V0IiwiRW1haWwiOiJqcm9ja2V0QGV4YW1wbGUuY29tIiwiUm9sZSI6WyJNYW5hZ2VyIiwiUHJvamVjdCBBZG1pbmlzdHJhdG9yIl19.fJ4JrEBtbGaldUsk-460QXyfIbuG1udE4giLDbNSjBI';
 
         const storage = jwtTokenStoreFactory({
             usePerTokenTTL: true
