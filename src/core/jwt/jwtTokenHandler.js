@@ -33,6 +33,7 @@ import promiseQueue from 'core/promiseQueue';
  * @param {String} options.serviceName Name of the service what JWT token belongs to
  * @param {String} options.refreshTokenUrl Url where handler could refresh JWT token
  * @param {Number} [options.accessTokenTTL] Set accessToken TTL in ms for token store
+ * @param {Boolean} [options.usePerTokenTTL] if true, accessToken TTL should be extractable from JWT payload, and accessTokenTTL will be used as fallback
  * @param {Boolean} [options.useCredentials] refreshToken stored in cookie instead of store
  * @param {Object} [options.refreshTokenParameters] Parameters that should be send in refreshToken call
  * @returns {Object} JWT Token handler instance
@@ -41,12 +42,14 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
     serviceName = 'tao',
     refreshTokenUrl,
     accessTokenTTL,
+    usePerTokenTTL = false,
     refreshTokenParameters,
     useCredentials = false
 } = {}) {
     const tokenStorage = jwtTokenStoreFactory({
         namespace: serviceName,
-        accessTokenTTL
+        accessTokenTTL,
+        usePerTokenTTL
     });
 
     /**
@@ -174,10 +177,10 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
 
         /**
          * Set accessToken TTL
-         * @param {Number} accessTokenTTL - accessToken TTL in ms
+         * @param {Number} newAccessTokenTTL - accessToken TTL in ms
          */
-        setAccessTokenTTL(accessTokenTTL) {
-            tokenStorage.setAccessTokenTTL(accessTokenTTL);
+        setAccessTokenTTL(newAccessTokenTTL) {
+            tokenStorage.setAccessTokenTTL(newAccessTokenTTL);
         }
     };
 };
