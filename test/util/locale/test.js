@@ -21,7 +21,7 @@ define([
     'module',
     'moment',
     'util/locale'
-], function(module, moment, locale) {
+], function (module, moment, locale) {
     // All tests are grouped in one module because global state is changed during them
     QUnit.module('API');
 
@@ -101,6 +101,8 @@ define([
         const ready = assert.async();
         const expectedTimestamp = 1621641600;
         const expectedOptions = 'X';
+
+        assert.expect(10);
 
         Promise.resolve()
             .then(() => {
