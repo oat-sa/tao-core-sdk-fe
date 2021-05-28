@@ -121,5 +121,25 @@ export default {
      */
     formatDateTime: function(timestamp) {
         return moment(timestamp, 'X').format(this.getDateTimeFormat());
+    },
+
+    /**
+     * Determine direction for language
+     * @param {String} locale
+     * @return boolean
+     */
+    isLanguageRTL: function(locale) {
+        return [ ... this.getConfig().rtl || [] ].includes(locale);
+    },
+
+    /**
+     * Determine direction for language
+     * @param {String} locale
+     * @return String {rtl|ltr}
+     */
+    getLanguageDirection: function(locale) {
+        return this.isLanguageRTL(locale)
+            ? 'rtl'
+            : 'ltr';
     }
 };
