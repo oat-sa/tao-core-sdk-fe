@@ -91,5 +91,27 @@ define(['module', 'util/locale'], function(module, locale) {
             6,
             'the valid integer value with dot as decimal separator and comma as thousands separator'
         );
+
     });
+
+    // check RTL locales
+    QUnit.test('isLanguageRTL', function(assert) {
+        assert.expect(2);
+
+        locale.setConfig({
+            rtl: ['ar-arb']
+        });
+        assert.ok(!locale.isLanguageRTL('en-US'), 'LTR language recognized as RTL');
+        assert.ok(locale.isLanguageRTL('ar-arb'), 'RTL language recognized as LTR');
+    });
+    QUnit.test('getLanguageDirection', function(assert) {
+        assert.expect(2);
+
+        locale.setConfig({
+            rtl: ['ar-arb']
+        });
+        assert.equal(locale.getLanguageDirection('en-US'), 'ltr', 'LTR language is not recognized as LTR');
+        assert.equal(locale.getLanguageDirection('ar-arb'), 'rtl', 'RTL language is notrecognized as RTL');
+    });
+
 });
