@@ -7,6 +7,12 @@
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
+                    //some mocks
+                    requirejs.config({
+                        paths: {
+                            'moment': 'test/util/locale/momentMock'
+                        }
+                    });
                     require(['test/util/locale/test'], function() {
                         QUnit.start();
                     });
