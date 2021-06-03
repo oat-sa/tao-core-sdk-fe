@@ -125,20 +125,22 @@ export default {
 
     /**
      * Determine direction for language
-     * @param {String} locale
+     * @param {String} lang
      * @return boolean
      */
-    isLanguageRTL: function(locale) {
-        return [ ... this.getConfig().rtl || [] ].includes(locale);
+    isLanguageRTL: function(lang) {
+        return (this.getConfig().rtl || [])
+            .map(lng => String(lng).toLowerCase())
+            .indexOf(lang.toLowerCase()) >= 0;
     },
 
     /**
      * Determine direction for language
-     * @param {String} locale
+     * @param {String} lang
      * @return String {rtl|ltr}
      */
-    getLanguageDirection: function(locale) {
-        return this.isLanguageRTL(locale)
+    getLanguageDirection: function(lang) {
+        return this.isLanguageRTL(lang)
             ? 'rtl'
             : 'ltr';
     }

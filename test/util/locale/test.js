@@ -95,23 +95,52 @@ define(['module', 'util/locale'], function(module, locale) {
     });
 
     // check RTL locales
-    QUnit.test('isLanguageRTL', function(assert) {
-        assert.expect(2);
-
+    QUnit.cases.init([{
+        title: 'LTR language',
+        config: ['ar-ARB'],
+        lang: 'en-US',
+        rtl: false
+    }, {
+        title: 'RTL language',
+        config: ['ar-ARB'],
+        lang: 'ar-ARB',
+        rtl: true
+    }, {
+        // check upper/lowercase
+        title: 'RTL language letter case',
+        config: ['ar-ARB'],
+        lang: 'ar-arb',
+        rtl: true
+    }]).test('isLanguageRTL', (data, assert) => {
+        assert.expect(1);
         locale.setConfig({
-            rtl: ['ar-arb']
+            rtl: data.config
         });
-        assert.ok(!locale.isLanguageRTL('en-US'), 'LTR language recognized as RTL');
-        assert.ok(locale.isLanguageRTL('ar-arb'), 'RTL language recognized as LTR');
+        assert.equal(locale.isLanguageRTL(data.lang), data.rtl, 'Language is properly recognized as RTL or LTR');
     });
-    QUnit.test('getLanguageDirection', function(assert) {
-        assert.expect(2);
 
+    QUnit.cases.init([{
+        title: 'LTR language',
+        config: ['ar-ARB'],
+        lang: 'en-US',
+        direction: 'ltr'
+    }, {
+        title: 'RTL language',
+        config: ['ar-ARB'],
+        lang: 'ar-ARB',
+        direction: 'rtl'
+    }, {
+        // check upper/lowercase
+        title: 'RTL language letter case',
+        config: ['ar-ARB'],
+        lang: 'ar-arb',
+        direction: 'rtl'
+    }]).test('getLanguageDirection', (data, assert) => {
+        assert.expect(1);
         locale.setConfig({
-            rtl: ['ar-arb']
+            rtl: data.config
         });
-        assert.equal(locale.getLanguageDirection('en-US'), 'ltr', 'LTR language is not recognized as LTR');
-        assert.equal(locale.getLanguageDirection('ar-arb'), 'rtl', 'RTL language is notrecognized as RTL');
+        assert.equal(locale.getLanguageDirection(data.lang), data.direction, 'Language direction is properly recognized');
     });
 
 });
