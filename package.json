@@ -48,7 +48,7 @@
     "@oat-sa/tao-qunit-testrunner": "1.0.3",
     "async": "^0.2.10",
     "decimal.js": "10.1.1",
-    "dompurify": "1.0.11",
+    "dompurify": "2.0.17",
     "eslint": "^7.10.0",
     "eslint-plugin-es": "^3.0.1",
     "eslint-plugin-jsdoc": "^30.6.3",
