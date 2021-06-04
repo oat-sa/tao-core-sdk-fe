@@ -123,5 +123,27 @@ export default {
     formatDateTime(timestamp, utc = false) {
         const datetime = utc ? moment.utc(timestamp, 'X') : moment(timestamp, 'X');
         return datetime.format(this.getDateTimeFormat());
+    },
+
+    /**
+     * Determine direction for language
+     * @param {String} lang
+     * @return boolean
+     */
+    isLanguageRTL: function(lang) {
+        return (this.getConfig().rtl || [])
+            .map(lng => String(lng).toLowerCase())
+            .indexOf(lang.toLowerCase()) >= 0;
+    },
+
+    /**
+     * Determine direction for language
+     * @param {String} lang
+     * @return String {rtl|ltr}
+     */
+    getLanguageDirection: function(lang) {
+        return this.isLanguageRTL(lang)
+            ? 'rtl'
+            : 'ltr';
     }
 };

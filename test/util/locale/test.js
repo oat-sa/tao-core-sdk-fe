@@ -97,6 +97,56 @@ define([
         );
     });
 
+    // check RTL locales
+    QUnit.cases.init([{
+        title: 'LTR language',
+        config: ['ar-ARB'],
+        lang: 'en-US',
+        rtl: false
+    }, {
+        title: 'RTL language',
+        config: ['ar-ARB'],
+        lang: 'ar-ARB',
+        rtl: true
+    }, {
+        // check upper/lowercase
+        title: 'RTL language letter case',
+        config: ['ar-ARB'],
+        lang: 'ar-arb',
+        rtl: true
+    }]).test('isLanguageRTL', (data, assert) => {
+        assert.expect(1);
+        locale.setConfig({
+            rtl: data.config
+        });
+        assert.equal(locale.isLanguageRTL(data.lang), data.rtl, 'Language is properly recognized as RTL or LTR');
+    });
+
+    QUnit.cases.init([{
+        title: 'LTR language',
+        config: ['ar-ARB'],
+        lang: 'en-US',
+        direction: 'ltr'
+    }, {
+        title: 'RTL language',
+        config: ['ar-ARB'],
+        lang: 'ar-ARB',
+        direction: 'rtl'
+    }, {
+        // check upper/lowercase
+        title: 'RTL language letter case',
+        config: ['ar-ARB'],
+        lang: 'ar-arb',
+        direction: 'rtl'
+    }]).test('getLanguageDirection', (data, assert) => {
+        assert.expect(1);
+        locale.setConfig({
+            rtl: data.config
+        });
+        assert.equal(locale.getLanguageDirection(data.lang), data.direction, 'Language direction is properly recognized');
+    });
+
+
     QUnit.test('util/formatDateTime', assert => {
         const ready = assert.async();
         const expectedTimestamp = 1621641600;
