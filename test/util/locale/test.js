@@ -13,15 +13,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  * @author Ivan Klimchuk <klimchuk@1pt.com>
  */
-define(['module', 'util/locale'], function(module, locale) {
+define([
+    'module',
+    'moment',
+    'util/locale'
+], function (module, moment, locale) {
     // All tests are grouped in one module because global state is changed during them
     QUnit.module('API');
 
-    QUnit.test('util api, different locales', function(assert) {
+    QUnit.test('util api, different locales', assert => {
         // American style
         locale.setConfig({
             decimalSeparator: '.',
@@ -91,7 +95,6 @@ define(['module', 'util/locale'], function(module, locale) {
             6,
             'the valid integer value with dot as decimal separator and comma as thousands separator'
         );
-
     });
 
     // check RTL locales
@@ -143,4 +146,89 @@ define(['module', 'util/locale'], function(module, locale) {
         assert.equal(locale.getLanguageDirection(data.lang), data.direction, 'Language direction is properly recognized');
     });
 
+
+    QUnit.test('util/formatDateTime', assert => {
+        const ready = assert.async();
+        const expectedTimestamp = 1621641600;
+        const expectedOptions = 'X';
+
+        assert.expect(10);
+
+        Promise.resolve()
+            .then(() => {
+                const expectedOutput = '05/21/2021';
+
+                moment.off('.test');
+
+                const promises = [
+                    new Promise(resolve => {
+                        moment.on('moment.test', (ts, options) => {
+                            assert.ok(true, 'Local timezone applied!');
+                            assert.equal(ts, expectedTimestamp, 'The expected timestamp has been supplied');
+                            assert.equal(options, expectedOptions, 'The expected options have been supplied');
+                            resolve();
+                        });
+
+                        moment.on('utc.test', (ts, options) => {
+                            assert.ok(false, 'UTC timezone should not be applied!');
+                            assert.equal(ts, expectedTimestamp, 'The expected timestamp has been supplied');
+                            assert.equal(options, expectedOptions, 'The expected options have been supplied');
+                            resolve();
+                        });
+                    }),
+                    new Promise(resolve => {
+                        moment.on('format.test', () => {
+                            assert.ok(true, 'Local format applied');
+                            resolve();
+                        });
+                    })
+                ];
+
+                moment.mockFormat(expectedOutput);
+                assert.equal(locale.formatDateTime(expectedTimestamp), expectedOutput, 'Format date/time to locale using user timezone');
+
+                return promises;
+            })
+            .then(() => {
+                const expectedOutput = '05/22/2021';
+
+                moment.off('.test');
+
+                const promises = [
+                    new Promise(resolve => {
+                        moment.on('moment.test', (ts, options) => {
+                            assert.ok(false, 'Local timezone should not be applied!');
+                            assert.equal(ts, expectedTimestamp, 'The expected timestamp has been supplied');
+                            assert.equal(options, expectedOptions, 'The expected options have been supplied');
+                            resolve();
+                        });
+
+                        moment.on('utc.test', (ts, options) => {
+                            assert.ok(true, 'UTC timezone applied!');
+                            assert.equal(ts, expectedTimestamp, 'The expected timestamp has been supplied');
+                            assert.equal(options, expectedOptions, 'The expected options have been supplied');
+                            resolve();
+                        });
+                    }),
+                    new Promise(resolve => {
+                        moment.on('format.test', () => {
+                            assert.ok(true, 'Local format applied');
+                            resolve();
+                        });
+                    })
+                ];
+
+                moment.mockFormat(expectedOutput);
+                assert.equal(locale.formatDateTime(expectedTimestamp, true), expectedOutput, 'Format date/time to locale using UTC timezone');
+
+                return promises;
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
+    });
 });

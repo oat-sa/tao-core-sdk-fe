@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA;
  *
  */
 
@@ -115,12 +115,14 @@ export default {
 
     /**
      * Parse unix timestamp
-     * Note that user's (browser's) timezone will be used.
-     * @param {Number} timestamp
+     * Note that user's (browser's) timezone will be used by default, unless the utc parameter is set to true.
+     * @param {Number} timestamp - The timestamp to format. It is considered as in the target timezone.
+     * @param {Boolean} [utc=false] - For the UTC timezone. By default the user's timezone will be used.
      * @return string
      */
-    formatDateTime: function(timestamp) {
-        return moment(timestamp, 'X').format(this.getDateTimeFormat());
+    formatDateTime(timestamp, utc = false) {
+        const datetime = utc ? moment.utc(timestamp, 'X') : moment(timestamp, 'X');
+        return datetime.format(this.getDateTimeFormat());
     },
 
     /**
