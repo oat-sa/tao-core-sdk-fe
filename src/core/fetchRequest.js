@@ -102,6 +102,14 @@ const requestFactory = (url, options) => {
 
             // successful request
             if ((responseCode >= 200 && responseCode < 300) || (response && response.success === true)) {
+                if(options.method === "HEAD"){
+                    const headers = {};
+                    for (const [key, value] of originalResponse.headers.entries()) {
+                        headers[key] = value;
+                    }
+                    return Object.assign(response, {headers});
+                }
+
                 return response;
             }
 
