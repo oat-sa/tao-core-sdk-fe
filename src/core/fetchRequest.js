@@ -53,7 +53,7 @@ const requestFactory = (url, options) => {
             });
     }
 
-    flow = flow.then(() => (
+    flow = flow.then(() =>
         Promise.race([
             fetch(url, options),
             new Promise((resolve, reject) => {
@@ -62,7 +62,7 @@ const requestFactory = (url, options) => {
                 }, options.timeout);
             })
         ])
-    ));
+    );
 
     if (options.jwtTokenHandler) {
         flow = flow.then(response => {
@@ -102,12 +102,9 @@ const requestFactory = (url, options) => {
 
             // successful request
             if ((responseCode >= 200 && responseCode < 300) || (response && response.success === true)) {
-                if(options.method === "HEAD"){
-                    const headers = {};
-                    for (const [key, value] of originalResponse.headers.entries()) {
-                        headers[key] = value;
-                    }
-                    return Object.assign(response, {headers});
+                if (options.method === 'HEAD') {
+                    const { headers } = originalResponse;
+                    return Object.assign(response, { headers });
                 }
 
                 return response;
@@ -122,16 +119,12 @@ const requestFactory = (url, options) => {
                     originalResponse
                 );
             } else {
-                err = new NetworkError(
-                    `${responseCode} : Request error`,
-                    responseCode || 0,
-                    originalResponse
-                );
+                err = new NetworkError(`${responseCode} : Request error`, responseCode || 0, originalResponse);
             }
             throw err;
         })
         .catch(err => {
-            if(!err.type){
+            if (!err.type) {
                 //offline, CORS, etc.
                 return Promise.reject(new NetworkError(err.message, 0));
             }
