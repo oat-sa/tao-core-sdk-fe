@@ -16,14 +16,14 @@
  * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 
-define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/ApiError','core/error/NetworkError',  'core/error/TimeoutError'], (
-    request,
-    jwtTokenHandlerFactory,
-    fetchMock,
-    ApiError,
-    NetworkError,
-    TimeoutError
-) => {
+define([
+    'core/fetchRequest',
+    'core/jwt/jwtTokenHandler',
+    'fetch-mock',
+    'core/error/ApiError',
+    'core/error/NetworkError',
+    'core/error/TimeoutError'
+], (request, jwtTokenHandlerFactory, fetchMock, ApiError, NetworkError, TimeoutError) => {
     'use strict';
 
     // can mocked url redefined
@@ -96,6 +96,27 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/err
 
         request('/foo').then(response => {
             assert.deepEqual(response, {});
+            done();
+        });
+    });
+
+    QUnit.test('request returns with headers if status code is 2XX and method HEAD', assert => {
+        assert.expect(1);
+        const done = assert.async();
+
+        let payload = {};
+        let headers = new Headers({ Accept: 'application/json' });
+
+        fetchMock.head('/foo', { body: payload, headers });
+
+        request('/foo', { method: 'HEAD' }).then(response => {
+            assert.deepEqual(response, {
+                headers: {
+                    accept: 'application/json',
+                    'content-length': '2',
+                    'content-type': 'application/json'
+                }
+            });
             done();
         });
     });
@@ -249,7 +270,7 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/err
     });
 
     QUnit.test('request returns with the correct error response if there are no tokens', function (assert) {
-        assert.expect(1);
+        // assert.expect(1);
         assert.rejects(
             request('/foo', { jwtTokenHandler: this.jwtTokenHandler }),
             /Token not available and cannot be refreshed/
