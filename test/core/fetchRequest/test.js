@@ -100,7 +100,7 @@ define([
         });
     });
 
-    QUnit.test('request returns with headers if status code is 2XX and method HEAD', assert => {
+    QUnit.test('request returns headers if status code is 2XX and method HEAD', assert => {
         assert.expect(1);
         const done = assert.async();
 
@@ -270,7 +270,7 @@ define([
     });
 
     QUnit.test('request returns with the correct error response if there are no tokens', function (assert) {
-        // assert.expect(1);
+        assert.expect(1);
         assert.rejects(
             request('/foo', { jwtTokenHandler: this.jwtTokenHandler }),
             /Token not available and cannot be refreshed/
