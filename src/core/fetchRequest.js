@@ -119,7 +119,11 @@ const requestFactory = (url, options) => {
                     originalResponse
                 );
             } else {
-                err = new NetworkError(`${responseCode} : Request error`, responseCode || 0, originalResponse);
+                err = new NetworkError(
+                    `${responseCode} : Request error`,
+                    responseCode || 0,
+                    originalResponse
+                );
             }
             throw err;
         })
