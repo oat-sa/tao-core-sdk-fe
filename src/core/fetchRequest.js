@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020-21 (original work) Open Assessment Technologies SA ;
  */
 
 import ApiError from 'core/error/ApiError';
@@ -30,6 +30,7 @@ import TimeoutError from 'core/error/TimeoutError';
  * @param {object} options - fetch request options that implements RequestInit (https://fetch.spec.whatwg.org/#requestinit)
  * @param {integer} [options.timeout] - (default: 5000) if timeout reached, the request will be rejected
  * @param {object} [options.jwtTokenHandler] - core/jwt/jwtTokenHandler instance that should be used during request
+ * @param {boolean} [options.returnOriginalResponse] - the full original response should be returned instead of parsing internally (useful for HEAD requests or other empty-response-body requests)
  * @returns {Promise<Response>} resolves with http Response object
  */
 const requestFactory = (url, options) => {
@@ -53,7 +54,7 @@ const requestFactory = (url, options) => {
             });
     }
 
-    flow = flow.then(() => (
+    flow = flow.then(() =>
         Promise.race([
             fetch(url, options),
             new Promise((resolve, reject) => {
@@ -62,7 +63,7 @@ const requestFactory = (url, options) => {
                 }, options.timeout);
             })
         ])
-    ));
+    );
 
     if (options.jwtTokenHandler) {
         flow = flow.then(response => {
@@ -93,6 +94,10 @@ const requestFactory = (url, options) => {
         .then(response => {
             originalResponse = response.clone();
             responseCode = response.status;
+
+            if (options.returnOriginalResponse) {
+                return originalResponse;
+            }
             return response.json().catch(() => ({}));
         })
         .then(response => {
@@ -123,7 +128,7 @@ const requestFactory = (url, options) => {
             throw err;
         })
         .catch(err => {
-            if(!err.type){
+            if (!err.type) {
                 //offline, CORS, etc.
                 return Promise.reject(new NetworkError(err.message, 0));
             }
