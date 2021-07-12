@@ -13,17 +13,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020-21 (original work) Open Assessment Technologies SA ;
  */
 
-define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/ApiError','core/error/NetworkError',  'core/error/TimeoutError'], (
-    request,
-    jwtTokenHandlerFactory,
-    fetchMock,
-    ApiError,
-    NetworkError,
-    TimeoutError
-) => {
+define([
+    'core/fetchRequest',
+    'core/jwt/jwtTokenHandler',
+    'fetch-mock',
+    'core/error/ApiError',
+    'core/error/NetworkError',
+    'core/error/TimeoutError'
+], (request, jwtTokenHandlerFactory, fetchMock, ApiError, NetworkError, TimeoutError) => {
     'use strict';
 
     // can mocked url redefined
@@ -96,6 +96,64 @@ define(['core/fetchRequest', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/err
 
         request('/foo').then(response => {
             assert.deepEqual(response, {});
+            done();
+        });
+    });
+
+    QUnit.test('request returns with full original response if options.returnOriginalResponse passed', assert => {
+        assert.expect(6);
+        const done = assert.async();
+
+        const payload = { success: true, data: { ping: 123 } };
+
+        fetchMock.mock('/foo', {
+            body: JSON.stringify(payload),
+            status: 200
+        });
+
+        const options = { returnOriginalResponse: true };
+
+        const expectedResponseHeaders = {
+            'content-length': '36',
+            'content-type': 'text/plain;charset=UTF-8'
+        };
+
+        request('/foo', options).then(response => {
+            assert.ok(response.ok);
+            assert.equal(response.status, 200);
+            assert.equal(response.bodyUsed, false);
+            // response.headers is Iterator
+            for (const pair of response.headers) {
+                assert.equal(expectedResponseHeaders[pair[0]], pair[1]);
+            }
+            response.json().then(responseData => {
+                assert.deepEqual(responseData, payload);
+                done();
+            });
+        });
+    });
+
+    QUnit.test('request returns with full original response to HEAD request if options.returnOriginalResponse passed', assert => {
+        assert.expect(5);
+        const done = assert.async();
+
+        fetchMock.head('/foo', { body: '', status: 200 });
+
+        const options = { method: 'HEAD', returnOriginalResponse: true };
+
+        const expectedResponseHeaders = {
+            'content-length': '0',
+            'content-type': 'text/plain;charset=UTF-8'
+        };
+
+        request('/foo', options).then(response => {
+            assert.ok(response.ok);
+            assert.equal(response.status, 200);
+            assert.equal(response.bodyUsed, false);
+            // response.headers is Iterator
+            for (const pair of response.headers) {
+                assert.equal(expectedResponseHeaders[pair[0]], pair[1]);
+            }
             done();
         });
     });
