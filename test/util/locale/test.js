@@ -133,11 +133,19 @@ define([
         lang: 'ar-ARB',
         direction: 'rtl'
     }, {
-        // check upper/lowercase
-        title: 'RTL language letter case',
+        title: 'RTL language upper/lowercase ignoring',
         config: ['ar-ARB'],
         lang: 'ar-arb',
         direction: 'rtl'
+    }, {
+        title: 'RTL with missed "lang" fallback to LTR',
+        config: ['ar-ARB'],
+        direction: 'ltr'
+    }, {
+        title: 'Empty config fallback to LTR',
+        config: [],
+        lang: 'ar-arb',
+        direction: 'ltr'
     }]).test('getLanguageDirection', (data, assert) => {
         assert.expect(1);
         locale.setConfig({
