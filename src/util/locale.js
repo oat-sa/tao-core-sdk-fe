@@ -131,9 +131,14 @@ export default {
      * @return boolean
      */
     isLanguageRTL: function(lang) {
-        return (this.getConfig().rtl || [])
-            .map(lng => String(lng).toLowerCase())
-            .indexOf(lang.toLowerCase()) >= 0;
+        if (!(this.getConfig() && this.getConfig().rtl) || !lang) {
+            return false;
+        }
+
+        return this.getConfig().rtl
+            .some(function (lng) {
+                return String(lng).toLowerCase() === lang.toLowerCase();
+            });
     },
 
     /**
