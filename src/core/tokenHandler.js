@@ -101,7 +101,7 @@ export default function tokenHandlerFactory(options) {
                                         .then(getFirstTokenValue);
                                 } else {
                                     // No more token options, refresh needed
-                                    return Promise.reject(new Error('No tokens available. Please refresh the page.'));
+                                    return Promise.reject({"level": "warn", "message": "No tokens available. Please refresh the page."});
                                 }
                             });
                     }
