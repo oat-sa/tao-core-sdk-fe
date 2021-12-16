@@ -734,9 +734,13 @@ DataBinder.prototype._rebind = function _rebind($elt, prefix) {
             self._listenUpdates($node, boundPath, self.model);
             self._listenRemoves($node, boundPath, self.model);
         });
-        $elt.find('[data-bind-each]').each(function() {
-            self._rebind($(this), prefix);
-        });
+        $elt.find('[data-bind-each]')
+            .not(function() { 
+                return $(this).closest('[data-bind-index]').get(0) !== $elt.get(0);  // only first level to have proper path
+            })
+            .each(function() {
+                self._rebind($(this), prefix);
+            });
     }
 };
 
