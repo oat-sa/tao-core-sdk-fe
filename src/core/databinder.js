@@ -495,7 +495,7 @@ DataBinder.prototype._listenAdds = function _listenAdds($node, path) {
             .each(function () {
                 //got the inserted node
                 const $newNode = $(this);
-                const realPath = `${path}.{size}`;
+                const realPath = `${path}.${size}`;
                 $newNode.attr('data-bind-index', size);
 
                 if (data) {
