@@ -445,7 +445,7 @@ DataBinder.prototype._listenRemoves = function _listenRemoves($node, path, model
         if (undoable === true) {
             //can be linked tp the ui/deleter
 
-            self._resyncIndexOnceRm($node, path);
+            self._resyncIndexOnceRm($node, path, undoable);
 
             $node.parent().one('deleted.deleter', function () {
                 doRemoval();
@@ -527,8 +527,9 @@ DataBinder.prototype._listenAdds = function _listenAdds($node, path) {
  * @private
  * @param {jQueryElement} $node - the elements to bind
  * @param {string} path - the path to the model value to bind
+ * @param {boolean} undoable - is node hidden temporary?
  */
-DataBinder.prototype._resyncIndexOnceRm = function _resyncIndexOnceRm($node, path) {
+DataBinder.prototype._resyncIndexOnceRm = function _resyncIndexOnceRm($node, path, undoable) {
     const self = this;
 
     if ($node.is('[data-bind-index]')) {
@@ -551,9 +552,15 @@ DataBinder.prototype._resyncIndexOnceRm = function _resyncIndexOnceRm($node, pat
                     $item.attr('data-bind-index', newIndex).data('bind-index', newIndex.toString());
                 });
         }
+        if (undoable) {
+            // do not have 2 elements with the same index
+            // will be changed on undo action
+            $node.attr('data-bind-index', '-1' ).data('bind-index', '-1');
+        }
 
         //we need to rebind the model to the new paths
-        self._rebind($parentNode, parentPath.replace($parentNode.data('bind-each'), ''));
+        const re = new RegExp(`${$parentNode.data('bind-each')}$`); // only in the end of the string
+        self._rebind($parentNode, parentPath.replace(re, ''));
     }
 };
 
