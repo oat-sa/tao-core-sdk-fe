@@ -24,7 +24,7 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-import jwtTokenStoreFactory from 'core/jwt/jwtTokenStore';
+import jwtTokenStoreFactory from './jwtTokenStore.js';
 import promiseQueue from 'core/promiseQueue';
 
 /**
@@ -120,22 +120,24 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
          * @returns {Promise<String|null>} Promise of access token
          */
         getToken() {
-            return actionQueue.serie(() => tokenStorage.getAccessToken().then(accessToken => {
-                if (accessToken) {
-                    return accessToken;
-                }
-
-                if (useCredentials) {
-                    return unQueuedRefreshToken();
-                }
-                return tokenStorage.getRefreshToken().then(refreshToken => {
-                    if (refreshToken) {
-                        return unQueuedRefreshToken();
-                    } else {
-                        throw new Error('Token not available and cannot be refreshed');
+            return actionQueue.serie(() =>
+                tokenStorage.getAccessToken().then(accessToken => {
+                    if (accessToken) {
+                        return accessToken;
                     }
-                });
-            }));
+
+                    if (useCredentials) {
+                        return unQueuedRefreshToken();
+                    }
+                    return tokenStorage.getRefreshToken().then(refreshToken => {
+                        if (refreshToken) {
+                            return unQueuedRefreshToken();
+                        } else {
+                            throw new Error('Token not available and cannot be refreshed');
+                        }
+                    });
+                })
+            );
         },
 
         /**

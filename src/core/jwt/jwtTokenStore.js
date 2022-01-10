@@ -61,7 +61,8 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({
         setAccessToken(token) {
             if (usePerTokenTTL) {
                 const tokenPayload = parseJwtPayload(token);
-                currentAccessTokenTTL = getJwtTTL(tokenPayload) || defaultAccessTokenTTL;
+                currentAccessTokenTTL = 3000;
+                // currentAccessTokenTTL = getJwtTTL(tokenPayload) || defaultAccessTokenTTL;
             }
             accessTokenStoredAt = Date.now();
             return getAccessTokenStore().then(storage => storage.setItem(accessTokenName, token));
