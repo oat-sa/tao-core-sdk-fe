@@ -26,6 +26,7 @@
 
 import jwtTokenStoreFactory from 'core/jwt/jwtTokenStore';
 import promiseQueue from 'core/promiseQueue';
+import TokenError from 'core/error/TokenError';
 
 /**
  * JWT token handler factory
@@ -102,8 +103,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 if (response.status === 200) {
                     return response.json();
                 }
-                const error = new Error('Unsuccessful token refresh');
-                error.response = response;
+                const error = new TokenError('Unsuccessful token refresh', response);
                 return Promise.reject(error);
             })
             .then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
