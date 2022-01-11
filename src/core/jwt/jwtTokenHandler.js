@@ -103,7 +103,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 if (response.status === 200) {
                     return response.json();
                 }
-                const error = new TokenError('Unsuccessful token refresh', response);
+                const error = new TokenError('Refresh-token expired', response);
                 return Promise.reject(error);
             })
             .then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
