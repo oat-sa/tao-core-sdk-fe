@@ -40,5 +40,6 @@ export default class TokenError extends NetworkError {
 
         this.name = 'TokenError';
         this.type = errorTypes.token;
+        this.recoverable = false;
     }
 }
