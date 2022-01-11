@@ -20,7 +20,7 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandlerFactory, fetchMock) => {
+define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/TokenError'], ($, jwtTokenHandlerFactory, fetchMock, TokenError) => {
     'use strict';
 
     QUnit.module('factory');
@@ -191,7 +191,7 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandler
             this.handler
                 .refreshToken()
                 .catch(e => {
-                    assert.equal(e instanceof Error, true, 'rejects with error');
+                    assert.equal(e instanceof TokenError, true, 'rejects with error');
                     assert.equal(e.response instanceof Response, true, 'passes response');
                     return e.response.json();
                 })
@@ -221,7 +221,7 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandler
             this.handler
                 .getToken()
                 .catch(e => {
-                    assert.equal(e instanceof Error, true, 'rejects with error');
+                    assert.equal(e instanceof TokenError, true, 'rejects with error');
                     assert.equal(e.response instanceof Response, true, 'passes response');
                     return e.response.json();
                 })
