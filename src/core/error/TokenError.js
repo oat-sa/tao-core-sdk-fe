@@ -28,11 +28,10 @@ export default class TokenError extends NetworkError {
      * Instantiate an error
      * @param {string} message - the error message
      * @param {Object} [response] - the full response object if any
-     * @param {boolean} [recoverable=true] - can the user recover after having such error ?
      * @param {...} params - additional error parameters (line, etc.)
      */
-    constructor(message, response, recoverable = true, ...params) {
-        super(message, 401, response, recoverable, ...params);
+    constructor(message, response, ...params) {
+        super(message, 401, response, false, ...params);
 
         if (Error.captureStackTrace) {
             Error.captureStackTrace(this, TokenError);
@@ -40,6 +39,5 @@ export default class TokenError extends NetworkError {
 
         this.name = 'TokenError';
         this.type = errorTypes.token;
-        this.recoverable = false;
     }
 }
