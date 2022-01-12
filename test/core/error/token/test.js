@@ -22,10 +22,10 @@ define(['core/error/types', 'core/error/TokenError'], function (errorTypes, Toke
 
     QUnit.module('TokenError');
 
-    QUnit.test('construct with default params', assert => {
+    QUnit.test('construct with minimal params', assert => {
         assert.expect(6);
 
-        const err = new TokenError('Token expired', null);
+        const err = new TokenError('Token expired');
         assert.equal(err.name, 'TokenError');
         assert.equal(err.type, errorTypes.token);
         assert.equal(err.message, 'Token expired');
@@ -35,17 +35,16 @@ define(['core/error/types', 'core/error/TokenError'], function (errorTypes, Toke
     });
 
     QUnit.test('construct with passed params', assert => {
-        assert.expect(7);
+        assert.expect(6);
 
         const response = {};
-        const err = new TokenError('Unexpected error', response, {cause: true});
+        const err = new TokenError('Unexpected error', response);
         assert.equal(err.name, 'TokenError');
         assert.equal(err.type, errorTypes.token);
         assert.equal(err.message, 'Unexpected error');
         assert.equal(err.errorCode, 401);
         assert.equal(err.response, response);
         assert.equal(err.recoverable, false);
-        assert.equal(err.cause, true);
     });
 
     QUnit.test('throw', assert => {
