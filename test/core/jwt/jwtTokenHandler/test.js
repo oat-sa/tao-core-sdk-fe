@@ -202,6 +202,37 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/TokenErr
         });
     });
 
+    QUnit.test('unsuccessful refresh token with exception', function (assert) {
+        assert.expect(6);
+
+        const done = assert.async();
+
+        const error = 'some backend exception';
+        const refreshToken = 'some refresh token';
+
+        fetchMock.mock('/refreshUrl', function (url, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return new Response(JSON.stringify({ error }), { status: 500 });
+        });
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
+            assert.equal(setTokenResult, true, 'refresh token is set');
+            this.handler
+                .refreshToken()
+                .catch(e => {
+                    assert.equal(e instanceof Error, true, 'rejects with error');
+                    assert.equal(e instanceof TokenError, false, 'correct error type is set');
+                    assert.equal(e.response instanceof Response, true, 'passes response');
+                    return e.response.json();
+                })
+                .then(errorResponse => {
+                    assert.equal(errorResponse.error, error, 'should get back api error message');
+                    done();
+                });
+        });
+    });
+
     QUnit.test('unsuccessful get token if refresh fails', function (assert) {
         assert.expect(5);
 
