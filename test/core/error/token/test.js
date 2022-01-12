@@ -35,16 +35,17 @@ define(['core/error/types', 'core/error/TokenError'], function (errorTypes, Toke
     });
 
     QUnit.test('construct with passed params', assert => {
-        assert.expect(6);
+        assert.expect(7);
 
         const response = {};
-        const err = new TokenError('Unexpected error', response, true);
+        const err = new TokenError('Unexpected error', response, {cause: true});
         assert.equal(err.name, 'TokenError');
         assert.equal(err.type, errorTypes.token);
         assert.equal(err.message, 'Unexpected error');
         assert.equal(err.errorCode, 401);
         assert.equal(err.response, response);
         assert.equal(err.recoverable, false);
+        assert.equal(err.cause, true);
     });
 
     QUnit.test('throw', assert => {
