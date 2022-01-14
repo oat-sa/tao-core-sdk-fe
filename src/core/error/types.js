@@ -33,5 +33,8 @@ export default Object.freeze({
     user: 'user',
 
     // rendering error: an interface, a component fails to render
-    rendering: 'rendering'
+    rendering: 'rendering',
+
+    // token expiration error: 401
+    token: 'token'
 });

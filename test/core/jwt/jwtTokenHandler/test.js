@@ -13,14 +13,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA ;
  */
 
 /**
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandlerFactory, fetchMock) => {
+define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/TokenError'], ($, jwtTokenHandlerFactory, fetchMock, TokenError) => {
     'use strict';
 
     QUnit.module('factory');
@@ -191,7 +191,38 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandler
             this.handler
                 .refreshToken()
                 .catch(e => {
+                    assert.equal(e instanceof TokenError, true, 'rejects with error');
+                    assert.equal(e.response instanceof Response, true, 'passes response');
+                    return e.response.json();
+                })
+                .then(errorResponse => {
+                    assert.equal(errorResponse.error, error, 'should get back api error message');
+                    done();
+                });
+        });
+    });
+
+    QUnit.test('unsuccessful refresh token with exception', function (assert) {
+        assert.expect(6);
+
+        const done = assert.async();
+
+        const error = 'some backend exception';
+        const refreshToken = 'some refresh token';
+
+        fetchMock.mock('/refreshUrl', function (url, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return new Response(JSON.stringify({ error }), { status: 500 });
+        });
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
+            assert.equal(setTokenResult, true, 'refresh token is set');
+            this.handler
+                .refreshToken()
+                .catch(e => {
                     assert.equal(e instanceof Error, true, 'rejects with error');
+                    assert.equal(e instanceof TokenError, false, 'correct error type is set');
                     assert.equal(e.response instanceof Response, true, 'passes response');
                     return e.response.json();
                 })
@@ -221,7 +252,7 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock'], ($, jwtTokenHandler
             this.handler
                 .getToken()
                 .catch(e => {
-                    assert.equal(e instanceof Error, true, 'rejects with error');
+                    assert.equal(e instanceof TokenError, true, 'rejects with error');
                     assert.equal(e.response instanceof Response, true, 'passes response');
                     return e.response.json();
                 })

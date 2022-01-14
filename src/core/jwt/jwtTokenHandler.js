@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -26,6 +26,7 @@
 
 import jwtTokenStoreFactory from 'core/jwt/jwtTokenStore';
 import promiseQueue from 'core/promiseQueue';
+import TokenError from 'core/error/TokenError';
 
 /**
  * JWT token handler factory
@@ -102,7 +103,12 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 if (response.status === 200) {
                     return response.json();
                 }
-                const error = new Error('Unsuccessful token refresh');
+                if(response.status === 401){
+                    const error = new TokenError('Refresh-token expired', response);
+                    return Promise.reject(error);
+                }
+
+                let error = new Error('Unsuccessful token refresh');
                 error.response = response;
                 return Promise.reject(error);
             })
