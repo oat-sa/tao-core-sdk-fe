@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2013-2021 Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2013-2022 Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
 /**
  * @author Bertrand Chevrier <bertrand@taotesting.com>
@@ -456,6 +456,9 @@ DataBinder.prototype._listenRemoves = function _listenRemoves($node, path, model
                     const $parentNode = $node.parent().closest('[data-bind-each]');
                     const parentPath = path.replace(/\.[0-9]+$/, '');
                     resyncIndexes(self.model, parentPath, $parentNode);
+                    //we need to rebind the model to the new paths
+                    const re = new RegExp(`${$parentNode.data('bind-each')}$`); // only in the end of the string
+                    self._rebind($parentNode, parentPath.replace(re, ''));
                 });
             }
         } else {
