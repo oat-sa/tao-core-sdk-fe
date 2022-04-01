@@ -532,4 +532,85 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/TokenErr
             }
         );
     });
+
+    QUnit.module('OAuth2', {
+        beforeEach: function () {
+            this.handler = jwtTokenHandlerFactory({
+                refreshTokenUrl: '/refreshUrl',
+                oauth2RequestFormat: true,
+                refreshTokenParameters: {
+                    grant_type: 'refresh_token',
+                    client_id: 'client_1'
+                }
+            });
+        },
+        afterEach: function (assert) {
+            const done = assert.async();
+            fetchMock.restore();
+            this.handler.clearStore().then(done);
+        }
+    });
+
+    QUnit.test('refresh token', function (assert) {
+        assert.expect(10);
+
+        const done = assert.async();
+
+        const accessToken = 'some access token';
+        const refreshToken = 'some refresh token';
+        const updatedRefreshToken = 'some updated refresh token';
+        const updatedAccessToken = 'some updated access token';
+
+        const setupSecondRequest = () => {
+            fetchMock.restore();
+            fetchMock.mock('/refreshUrl', function (url, opts) {
+                const data = {};
+                for (let key of opts.body.keys()) {
+                    data[key] = opts.body.get(key);
+                }
+                assert.equal(data.grant_type, 'refresh_token', 'grant type is sent to the api');
+                assert.equal(data.client_id, 'client_1', 'client id is sent to the api');
+                assert.equal(data.refresh_token, updatedRefreshToken, 'new refresh token is sent to the api');
+                return JSON.stringify({
+                    access_token: updatedAccessToken,
+                    refresh_token: updatedRefreshToken,
+                    expires_in: 1
+                });
+            });
+        };
+
+        fetchMock.mock('/refreshUrl', function (url, opts) {
+            const data = {};
+            for (let key of opts.body.keys()) {
+                data[key] = opts.body.get(key);
+            }
+            assert.equal(data.grant_type, 'refresh_token', 'grant type is sent to the api');
+            assert.equal(data.client_id, 'client_1', 'client id is sent to the api');
+            assert.equal(data.refresh_token, refreshToken, 'refresh token is sent to the api');
+            setupSecondRequest();
+            return JSON.stringify({
+                access_token: accessToken,
+                refresh_token: updatedRefreshToken,
+                expires_in: 1
+            });
+        });
+
+        this.handler.storeRefreshToken(refreshToken).then(setTokenResult => {
+            assert.equal(setTokenResult, true, 'refresh token is set');
+            this.handler.getToken().then(refreshedAccessToken => {
+                assert.equal(refreshedAccessToken, accessToken, 'get refreshed access token');
+
+                this.handler.getToken().then(storedAccessToken => {
+                    assert.equal(storedAccessToken, accessToken, 'get access token from store without refresh');
+                }).then(() => new Promise(resolve => {
+                    setTimeout(resolve, 1000);
+                })).then(() => {
+                    this.handler.getToken().then(storedAccessToken => {
+                        assert.equal(storedAccessToken, updatedAccessToken, 'get access token again, because it was expired');
+                        done();
+                    });
+                });
+            });
+        });
+    });
 });

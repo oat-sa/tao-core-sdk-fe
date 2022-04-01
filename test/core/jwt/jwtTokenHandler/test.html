@@ -38,6 +38,12 @@
                             },
                             setAccessTokenTTL(newAccessTokenTTL) {
                                 accessTokenTTL = newAccessTokenTTL;
+                            },
+                            setTokens(newAccessToken, newRefreshToken) {
+                                accessToken = newAccessToken;
+                                refreshToken = newRefreshToken;
+                                accessTokenStoredAt = Date.now();
+                                return Promise.resolve(true);
                             }
                         };
                     });
