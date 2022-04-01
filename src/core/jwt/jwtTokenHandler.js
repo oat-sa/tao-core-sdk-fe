@@ -37,6 +37,7 @@ import TokenError from 'core/error/TokenError';
  * @param {Boolean} [options.usePerTokenTTL] if true, accessToken TTL should be extractable from JWT payload, and accessTokenTTL will be used as fallback
  * @param {Boolean} [options.useCredentials] refreshToken stored in cookie instead of store
  * @param {Object} [options.refreshTokenParameters] Parameters that should be send in refreshToken call
+ * @param {Boolean} [options.oauth2RequestFormat] use oauth2 request format
  * @returns {Object} JWT Token handler instance
  */
 const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
@@ -45,7 +46,8 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
     accessTokenTTL,
     usePerTokenTTL = false,
     refreshTokenParameters,
-    useCredentials = false
+    useCredentials = false,
+    oauth2RequestFormat = false
 } = {}) {
     const tokenStorage = jwtTokenStoreFactory({
         namespace: serviceName,
@@ -65,12 +67,12 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
      * @returns {Promise<String>} Promise of new token
      */
     const unQueuedRefreshToken = () => {
-        let body;
+        let parameters;
         let credentials;
         let flow;
 
         if (refreshTokenParameters) {
-            body = Object.assign({}, refreshTokenParameters);
+            parameters = Object.assign({}, refreshTokenParameters);
         }
 
         if (useCredentials) {
@@ -81,21 +83,34 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 if (!refreshToken) {
                     throw new Error('Refresh token is not available');
                 }
-                body = Object.assign({}, body, { refreshToken });
+                if (oauth2RequestFormat) {
+                    parameters = Object.assign({}, parameters, { refresh_token: refreshToken });
+                } else {
+                    parameters = Object.assign({}, parameters, { refreshToken });
+                }
             });
         }
 
         return flow
             .then(() => {
-                if (body) {
-                    body = JSON.stringify(body);
+                const headers = {};
+                let body;
+                if (oauth2RequestFormat) {
+                    body = new FormData();
+                    Object.keys(parameters).forEach(key => {
+                        body.append(key, parameters[key]);
+                    });
+                } else {
+                    if (parameters) {
+                        body = JSON.stringify(parameters);
+                    }
+
+                    headers['Content-Type'] = 'application/json';
                 }
                 return fetch(refreshTokenUrl, {
                     method: 'POST',
                     credentials,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers,
                     body
                 });
             })
@@ -112,7 +127,28 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 error.response = response;
                 return Promise.reject(error);
             })
-            .then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
+            .then(response => {
+                let accessToken, refreshToken, expiresIn;
+
+                if (oauth2RequestFormat) {
+                    accessToken = response.access_token;
+                    refreshToken = response.refresh_token;
+                    expiresIn = response.expires_in;
+                } else {
+                    accessToken = response.accessToken;
+                    refreshToken = response.refreshToken;
+                }
+
+                if (expiresIn) {
+                    tokenStorage.setAccessTokenTTL(expiresIn * 1000);
+                }
+
+                if (accessToken && refreshToken) {
+                    return tokenStorage.setTokens(accessToken, refreshToken).then(() => accessToken);
+                }
+
+                return tokenStorage.setAccessToken(accessToken).then(() => accessToken);
+            });
     };
 
     return {
