@@ -86,25 +86,23 @@ export default function tokenHandlerFactory(options) {
             return tokenStore
                 .expireOldTokens()
                 .then(() => {
-                    if (!clientConfigFetched) {
-                        // Client Config allowed! (first and only time)
-                        return this.getClientConfigTokens()
-                            .then(getFirstTokenValue);
-                    } else {
-                        return tokenStore.getSize()
-                            .then(queueSize => {
-                                if (queueSize > 0) {
-                                    // Token available, use it
-                                    return getFirstTokenValue();
-                                } else if (!validateTokensOpt) {
-                                    return this.getClientConfigTokens()
-                                        .then(getFirstTokenValue);
-                                } else {
-                                    // No more token options, refresh needed
-                                    return Promise.reject(new Error('No tokens available. Please refresh the page.'));
-                                }
-                            });
-                    }
+                    return tokenStore
+                        .getSize()
+                        .then(queueSize => {
+                            if (queueSize > 0) {
+                                // Token available, use it
+                                return getFirstTokenValue();
+                            }
+
+                            if (!validateTokensOpt || !clientConfigFetched) {
+                                return this
+                                    .getClientConfigTokens()
+                                    .then(getFirstTokenValue);
+                            }
+
+                            // No more token options, refresh needed
+                            return Promise.reject(new Error('No tokens available. Please refresh the page.'));
+                        });
                 });
         },
 
