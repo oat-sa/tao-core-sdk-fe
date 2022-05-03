@@ -13,54 +13,63 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018 Open Assessment Technologies SA
- *
- *
+ * Copyright (c) 2018-2022 Open Assessment Technologies SA
  */
 define(['util/strLimiter'], function(strLimiter) {
     'use strict';
 
-    var txt = 'Lorem ipsum dolor sit amet'; // 5 words, 26 characters
+    QUnit.module('strLimiter');
 
-    var weirdWhiteSpace = 'Lorem    ipsum   dolor  sit   amet';
-
-    QUnit.module('API');
-
-    QUnit.test('Limit by Word Count', function(assert) {
-        assert.equal(
-            strLimiter.limitByWordCount(txt, 5),
-            'Lorem ipsum dolor sit amet',
-            'Word count, input already correct size'
-        );
-        assert.equal(strLimiter.limitByWordCount(txt, 10), 'Lorem ipsum dolor sit amet', 'Word count, input too short');
-        assert.equal(strLimiter.limitByWordCount(txt, 2), 'Lorem ipsum', 'Word count, input too long');
+    QUnit.cases.init([{
+        title: 'input already at the limit',
+        limit: 5,
+        input: 'Lorem ipsum dolor sit amet',
+        expected: 'Lorem ipsum dolor sit amet'
+    }, {
+        title: 'input below the limit',
+        limit: 10,
+        input: 'Lorem ipsum dolor sit amet',
+        expected: 'Lorem ipsum dolor sit amet'
+    }, {
+        title: 'input above the limit',
+        limit: 2,
+        input: 'Lorem ipsum dolor sit amet',
+        expected: 'Lorem ipsum'
+    }, {
+        title: 'input already at the limit - with long spaces',
+        limit: 5,
+        input: 'Lorem    ipsum   dolor  sit   amet',
+        expected: 'Lorem    ipsum   dolor  sit   amet'
+    }, {
+        title: 'input below the limit - with long spaces',
+        limit: 10,
+        input: 'Lorem    ipsum   dolor  sit   amet',
+        expected: 'Lorem    ipsum   dolor  sit   amet'
+    }, {
+        title: 'input above the limit - with long spaces',
+        limit: 2,
+        input: 'Lorem    ipsum   dolor  sit   amet',
+        expected: 'Lorem    ipsum'
+    }]).test('limitByWordCount ', (data, assert) => {
+        assert.equal(strLimiter.limitByWordCount(data.input, data.limit), data.expected, `Limit by ${data.limit} words`);
     });
 
-    QUnit.test('Limit by Word Count, weird whitespace', function(assert) {
-        assert.equal(
-            strLimiter.limitByWordCount(weirdWhiteSpace, 5),
-            'Lorem    ipsum   dolor  sit   amet',
-            'Word count, input already correct size'
-        );
-        assert.equal(
-            strLimiter.limitByWordCount(weirdWhiteSpace, 10),
-            'Lorem    ipsum   dolor  sit   amet',
-            'Word count, input too short'
-        );
-        assert.equal(strLimiter.limitByWordCount(weirdWhiteSpace, 2), 'Lorem    ipsum', 'Word count, input too long');
-    });
-
-    QUnit.test('Limit by Character count', function(assert) {
-        assert.equal(
-            strLimiter.limitByCharCount(txt, 26),
-            'Lorem ipsum dolor sit amet',
-            'Char count, input already correct size'
-        );
-        assert.equal(
-            strLimiter.limitByCharCount(txt, 100),
-            'Lorem ipsum dolor sit amet',
-            'Char count, input too short'
-        );
-        assert.equal(strLimiter.limitByCharCount(txt, 11), 'Lorem ipsum', 'Char count, input too long');
+    QUnit.cases.init([{
+        title: 'input already at the limit',
+        limit: 26,
+        input: 'Lorem ipsum dolor sit amet',
+        expected: 'Lorem ipsum dolor sit amet'
+    }, {
+        title: 'input below the limit',
+        limit: 100,
+        input: 'Lorem ipsum dolor sit amet',
+        expected: 'Lorem ipsum dolor sit amet'
+    }, {
+        title: 'input above the limit',
+        limit: 11,
+        input: 'Lorem ipsum dolor sit amet',
+        expected: 'Lorem ipsum'
+    }]).test('limitByCharCount ', (data, assert) => {
+        assert.equal(strLimiter.limitByCharCount(data.input, data.limit), data.expected, `Limit by ${data.limit} characters`);
     });
 });
