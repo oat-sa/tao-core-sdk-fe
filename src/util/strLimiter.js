@@ -13,8 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018-2019 Open Assessment Technologies SA
- *
+ * Copyright (c) 2018-2022 Open Assessment Technologies SA
  */
 
 /**
@@ -25,26 +24,68 @@
 
 export default {
     /**
-     * Limit a string by word count
+     * Limits a string by word count.
      *
-     * @param {string} str
-     * @param {integer} maxWordCount
+     * @param {string} text
+     * @param {number} limit
      * @returns {string}
      */
-    limitByWordCount: function limitByWordCount(str, maxWordCount) {
-        // contains alternating a word and whitespace
-        // to make sure the original whitespace is retained
-        var textArr = str.match(/(([\S]+)|([\s]+))/g);
-        var newText = /\s+/.test(textArr[0]) ? textArr.shift() : '';
-        while (maxWordCount && textArr.length) {
-            newText += textArr.shift(); // word
-            if (textArr.length) {
-                newText += textArr.shift(); // white space
+    limitByWordCount(text, limit) {
+        /**
+         * Removes the trailing spaces from a text.
+         * @param {string} str
+         * @returns {string}
+         */
+        const removeTrailing = str => str.replace(/(\s+)$/, '');
+
+        /**
+         * Cuts a plain text after the max number of words expressed by the variable `limit`.
+         * @param {string} str
+         * @returns {string}
+         */
+        const limitText = str => {
+            const words = str.match(/([\s]*[\S]+)/g);
+            const trailing = str.match(/(\s+)$/);
+            if (!words) {
+                return '';
             }
-            maxWordCount--;
+            const count = limit;
+            limit = Math.max(0, limit - words.length);
+            return words.slice(0, count).join('') + ((trailing && trailing[0]) || '');
+        };
+
+        /**
+         * Limits the number of words in an HTML fragment, removing the extraneous ones.
+         * @param {Node} fragment
+         */
+        const limitFragment = fragment => {
+            [].slice.call(fragment.childNodes).forEach(node => {
+                switch (node.nodeType) {
+                    case Node.ELEMENT_NODE:
+                        if (node.childNodes.length && node.textContent.trim()) {
+                            limitFragment(node);
+
+                            if (!node.textContent.trim()) {
+                                node.remove();
+                            }
+                        }
+                        break;
+
+                    case Node.TEXT_NODE:
+                        node.textContent = limitText(node.textContent);
+                        break;
+                }
+            });
+        };
+
+        if (/<.*>/g.test(text)) {
+            const fragment = document.createElement('div');
+            fragment.innerHTML = text;
+            limitFragment(fragment);
+            return removeTrailing(fragment.innerHTML);
         }
-        newText = newText.replace(/\s+$/, ''); // remove trailing space
-        return newText;
+
+        return removeTrailing(limitText(text));
     },
 
     /**
