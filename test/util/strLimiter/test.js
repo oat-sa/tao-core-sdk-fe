@@ -44,6 +44,8 @@ define(['util/strLimiter'], function(strLimiter) {
         assert.equal(strLimiter.limitByWordCount(data.input, 5), data.unlimited, 'Limited by 5 words');
         assert.equal(strLimiter.limitByWordCount(data.input, 10), data.unlimited, 'Limited by 10 words');
         assert.equal(strLimiter.limitByWordCount(data.input, 2), data.limited, 'Limited by 2 words');
+        assert.equal(strLimiter.limitByWordCount(data.input, 0), '', 'Limited by 0 words');
+        assert.equal(strLimiter.limitByWordCount(data.input, -2), '', 'Limited by negative value');
     });
 
     QUnit.cases.init([{
@@ -61,6 +63,51 @@ define(['util/strLimiter'], function(strLimiter) {
         limit: 11,
         input: 'Lorem ipsum dolor sit amet',
         expected: 'Lorem ipsum'
+    // }, {
+    //     title: 'input already at the limit - with long spaces',
+    //     limit: 34,
+    //     input: 'Lorem    ipsum   dolor  sit   amet',
+    //     expected: 'Lorem    ipsum   dolor  sit   amet'
+    // }, {
+    //     title: 'input below the limit - with long spaces',
+    //     limit: 100,
+    //     input: 'Lorem    ipsum   dolor  sit   amet',
+    //     expected: 'Lorem    ipsum   dolor  sit   amet'
+    // }, {
+    //     title: 'input above the limit - with long spaces',
+    //     limit: 14,
+    //     input: 'Lorem    ipsum   dolor  sit   amet',
+    //     expected: 'Lorem    ipsum'
+    // }, {
+    //     title: 'input already at the limit - with tags',
+    //     limit: 26,
+    //     input: '<p>Lorem</p><p>ipsum</p><p>dolor</p><p>sit</p><p>amet</p>',
+    //     expected: '<p>Lorem</p><p>ipsum</p><p>dolor</p><p>sit</p><p>amet</p>'
+    // }, {
+    //     title: 'input below the limit - with tags',
+    //     limit: 100,
+    //     input: '<p>Lorem</p><p>ipsum</p><p>dolor</p><p>sit</p><p>amet</p>',
+    //     expected: '<p>Lorem</p><p>ipsum</p><p>dolor</p><p>sit</p><p>amet</p>'
+    // }, {
+    //     title: 'input above the limit - with tags',
+    //     limit: 11,
+    //     input: '<p>Lorem</p><p>ipsum</p><p>dolor</p><p>sit</p><p>amet</p>',
+    //     expected: '<p>Lorem</p><p>ipsum</p>'
+    // }, {
+    //     title: 'input already at the limit - with entities',
+    //     limit: 26,
+    //     input: '<p>Lorem&nbsp;ipsum&nbsp;dolor&nbsp;sit&nbsp;amet</p>',
+    //     expected: '<p>Lorem&nbsp;ipsum&nbsp;dolor&nbsp;sit&nbsp;amet</p>'
+    // }, {
+    //     title: 'input below the limit - with entities',
+    //     limit: 100,
+    //     input: '<p>Lorem&nbsp;ipsum&nbsp;dolor&nbsp;sit&nbsp;amet</p>',
+    //     expected: '<p>Lorem&nbsp;ipsum&nbsp;dolor&nbsp;sit&nbsp;amet</p>'
+    // }, {
+    //     title: 'input above the limit - with entities',
+    //     limit: 11,
+    //     input: '<p>Lorem&nbsp;ipsum&nbsp;dolor&nbsp;sit&nbsp;amet</p>',
+    //     expected: '<p>Lorem&nbsp;ipsum</p>'
     }]).test('limitByCharCount ', (data, assert) => {
         assert.equal(strLimiter.limitByCharCount(data.input, data.limit), data.expected, `Limit by ${data.limit} characters`);
     });
