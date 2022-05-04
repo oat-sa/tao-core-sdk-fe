@@ -21,37 +21,29 @@ define(['util/strLimiter'], function(strLimiter) {
     QUnit.module('strLimiter');
 
     QUnit.cases.init([{
-        title: 'input already at the limit',
-        limit: 5,
+        title: 'plain text',
         input: 'Lorem ipsum dolor sit amet',
-        expected: 'Lorem ipsum dolor sit amet'
+        unlimited: 'Lorem ipsum dolor sit amet',
+        limited: 'Lorem ipsum'
     }, {
-        title: 'input below the limit',
-        limit: 10,
-        input: 'Lorem ipsum dolor sit amet',
-        expected: 'Lorem ipsum dolor sit amet'
+        title: 'plain text with long spaces',
+        input: '  Lorem    ipsum   dolor  sit   amet  ',
+        unlimited: '  Lorem    ipsum   dolor  sit   amet',
+        limited: '  Lorem    ipsum'
     }, {
-        title: 'input above the limit',
-        limit: 2,
-        input: 'Lorem ipsum dolor sit amet',
-        expected: 'Lorem ipsum'
+        title: 'simple HTML',
+        input: '<p>Lorem ipsum dolor sit amet</p>',
+        unlimited: '<p>Lorem ipsum dolor sit amet</p>',
+        limited: '<p>Lorem ipsum</p>'
     }, {
-        title: 'input already at the limit - with long spaces',
-        limit: 5,
-        input: 'Lorem    ipsum   dolor  sit   amet',
-        expected: 'Lorem    ipsum   dolor  sit   amet'
-    }, {
-        title: 'input below the limit - with long spaces',
-        limit: 10,
-        input: 'Lorem    ipsum   dolor  sit   amet',
-        expected: 'Lorem    ipsum   dolor  sit   amet'
-    }, {
-        title: 'input above the limit - with long spaces',
-        limit: 2,
-        input: 'Lorem    ipsum   dolor  sit   amet',
-        expected: 'Lorem    ipsum'
+        title: 'glued HTML',
+        input: '<p> Lorem </p><p> ipsum <br></p><p> dolor </p><p> sit </p><p> amet </p>',
+        unlimited: '<p> Lorem </p><p> ipsum <br></p><p> dolor </p><p> sit </p><p> amet </p>',
+        limited: '<p> Lorem </p><p> ipsum <br></p>'
     }]).test('limitByWordCount ', (data, assert) => {
-        assert.equal(strLimiter.limitByWordCount(data.input, data.limit), data.expected, `Limit by ${data.limit} words`);
+        assert.equal(strLimiter.limitByWordCount(data.input, 5), data.unlimited, 'Limited by 5 words');
+        assert.equal(strLimiter.limitByWordCount(data.input, 10), data.unlimited, 'Limited by 10 words');
+        assert.equal(strLimiter.limitByWordCount(data.input, 2), data.limited, 'Limited by 2 words');
     });
 
     QUnit.cases.init([{
