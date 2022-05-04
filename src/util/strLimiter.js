@@ -49,8 +49,8 @@ export default {
             if (!words) {
                 return '';
             }
-            const count = limit;
-            limit = Math.max(0, limit - words.length);
+            const count = Math.max(0, limit);
+            limit = Math.max(0, count - words.length);
             return words.slice(0, count).join('') + ((trailing && trailing[0]) || '');
         };
 
