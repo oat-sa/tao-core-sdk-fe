@@ -86,6 +86,15 @@ var adaptSize = (function() {
          */
         both: function($elements, minWidth, minHeight) {
             _resize($elements, { height: minHeight, width: minWidth });
+        },
+
+        /**
+         * Set height to auto on a set of elements
+         *
+         * @param {jQueryElements} $elements
+         */
+        resetHeight: function($elements) {
+            $elements.height('auto');
         }
     };
 })();
