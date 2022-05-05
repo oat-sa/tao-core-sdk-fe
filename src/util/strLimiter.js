@@ -17,6 +17,47 @@
  */
 
 /**
+ * Limit a string by the supplied limiter function.
+ * @param {string} text
+ * @param {function} limitText
+ * @returns {string}
+ */
+function limitBy(text, limitText) {
+    /**
+     * Limits the size of an HTML fragment, removing the extraneous content.
+     * @param {Node} fragment
+     */
+    const limitFragment = fragment => {
+        [].slice.call(fragment.childNodes).forEach(node => {
+            switch (node.nodeType) {
+                case Node.ELEMENT_NODE:
+                    if (node.childNodes.length && node.textContent.trim()) {
+                        limitFragment(node);
+
+                        if (!node.textContent.trim()) {
+                            node.remove();
+                        }
+                    }
+                    break;
+
+                case Node.TEXT_NODE:
+                    node.textContent = limitText(node.textContent);
+                    break;
+            }
+        });
+    };
+
+    if (/<.*>/g.test(text)) {
+        const fragment = document.createElement('div');
+        fragment.innerHTML = text;
+        limitFragment(fragment);
+        return fragment.innerHTML;
+    }
+
+    return limitText(text);
+}
+
+/**
  * Limit a string by either word or character count
  *
  * @author dieter <dieter@taotesting.com>
@@ -32,70 +73,54 @@ export default {
      */
     limitByWordCount(text, limit) {
         /**
-         * Removes the trailing spaces from a text.
-         * @param {string} str
-         * @returns {string}
-         */
-        const removeTrailing = str => str.replace(/(\s+)$/, '');
-
-        /**
          * Cuts a plain text after the max number of words expressed by the variable `limit`.
          * @param {string} str
          * @returns {string}
          */
         const limitText = str => {
+            // split words by space, keeping the leading spaces attached
             const words = str.match(/([\s]*[\S]+)/g);
+            // keep the trailing spaces
             const trailing = str.match(/(\s+)$/);
+
             if (!words) {
                 return '';
             }
+
             const count = Math.max(0, limit);
             limit = Math.max(0, count - words.length);
             return words.slice(0, count).join('') + ((trailing && trailing[0]) || '');
         };
 
-        /**
-         * Limits the number of words in an HTML fragment, removing the extraneous ones.
-         * @param {Node} fragment
-         */
-        const limitFragment = fragment => {
-            [].slice.call(fragment.childNodes).forEach(node => {
-                switch (node.nodeType) {
-                    case Node.ELEMENT_NODE:
-                        if (node.childNodes.length && node.textContent.trim()) {
-                            limitFragment(node);
-
-                            if (!node.textContent.trim()) {
-                                node.remove();
-                            }
-                        }
-                        break;
-
-                    case Node.TEXT_NODE:
-                        node.textContent = limitText(node.textContent);
-                        break;
-                }
-            });
-        };
-
-        if (/<.*>/g.test(text)) {
-            const fragment = document.createElement('div');
-            fragment.innerHTML = text;
-            limitFragment(fragment);
-            return removeTrailing(fragment.innerHTML);
-        }
-
-        return removeTrailing(limitText(text));
+        return limitBy(text, limitText).replace(/(\s+)$/, '');
     },
 
     /**
-     * Limit a string by character count
+     * Limit a string by character count.
      *
-     * @param {string} str
-     * @param {integer} maxCharCount
-     * @returns {string|*}
+     * @param {string} text
+     * @param {number} limit
+     * @returns {string}
      */
-    limitByCharCount: function limitByCharCount(str, maxCharCount) {
-        return str.substr(0, maxCharCount);
+    limitByCharCount(text, limit) {
+        /**
+         * Cuts a plain text after the max number of chars expressed by the variable `limit`.
+         * @param {string} str
+         * @returns {string}
+         */
+        const limitText = str => {
+            // split by char or by HTML entity
+            const chars = str.match(/((&.*?;)|(.))/g);
+
+            if (!chars) {
+                return '';
+            }
+
+            const count = Math.max(0, limit);
+            limit = Math.max(0, count - chars.length);
+            return chars.slice(0, count).join('');
+        };
+
+        return limitBy(text, limitText);
     }
 };
