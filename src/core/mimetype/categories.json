@@ -87,5 +87,15 @@
     "generic" : {
         "category" : "generic",
         "mimes" : ["application/octet-stream", "application/force-download", "application/x-force-download"]
+    },
+    "cpp" : {
+        "category": "sources",
+        "mimes" : ["text/x-c"],
+        "extensions": ["cpp"]
+    },
+    "pas" : {
+        "category": "sources",
+        "mimes" : ["text/pascal"],
+        "extensions": ["pas"]
     }
 }

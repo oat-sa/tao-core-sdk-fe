@@ -61,3 +61,8 @@ typings/
 .next
 
 dist
+
+# IDE
+.vscode
+
+eslint_report.json

@@ -51,7 +51,7 @@ export default inputs.map(input => {
             name
         },
         watch: {
-            clearScreen : false
+            clearScreen: false
         },
         external: [
             ...localExternals,
@@ -69,8 +69,12 @@ export default inputs.map(input => {
             'moment'
         ],
         plugins: [
-            resolve(),
-            commonJS(),
+            resolve({ mainFields: ['main'] }),
+            commonJS({
+                namedExports: {
+                    fastestsmallesttextencoderdecoder: ['TextEncoder']
+                }
+            }),
             alias({
                 resolve: ['.js', '.json'],
                 core: path.resolve(srcDir, 'core'),
@@ -81,11 +85,14 @@ export default inputs.map(input => {
             }),
             ...(process.env.COVERAGE ? [istanbul()] : []),
             babel({
-                presets: [[
-                    '@babel/env', {
-                        useBuiltIns: false
-                    }
-                ]]
+                presets: [
+                    [
+                        '@babel/env',
+                        {
+                            useBuiltIns: false
+                        }
+                    ]
+                ]
             })
         ]
     };
