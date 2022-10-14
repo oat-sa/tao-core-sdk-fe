@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluator/testCases.json'], function(
+define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluator/testCases.json'], function (
     $,
     _,
     mathsEvaluatorFactory,
@@ -28,7 +28,7 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
 
     QUnit.module('API');
 
-    QUnit.test('module', function(assert) {
+    QUnit.test('module', function (assert) {
         assert.expect(3);
 
         assert.equal(typeof mathsEvaluatorFactory, 'function', 'The module exposes a function');
@@ -42,7 +42,7 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
 
     QUnit.module('Behavior');
 
-    QUnit.cases.init(testCases).test('expression ', function(data, assert) {
+    QUnit.cases.init(testCases).test('expression ', function (data, assert) {
         var evaluate = mathsEvaluatorFactory(data.config);
         var output = evaluate(data.expression, data.variables);
 
@@ -53,14 +53,14 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
         assert.equal(
             output.value,
             data.expected,
-            'The expression ' + data.expression + ' is correctly computed to ' + data.expected
+            `The expression ${data.expression} is correctly computed to ${data.expected}`
         );
         assert.equal(output.expression, data.expression, 'The expression is provided in the output');
         assert.equal(output.variables, data.variables, 'The variables are provided in the output');
         assert.notEqual(typeof output.result, 'undefined', 'The internal result is provided in the output');
     });
 
-    QUnit.test('expression as object', function(assert) {
+    QUnit.test('expression as object', function (assert) {
         var evaluate = mathsEvaluatorFactory();
         var mathsExpression = {
             expression: '3*x + 1',
@@ -76,18 +76,14 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
 
         assert.expect(8);
 
-        assert.equal(output.value, '7', 'The expression ' + mathsExpression.expression + ' is correctly computed to 7');
+        assert.equal(output.value, '7', `The expression ${mathsExpression.expression} is correctly computed to 7`);
         assert.equal(output.expression, mathsExpression.expression, 'The expression is provided in the output');
         assert.equal(output.variables, mathsExpression.variables, 'The variables are provided in the output');
         assert.notEqual(typeof output.result, 'undefined', 'The internal result is provided in the output');
 
         output = evaluate(mathsExpression, variables);
 
-        assert.equal(
-            output.value,
-            '10',
-            'The expression ' + mathsExpression.expression + ' is correctly computed to 10'
-        );
+        assert.equal(output.value, '10', `The expression ${mathsExpression.expression} is correctly computed to 10`);
         assert.equal(output.expression, mathsExpression.expression, 'The expression is provided in the output');
         assert.equal(output.variables, variables, 'The variables are provided in the output');
         assert.notEqual(typeof output.result, 'undefined', 'The internal result is provided in the output');
@@ -102,8 +98,8 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
          * @param {String} myValue
          * @returns {jQuery}
          */
-        insertAtCaret: function(myValue) {
-            return this.each(function() {
+        insertAtCaret: function (myValue) {
+            return this.each(function () {
                 var sel, startPos, endPos, scrollTop;
                 if (document.selection) {
                     //For browsers like Internet Explorer
@@ -130,7 +126,7 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
         }
     });
 
-    QUnit.test('Visual test', function(assert) {
+    QUnit.test('Visual test', function (assert) {
         var evaluate = mathsEvaluatorFactory();
         var $container = $('#visual-test');
         var $screen = $container.find('.screen');
@@ -148,14 +144,15 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
             try {
                 return evaluate(expr, variables).value;
             } catch (err) {
+                // eslint-disable-next-line
                 console.log(err);
                 return 'Syntax error!';
             }
         }
 
         function showResult(expression, result) {
-            var $expr = $('<p class="expression">' + expression + '</p>');
-            var $res = $('<p class="result">' + result + '</p>');
+            var $expr = $(`'<p class="expression">${expression}</p>'`);
+            var $res = $(`<p class="result">${result}</p>`);
             var currentScrollTop, scrollTop;
             $screen.append($expr);
             $screen.append($res);
@@ -175,14 +172,14 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
             var lines = [];
             var variables = _.reduce(
                 parts,
-                function(acc, part) {
+                function (acc, part) {
                     var s = part.split('=');
                     var name = (s[0] || '').trim();
                     var value = (s[1] || '').trim();
                     if (name && value) {
                         value = processExpression(value);
                         acc[name] = value;
-                        lines.push(name + '=' + value);
+                        lines.push(`${name}=${value}`);
                     }
                     return acc;
                 },
@@ -199,17 +196,19 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
         $keyboard.find('[data-switch="radian"]').click();
 
         $keyboard
-            .on('change', 'input', function() {
+            .on('change', 'input', function () {
                 switch (this.name) {
                     case 'degree':
                         degree = !!parseInt(this.value, 10);
                         setupMathsEvaluator();
                 }
             })
-            .on('click', 'button', function() {
+            .on('click', 'button', function () {
                 switch (this.dataset.action) {
                     case 'compute':
                         compute();
+                        clear();
+                        break;
                     case 'clear':
                         clear();
                         break;
@@ -218,7 +217,7 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
                 }
             });
 
-        $input.on('keydown', function(e) {
+        $input.on('keydown', function (e) {
             switch (e.keyCode) {
                 case 13:
                     e.preventDefault();

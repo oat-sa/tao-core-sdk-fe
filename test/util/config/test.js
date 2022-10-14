@@ -19,26 +19,26 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define(['util/config'], function(configHelper) {
+define(['util/config'], function (configHelper) {
     'use strict';
 
     QUnit.module('helpers/config');
 
-    QUnit.test('module', function(assert) {
+    QUnit.test('module', function (assert) {
         assert.expect(1);
         assert.equal(typeof configHelper, 'object', 'The config helper module exposes an object');
     });
 
-    QUnit.cases.init([{ title: 'build' }, { title: 'from' }]).test('helpers/config API ', function(data, assert) {
+    QUnit.cases.init([{ title: 'build' }, { title: 'from' }]).test('helpers/config API ', function (data, assert) {
         assert.expect(1);
         assert.equal(
             typeof configHelper[data.title],
             'function',
-            'The config helper exposes a "' + data.title + '" function'
+            `The config helper exposes a "${data.title}" function`
         );
     });
 
-    QUnit.test('helpers/config.build', function(assert) {
+    QUnit.test('helpers/config.build', function (assert) {
         var source = {
             foo: 'bar'
         };
@@ -66,7 +66,7 @@ define(['util/config'], function(configHelper) {
         );
     });
 
-    QUnit.test('helpers/config.from', function(assert) {
+    QUnit.test('helpers/config.from', function (assert) {
         var source = {
             foo: 'bar',
             tro: 'lolo',
@@ -111,7 +111,7 @@ define(['util/config'], function(configHelper) {
             'The config helper from() returns the expected config with defaults values'
         );
 
-        assert.throws(function() {
+        assert.throws(function () {
             configHelper.from(source, { no: true });
         }, 'The config helper from() throws an error is a required config entry is missing');
     });
