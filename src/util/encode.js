@@ -22,8 +22,8 @@
  * @author dieter <dieter@taotesting.com>
  */
 
-var _reQuot = /"/g;
-var _reApos = /'/g;
+const _reQuot = /"/g;
+const _reApos = /'/g;
 
 /**
  * Encodes an HTML string to be safely displayed without code interpretation
@@ -31,10 +31,10 @@ var _reApos = /'/g;
  * @param {String} html
  * @returns {String}
  */
-var encodeHTML = function encodeHTML(html) {
+function encodeHTML(html) {
     // @see http://tinyurl.com/ko75kph
     return document.createElement('a').appendChild(document.createTextNode(html)).parentNode.innerHTML;
-};
+}
 
 /**
  * Encodes an HTML string to be safely use inside an attribute
@@ -42,13 +42,11 @@ var encodeHTML = function encodeHTML(html) {
  * @param {String} html
  * @returns {String}
  */
-var encodeAttribute = function encodeAttribute(html) {
+function encodeAttribute(html) {
     // use replaces chain instead of unified replace with map for performances reasons
     // @see http://jsperf.com/htmlencoderegex/68
-    return encodeHTML(html)
-        .replace(_reQuot, '&quot;')
-        .replace(_reApos, '&apos;');
-};
+    return encodeHTML(html).replace(_reQuot, '&quot;').replace(_reApos, '&apos;');
+}
 
 /**
  * Encodes a Unicode string to Base64.
@@ -62,7 +60,7 @@ function encodeBase64(str) {
     // can be fed into btoa.
     return btoa(
         encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function toSolidBytes(match, p1) {
-            return String.fromCharCode('0x' + p1);
+            return String.fromCharCode(`0x${p1}`);
         })
     );
 }
@@ -77,8 +75,9 @@ function decodeBase64(str) {
     // Going backwards: from bytestream, to percent-encoding, to original string.
     return decodeURIComponent(
         Array.prototype.map
-            .call(atob(str), function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            .call(atob(str), c => {
+                const num = `00${c.charCodeAt(0).toString(16)}`;
+                return `%${num.slice(-2)}`;
             })
             .join('')
     );

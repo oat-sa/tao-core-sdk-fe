@@ -16,18 +16,18 @@
  * example 2: str_pad('Kevin van Zonneveld', 30, '-', 'STR_PAD_BOTH');
  * returns 2: '------Kevin van Zonneveld-----'
  *
- * @param input
- * @param pad_length
- * @param pad_string
- * @param pad_type
+ * @param {string} input
+ * @param {number} pad_length
+ * @param {string} pad_string
+ * @param {string} pad_type
  * @returns {*}
  */
-var strPad = function(input, pad_length, pad_string, pad_type) {
-    var half = '',
-        pad_to_go;
+function strPad(input, pad_length, pad_string, pad_type) {
+    let half = '';
+    let pad_to_go;
 
-    var str_pad_repeater = function(s, len) {
-        var collect = '';
+    function str_pad_repeater(s, len) {
+        let collect = '';
 
         while (collect.length < len) {
             collect += s;
@@ -35,12 +35,12 @@ var strPad = function(input, pad_length, pad_string, pad_type) {
         collect = collect.substr(0, len);
 
         return collect;
-    };
+    }
 
     input = input.toString();
 
     input += '';
-    pad_string = pad_string !== undefined ? pad_string : ' ';
+    pad_string = typeof pad_string !== 'undefined' ? pad_string : ' ';
 
     if (pad_type !== 'STR_PAD_LEFT' && pad_type !== 'STR_PAD_RIGHT' && pad_type !== 'STR_PAD_BOTH') {
         pad_type = 'STR_PAD_RIGHT';
@@ -58,6 +58,6 @@ var strPad = function(input, pad_length, pad_string, pad_type) {
     }
 
     return input;
-};
+}
 
 export default strPad;
