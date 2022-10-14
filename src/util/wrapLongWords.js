@@ -30,16 +30,16 @@ import regexEscape from 'util/regexEscape';
  * even when they're preceded by a space. To address this chunks starting with one of the problematic characters
  * will have this removed and it will be appended to the previous chunk.
  *
- * @param longWord
- * @param chunkExp
+ * @param {string} longWord
+ * @param {RegExp} chunkExp
  * @returns {string}
  */
-var getCutTerm = function getCutTerm(longWord, chunkExp) {
-    var cutTerms = longWord.match(chunkExp),
-        i = cutTerms.length,
-        oldFirst = '',
-        newFirst = '',
-        offenders = ['.', ':', ';'];
+function getCutTerm(longWord, chunkExp) {
+    const cutTerms = longWord.match(chunkExp);
+    let i = cutTerms.length;
+    let oldFirst = '';
+    let newFirst = '';
+    const offenders = ['.', ':', ';'];
 
     while (i--) {
         newFirst = cutTerms[i].charAt(0);
@@ -52,26 +52,25 @@ var getCutTerm = function getCutTerm(longWord, chunkExp) {
         oldFirst = newFirst;
     }
     return cutTerms.join(' ');
-};
+}
 
 /**
  * Wrap very long strings after n characters
  *
- * @param str
- * @param threshold number of characters to break after
+ * @param {string} str
+ * @param {number} threshold number of characters to break after
  * @returns {string}
  */
 function wrapLongWords(str, threshold) {
     // add whitespaces to provoke line breaks before HTML tags
     str = str.toString().replace(/([\w])</g, '$1 <');
 
-    var chunkExp = new RegExp('.{1,' + threshold + '}', 'g'),
-        longWords = str.match(new RegExp('[\\S]{' + threshold + ',}', 'g')) || [],
-        i = longWords.length,
-        cut;
+    const chunkExp = new RegExp(`.{1,${threshold}}`, 'g');
+    const longWords = str.match(new RegExp(`[\\S]{${threshold},}`, 'g')) || [];
+    let i = longWords.length;
 
     while (i--) {
-        cut = getCutTerm(longWords[i], chunkExp);
+        const cut = getCutTerm(longWords[i], chunkExp);
         str = str.replace(new RegExp(regexEscape(longWords[i]), 'g'), cut);
     }
 

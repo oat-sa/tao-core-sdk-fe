@@ -30,7 +30,7 @@
  */
 import _ from 'lodash';
 
-var urlParts = ['hash', 'host', 'hostname', 'pathname', 'port', 'protocol', 'search'];
+const urlParts = ['hash', 'host', 'hostname', 'pathname', 'port', 'protocol', 'search'];
 
 /**
  * Parse an URL and gives you access to its parts
@@ -44,12 +44,11 @@ var urlParts = ['hash', 'host', 'hostname', 'pathname', 'port', 'protocol', 'sea
  * @param {String} url
  */
 function UrlParser(url) {
-    var detachedAnchor;
     this.url = url;
 
     //use the parser within the browser DOM engine
     //thanks to https://gist.github.com/jlong/2428561
-    detachedAnchor = document.createElement('a');
+    const detachedAnchor = document.createElement('a');
     detachedAnchor.href = url;
     this.data = _.pick(detachedAnchor, urlParts);
     this.params = UrlParser.extractParams(this.data.search);
@@ -62,9 +61,9 @@ function UrlParser(url) {
  * @param {String} search
  * @returns {Object} key : value
  */
-UrlParser.extractParams = function(search) {
-    var params = {};
-    search.replace(/^\?/, '').replace(/([^=&]+)=([^&]*)/g, function(m, key, value) {
+UrlParser.extractParams = function (search) {
+    const params = {};
+    search.replace(/^\?/, '').replace(/([^=&]+)=([^&]*)/g, function (m, key, value) {
         params[decodeURIComponent(key)] = decodeURIComponent(value);
     });
     return params;
@@ -77,7 +76,7 @@ UrlParser.extractParams = function(search) {
  * @param {string} what - in 'hash', 'host', 'hostname', 'pathname', 'port', 'protocol', 'search'
  * @returns {String|Boolean} the requested url part or false
  */
-UrlParser.prototype.get = function(what) {
+UrlParser.prototype.get = function (what) {
     return _.contains(urlParts, what) ? this.data[what] : false;
 };
 
@@ -87,7 +86,7 @@ UrlParser.prototype.get = function(what) {
  * @memberOf UrlParser
  * @returns {Object} key : value
  */
-UrlParser.prototype.getParams = function() {
+UrlParser.prototype.getParams = function () {
     return this.params;
 };
 
@@ -97,7 +96,7 @@ UrlParser.prototype.getParams = function() {
  * @memberOf UrlParser
  * @param {Object} params - of key:value
  */
-UrlParser.prototype.setParams = function(params) {
+UrlParser.prototype.setParams = function (params) {
     if (_.isObject(params)) {
         this.params = params;
     }
@@ -110,7 +109,7 @@ UrlParser.prototype.setParams = function(params) {
  * @param {String} key
  * @param {String} value
  */
-UrlParser.prototype.addParam = function(key, value) {
+UrlParser.prototype.addParam = function (key, value) {
     if (key) {
         this.params[key] = value;
     }
@@ -121,7 +120,7 @@ UrlParser.prototype.addParam = function(key, value) {
  * @memberOf UrlParser
  * @returns {Array} - the paths
  */
-UrlParser.prototype.getPaths = function() {
+UrlParser.prototype.getPaths = function () {
     return this.data.pathname.replace(/^\/|\/$/g, '').split('/');
 };
 
@@ -131,16 +130,16 @@ UrlParser.prototype.getPaths = function() {
  * @param {Array} [exclude] - url parts to exclude in hosts, params and hash
  * @returns {String} the url
  */
-UrlParser.prototype.getUrl = function(exclude) {
-    var url = '';
+UrlParser.prototype.getUrl = function (exclude) {
+    let url = '';
     exclude = exclude || [];
     if (this.data) {
         if (this.data.hostname && !_.contains(exclude, 'host')) {
-            url += (this.data.protocol ? this.data.protocol : 'http:') + '//' + this.data.hostname.replace(/\/$/, '');
+            url += `${this.data.protocol ? this.data.protocol : 'http:'}//${this.data.hostname.replace(/\/$/, '')}`;
 
             //the value of the port seems to be different regardign the browser, so we prevent adding port if not usual
             if (this.data.port && this.data.port !== 80 && this.data.port !== '80' && this.data.port !== '0') {
-                url += ':' + this.data.port;
+                url += `:${this.data.port}`;
             }
         }
         if (!/\/$/.test(url) && !/^\//.test(this.data.pathname)) {
@@ -150,8 +149,8 @@ UrlParser.prototype.getUrl = function(exclude) {
 
         if (this.params && !_.contains(exclude, 'params')) {
             url += '?';
-            _.forEach(this.params, function(value, key) {
-                url += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
+            _.forEach(this.params, function (value, key) {
+                url += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
             });
             url = url.substring(0, url.length - 1);
         }
@@ -168,10 +167,10 @@ UrlParser.prototype.getUrl = function(exclude) {
  * @deprecated
  * @returns {String} the url
  */
-UrlParser.prototype.getBaseUrl = function() {
-    var baseUrl = this.getUrl(['params', 'hash']);
-    var paths = this.getPaths();
-    var lastPart = paths[paths.length - 1];
+UrlParser.prototype.getBaseUrl = function () {
+    let baseUrl = this.getUrl(['params', 'hash']);
+    const paths = this.getPaths();
+    const lastPart = paths[paths.length - 1];
 
     //remove if trailing path token is a file
     if (paths.length > 0 && /\.[a-z]+$/.test(lastPart)) {
@@ -189,8 +188,8 @@ UrlParser.prototype.getBaseUrl = function() {
  * @returns {Boolean} true if same domain
  * @throws {TypeError} with wrong parameters
  */
-UrlParser.prototype.sameDomain = function(url) {
-    var parsedUrl;
+UrlParser.prototype.sameDomain = function (url) {
+    let parsedUrl;
     if (typeof url === 'undefined') {
         parsedUrl = new UrlParser(window.location);
     }
