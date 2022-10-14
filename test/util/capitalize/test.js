@@ -17,10 +17,10 @@
  *
  *
  */
-define(['util/capitalize', 'lodash'], function(capitalize, _) {
+define(['util/capitalize', 'lodash'], function (capitalize, _) {
     QUnit.module('API');
 
-    QUnit.test('util api', function(assert) {
+    QUnit.test('util api', function (assert) {
         assert.equal(capitalize('lorem'), 'Lorem', 'Single word input');
         assert.equal(capitalize('lorem ipsum dolor sit amet'), 'Lorem Ipsum Dolor Sit Amet', 'Multiple words input');
         assert.equal(
@@ -35,7 +35,7 @@ define(['util/capitalize', 'lodash'], function(capitalize, _) {
         );
         assert.equal(capitalize('12.3'), '12.3', 'valid but nonsense arg string "12.3"');
         assert.equal(capitalize('üabc éabc'), 'Üabc Éabc', 'Accents and such');
-        assert.equal(capitalize(undefined), undefined, '1st arg must be String but is undefined');
+        assert.equal(capitalize(void 0), void 0, '1st arg must be String but is undefined');
         assert.ok(_.isPlainObject(capitalize({})) && _.isEmpty(capitalize({})), '1st arg must be String but is {}');
     });
 });
