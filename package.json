@@ -11,7 +11,7 @@
   "license": "GPL-2.0",
   "scripts": {
     "test": "npx qunit-testrunner",
-    "test:keepAlive": "npx qunit-testrunner --keepalive",
+    "test:keepAlive": "npx qunit-testrunner --keepalive --port 5300",
     "test:cov": "npm run build:cov && npx qunit-testrunner --cov",
     "test:dev": "NODE_ENV=development run-p test:keepAlive build:watch ",
     "coverage": "nyc report",
