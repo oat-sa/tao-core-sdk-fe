@@ -60,9 +60,13 @@ typings/
 # next.js build output
 .next
 
-dist
+# IDE files
+.idea/
+.vscode/
 
-# IDE
-.vscode
+# Platform specifics
+.DS_Store
 
+# Project related
 eslint_report.json
+/dist
