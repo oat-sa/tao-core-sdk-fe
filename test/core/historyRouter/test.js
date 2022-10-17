@@ -21,13 +21,13 @@
 define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], function(historyRouterFactory, controller) {
     'use strict';
 
-    var location = window.history.location || window.location;
-    var port = location.port;
-    var protocol = location.protocol;
-    var domain = protocol + '//' + location.hostname;
-    var testerUrl = location.href;
+    const location = window.history.location || window.location;
+    const port = location.port;
+    const protocol = location.protocol;
+    let domain = `${protocol}//${location.hostname}`;
+    const testerUrl = location.href;
 
-    var historyRouterApi = [
+    const historyRouterApi = [
         { title: 'redirect' },
         { title: 'forward' },
         { title: 'replace' },
@@ -35,7 +35,7 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
         { title: 'pushState' }
     ];
 
-    var errorsProvider = [
+    const errorsProvider = [
         {
             title: 'Null',
             state: null
@@ -54,39 +54,37 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
         }
     ];
 
-    var pagesProvider;
-
     if (port && (('http:' === protocol && '80' !== port) || ('https:' === protocol && '443' !== port))) {
-        domain += ':' + port;
+        domain += `:${port}`;
     }
 
-    pagesProvider = [
+    const pagesProvider = [
         {
             title: 'Index page',
             state: '/tao/Test/index',
-            expected: domain + '/tao/Test/index'
+            expected: `${domain}/tao/Test/index`
         },
         {
             title: 'User page',
             state: {
                 url: '/tao/Test/user?id=foo#bar'
             },
-            expected: domain + '/tao/Test/user?id=foo#bar'
+            expected: `${domain}/tao/Test/user?id=foo#bar`
         },
         {
             title: 'Delivery page',
             state: {
                 url: '/tao/Test/delivery?delivery=bar'
             },
-            expected: domain + '/tao/Test/delivery?delivery=bar'
+            expected: `${domain}/tao/Test/delivery?delivery=bar`
         }
     ];
 
     QUnit.module('API', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             controller.removeAllListeners();
         },
-        afterEach: function(assert) {
+        afterEach: function() {
             window.history.replaceState(null, '', testerUrl);
         }
     });
@@ -104,27 +102,27 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
     });
 
     QUnit.cases.init(historyRouterApi).test('instance API ', function(data, assert) {
-        var instance = historyRouterFactory();
+        const instance = historyRouterFactory();
         assert.expect(1);
         assert.equal(
             typeof instance[data.title],
             'function',
-            'The historyRouter instance exposes a "' + data.title + '" function'
+            `The historyRouter instance exposes a "${data.title}" function`
         );
     });
 
     QUnit.module('States', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             controller.removeAllListeners();
         },
-        afterEach: function(assert) {
+        afterEach: function() {
             window.history.replaceState(null, '', testerUrl);
         }
     });
 
     QUnit.cases.init(pagesProvider).test('pushState', function(data, assert) {
-        var ready = assert.async();
-        var instance = historyRouterFactory();
+        const ready = assert.async();
+        const instance = historyRouterFactory();
 
         assert.expect(1);
 
@@ -141,8 +139,8 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
     });
 
     QUnit.cases.init(pagesProvider).test('replace', function(data, assert) {
-        var instance = historyRouterFactory();
-        var ready = assert.async();
+        const instance = historyRouterFactory();
+        const ready = assert.async();
 
         assert.expect(1);
 
@@ -159,8 +157,8 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
     });
 
     QUnit.test('forward', function(assert) {
-        var ready = assert.async();
-        var instance = historyRouterFactory();
+        const ready = assert.async();
+        const instance = historyRouterFactory();
 
         assert.expect(2);
 
@@ -181,10 +179,10 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
     });
 
     QUnit.test('redirect', function(assert) {
-        var ready = assert.async();
-        var instance = historyRouterFactory();
-        var url1 = domain + '/tao/Test/user';
-        var url2 = domain + '/tao/Test/delivery';
+        const ready = assert.async();
+        const instance = historyRouterFactory();
+        const url1 = `${domain}/tao/Test/user`;
+        const url2 = `${domain}/tao/Test/delivery`;
 
         assert.expect(3);
 
@@ -211,10 +209,10 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
     });
 
     QUnit.test('dispatch', function(assert) {
-        var ready = assert.async();
-        var instance = historyRouterFactory();
-        var url1 = domain + '/tao/Test/user';
-        var url2 = domain + '/tao/Test/delivery';
+        const ready = assert.async();
+        const instance = historyRouterFactory();
+        const url1 = `${domain}/tao/Test/user`;
+        const url2 = `${domain}/tao/Test/delivery`;
 
         assert.expect(3);
 
@@ -241,8 +239,8 @@ define(['core/historyRouter', 'test/core/historyRouter/mock/controller'], functi
     });
 
     QUnit.cases.init(errorsProvider).test('dispatch', function(data, assert) {
-        var instance = historyRouterFactory();
-        var ready = assert.async();
+        const instance = historyRouterFactory();
+        const ready = assert.async();
 
         assert.expect(1);
 

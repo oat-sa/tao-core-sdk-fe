@@ -755,7 +755,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
             assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
             return JSON.stringify({ accessToken: expiredAccessToken });
         });
-        
+
         $.mockjax([
             {
                 url: /^\/\/endpoint$/,

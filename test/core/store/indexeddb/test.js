@@ -32,7 +32,7 @@ define(['core/store/indexeddb', 'core/promise'], function(indexedDbBackend, Prom
             testDbs.forEach(function(dbName) {
                 req = idb.deleteDatabase(dbName);
                 req.onerror = function(event) {
-                    window.console.error('Error deleting test database ' + dbName, event);
+                    window.console.error(`Error deleting test database ${dbName}`, event);
                 };
             });
         }
