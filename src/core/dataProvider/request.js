@@ -62,8 +62,7 @@ export default function request(url, data, method, headers, background, noToken)
             return Promise.resolve();
         } else if (response.success) {
             return Promise.resolve(response.data);
-        }
-        else {
+        } else {
             return Promise.reject(response); // in case success:false different types of response
         }
     })

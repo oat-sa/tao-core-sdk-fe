@@ -19,7 +19,7 @@
 
 /**
  * Enables you to manage errors.
- * The error handler is context based, you throw errors in a conntext and
+ * The error handler is context based, you throw errors in a context and
  * then you can listen either a context or all errors.
  *
  * @example <caption>Listen for your context errors</caption>
@@ -36,7 +36,7 @@ import _ from 'lodash';
 /**
  * The error handler
  */
-var errorHandler = {
+const errorHandler = {
     /**
      * Keep contexts
      */
@@ -47,7 +47,7 @@ var errorHandler = {
      * @param {String} name - the context name
      * @returns {Object} the handling context
      */
-    getContext: function getContext(name) {
+    getContext(name) {
         if (_.isString(name) && name.length) {
             this._contexts[name] = this._contexts[name] || {
                 typedHandlers: {},
@@ -63,8 +63,8 @@ var errorHandler = {
      * @param {String} [type] - to listen by type of errors (it uses Error.name)
      * @param {Function} handler - the error handler, it has the error in parameter
      */
-    listen: function listen(name, type, handler) {
-        var context = this.getContext(name);
+    listen(name, type, handler) {
+        const context = this.getContext(name);
         if (context) {
             if (_.isFunction(type) && !handler) {
                 handler = type;
@@ -80,12 +80,13 @@ var errorHandler = {
     },
 
     /**
-     * Throw an error in this ontext
+     * Throw an error in this context
      * @param {String} name - the context name
      * @param {Error} err - the error with a message
+     * @returns {boolean}
      */
-    throw: function throwError(name, err) {
-        var context = this.getContext(name);
+    throw(name, err) {
+        const context = this.getContext(name);
         if (context) {
             if (_.isString(err)) {
                 err = new Error(err);
@@ -104,7 +105,7 @@ var errorHandler = {
      * Reset an error context
      * @param {String} name - the context name
      */
-    reset: function reset(name) {
+    reset(name) {
         if (this._contexts[name]) {
             this._contexts = _.omit(this._contexts, name);
         }

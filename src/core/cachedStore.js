@@ -24,7 +24,7 @@ import store from 'core/store';
  * The default name of the key storage indexing the persisted data
  * @type {String}
  */
-var defaultKey = 'cachedData';
+const defaultKey = 'cachedData';
 
 /**
  * Builds a cached store.
@@ -38,8 +38,8 @@ var defaultKey = 'cachedData';
 function cachedStoreFactory(storageName, storageKey) {
     storageKey = storageKey || defaultKey;
 
-    return store(storageName).then(function(storage) {
-        return storage.getItem(storageKey).then(function(data) {
+    return store(storageName).then(function (storage) {
+        return storage.getItem(storageKey).then(function (data) {
             // the persisted data set is always an object
             data = data || {};
 
@@ -52,7 +52,7 @@ function cachedStoreFactory(storageName, storageKey) {
                  * @param {String} name
                  * @returns {Object}
                  */
-                getItem: function getItem(name) {
+                getItem(name) {
                     return data[name];
                 },
 
@@ -62,7 +62,7 @@ function cachedStoreFactory(storageName, storageKey) {
                  * @param {Object} value
                  * @returns {Promise} Returns a promise that will be resolved if the data have been successfully stored
                  */
-                setItem: function setItem(name, value) {
+                setItem(name, value) {
                     data[name] = value;
                     return storage.setItem(storageKey, data);
                 },
@@ -72,8 +72,8 @@ function cachedStoreFactory(storageName, storageKey) {
                  * @param {String} name
                  * @returns {Promise} Returns a promise that will be resolved if the data have been successfully stored
                  */
-                removeItem: function removeItem(name) {
-                    data[name] = undefined;
+                removeItem(name) {
+                    data[name] = void 0;
                     return storage.setItem(storageKey, data);
                 },
 
@@ -81,7 +81,7 @@ function cachedStoreFactory(storageName, storageKey) {
                  * Clears the full data set
                  * @returns {Promise} Returns a promise that will be resolved if the data have been successfully erased
                  */
-                clear: function clear() {
+                clear() {
                     data = {};
                     return storage.removeItem(storageKey);
                 },
@@ -90,7 +90,7 @@ function cachedStoreFactory(storageName, storageKey) {
                  * Delete the database related to the current store
                  * @returns {Promise} with true in resolve once cleared
                  */
-                removeStore: function removeStore() {
+                removeStore() {
                     data = {};
                     return storage.removeStore();
                 }

@@ -29,7 +29,7 @@ import coreRequest from 'core/request';
  * @type {Object}
  * @private
  */
-var defaults = {
+const defaults = {
     timeout: 30 * 1000,
     interval: 30 * 1000,
     throttle: 1000
@@ -82,19 +82,17 @@ var defaults = {
  * @type {Object}
  */
 const pollProvider = {
-
     /**
      * The provider name
      */
-    name : 'poll',
+    name: 'poll',
 
     /**
      * Initializes the communication implementation
      * @returns {Promise}
      */
-    init: function init() {
-        var self = this;
-        var config = _.defaults(this.getConfig(), defaults);
+    init() {
+        const config = _.defaults(this.getConfig(), defaults);
 
         // validate the config
         if (!config.service) {
@@ -106,17 +104,17 @@ const pollProvider = {
         this.messagesQueue = [];
 
         this.request = function request() {
-            return new Promise(function(resolve) {
+            return new Promise(resolve => {
                 // split promises and their related messages
-                var promises = [];
-                var req = _.map(self.messagesQueue, function(msg) {
+                const promises = [];
+                const req = _.map(this.messagesQueue, function (msg) {
                     promises.push(msg.promise);
                     return {
                         channel: msg.channel,
                         message: msg.message
                     };
                 });
-                var defaultRequestParams = {
+                const defaultRequestParams = {
                     url: config.service,
                     method: 'POST',
                     headers: {},
@@ -127,43 +125,43 @@ const pollProvider = {
                     noToken: false,
                     timeout: config.timeout
                 };
-                var extendedRequestParams = Object.assign({}, defaultRequestParams, config.requestParams);
+                const extendedRequestParams = Object.assign({}, defaultRequestParams, config.requestParams);
 
                 // then reset the list of pending messages
-                self.messagesQueue = [];
+                this.messagesQueue = [];
 
                 coreRequest(extendedRequestParams)
-                    .then(function(response) {
+                    .then(response => {
                         // resolve each message promises
-                        _.forEach(promises, function(promise, idx) {
+                        _.forEach(promises, function (promise, idx) {
                             promise.resolve(response.responses && response.responses[idx]);
                         });
 
-                        if (!self.polling.is('stopped')) {
+                        if (!this.polling.is('stopped')) {
                             // receive server messages
-                            _.forEach(response.messages, function(msg) {
+                            _.forEach(response.messages, msg => {
                                 if (msg.channel) {
-                                    self.trigger('message', msg.channel, msg.message);
+                                    this.trigger('message', msg.channel, msg.message);
                                 } else {
-                                    self.trigger('message', 'malformed', msg);
+                                    this.trigger('message', 'malformed', msg);
                                 }
                             });
                         }
 
-                        self.trigger('receive', response);
+                        this.trigger('receive', response);
 
                         resolve();
                     })
-                    .catch(function(error) {
+                    .catch(error => {
                         error.source = 'network';
                         error.purpose = 'communicator';
 
                         // reject all message promises
-                        _.forEach(promises, function(promise) {
+                        _.forEach(promises, function (promise) {
                             promise.reject(error);
                         });
 
-                        self.trigger('error', error);
+                        this.trigger('error', error);
 
                         resolve();
                     });
@@ -172,20 +170,21 @@ const pollProvider = {
 
         // prepare the polling of the remote service
         // it will be started by the open() method
+        const callRequest = () => this.request();
         this.polling = pollingFactory({
             interval: config.interval,
             autoStart: false,
-            action: function communicatorPoll() {
-                var async = this.async();
-                self.request().then(function() {
+            action() {
+                const async = this.async();
+                callRequest().then(function () {
                     async.resolve();
                 });
             }
         });
 
         // adjust the message sending by throttle periods
-        this.throttledSend = _.throttle(function() {
-            self.polling.next();
+        this.throttledSend = _.throttle(() => {
+            this.polling.next();
         }, config.throttle);
 
         return Promise.resolve();
@@ -195,23 +194,21 @@ const pollProvider = {
      * Tears down the communication implementation
      * @returns {Promise}
      */
-    destroy: function destroy() {
-        var self = this;
-        var stopped;
+    destroy() {
+        let stopped;
 
         if (this.polling) {
-            stopped = new Promise(function(resolve) {
-                self.polling
-                    .off('stop.api')
-                    .on('stop.api', resolve)
-                    .stop();
+            stopped = new Promise(resolve => {
+                this.polling.off('stop.api').on('stop.api', resolve).stop();
             });
         } else {
             stopped = Promise.resolve();
         }
 
-        return stopped.then(function() {
-            self.polling = self.throttledSend = self.messagesQueue = null;
+        return stopped.then(() => {
+            this.polling = null;
+            this.throttledSend = null;
+            this.messagesQueue = null;
         });
     },
 
@@ -219,60 +216,41 @@ const pollProvider = {
      * Opens the connection with the remote service.
      * @returns {Promise}
      */
-    open: function open() {
-        var self = this;
-        var started;
-
+    open() {
         if (this.polling) {
-            started = new Promise(function(resolve) {
-                self.polling
-                    .off('next.api')
-                    .on('next.api', resolve)
-                    .start()
-                    .next();
+            return new Promise(resolve => {
+                this.polling.off('next.api').on('next.api', resolve).start().next();
             });
-        } else {
-            started = Promise.reject(new Error('The communicator has not been properly initialized'));
         }
-
-        return started;
+        return Promise.reject(new Error('The communicator has not been properly initialized'));
     },
 
     /**
      * Closes the connection with the remote service.
      * @returns {Promise}
      */
-    close: function close() {
-        var self = this;
-        var stopped;
-
+    close() {
         if (this.polling) {
-            stopped = new Promise(function(resolve) {
-                self.polling
-                    .off('stop.api')
-                    .on('stop.api', resolve)
-                    .stop();
+            return new Promise(resolve => {
+                this.polling.off('stop.api').on('stop.api', resolve).stop();
             });
-        } else {
-            stopped = Promise.reject(new Error('The communicator has not been properly initialized'));
         }
-
-        return stopped;
+        return Promise.reject(new Error('The communicator has not been properly initialized'));
     },
 
     /**
-     * Sends an messages through the communication implementation
+     * Sends messages through the communication implementation
      * @param {String} channel - The name of the communication channel to use
      * @param {Object} message - The message to send
      * @returns {Promise}
      */
-    send: function send(channel, message) {
+    send(channel, message) {
         // queue the message, it will be sent soon
-        var pending = {
+        const pending = {
             channel: channel,
             message: message
         };
-        var promise = new Promise(function(resolve, reject) {
+        const promise = new Promise(function (resolve, reject) {
             pending.promise = {
                 resolve: resolve,
                 reject: reject

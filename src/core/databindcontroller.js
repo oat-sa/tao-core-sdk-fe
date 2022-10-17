@@ -21,16 +21,16 @@ import _ from 'lodash';
 import DataBinder from 'core/databinder';
 
 export default {
-    takeControl: function($container, options) {
-        var control = {};
-        var model = {};
-        var binderOpts = _.pick(options, function(value, key) {
+    takeControl($container, options) {
+        const control = {};
+        let model = {};
+        const binderOpts = _.pick(options, function (value, key) {
             return key === 'encoders' || key === 'filters' || key === 'templates';
         });
 
         if (options.get) {
-            control.get = function get(cb, errBack) {
-                $.getJSON(options.get).done(function(data) {
+            control.get = function get(cb) {
+                $.getJSON(options.get).done(function (data) {
                     if (data) {
                         model = data;
                         new DataBinder($container, model, binderOpts).bind();
@@ -44,7 +44,7 @@ export default {
         }
         if (options.save) {
             control.save = function save(cb, errBack) {
-                var allowSave = true;
+                let allowSave = true;
                 if (typeof options.beforeSave === 'function') {
                     allowSave = !!options.beforeSave(model);
                 }
@@ -52,7 +52,7 @@ export default {
                     $.post(
                         options.save,
                         { model: JSON.stringify(model) },
-                        function(data) {
+                        function (data) {
                             if (data) {
                                 if (typeof cb === 'function') {
                                     cb(data);
@@ -60,7 +60,7 @@ export default {
                             }
                         },
                         'json'
-                    ).fail(function() {
+                    ).fail(function () {
                         if (typeof errBack === 'function') {
                             errBack();
                         }
