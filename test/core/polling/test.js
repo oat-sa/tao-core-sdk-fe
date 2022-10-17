@@ -30,7 +30,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
         assert.notStrictEqual(polling(), polling(), 'The polling factory provides a different object on each call');
     });
 
-    var testReviewApi = [
+    const testReviewApi = [
         { name: 'async', title: 'async' },
         { name: 'next', title: 'next' },
         { name: 'start', title: 'start' },
@@ -48,21 +48,21 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
     ];
 
     QUnit.cases.init(testReviewApi).test('instance API ', function(data, assert) {
-        var instance = polling();
+        const instance = polling();
         assert.expect(1);
         assert.equal(
             typeof instance[data.name],
             'function',
-            'The polling instance exposes a "' + data.title + '" function'
+            `The polling instance exposes a "${data.title}" function`
         );
     });
 
     QUnit.test('API', function(assert) {
-        var instance = polling();
-        var action = function() {};
-        var interval = 250;
-        var context = {};
-        var max = 3;
+        const instance = polling();
+        const action = function() {};
+        const interval = 250;
+        const context = {};
+        const max = 3;
 
         assert.expect(18);
 
@@ -92,7 +92,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
         );
         assert.equal(instance.getAction(), action, 'The polling instance has set the right action callback');
 
-        var instance2 = polling(action);
+        const instance2 = polling(action);
         assert.equal(instance2.getInterval(), 60000, 'The polling instance has set a default value for the interval');
         assert.equal(
             instance2.getContext(),
@@ -101,7 +101,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
         );
         assert.equal(instance2.getAction(), action, 'The polling instance has set the right action callback');
 
-        var instance3 = polling({
+        const instance3 = polling({
             action: action,
             interval: interval,
             context: context,
@@ -126,26 +126,26 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
     });
 
     QUnit.test('events', function(assert) {
-        var ready10 = assert.async();
-        var ready9 = assert.async();
-        var ready8 = assert.async();
-        var ready7 = assert.async(3);
-        var ready6 = assert.async();
-        var ready5 = assert.async(2);
-        var ready4 = assert.async(3);
-        var ready3 = assert.async(2);
-        var ready2 = assert.async();
-        var ready1 = assert.async(4);
-        var ready = assert.async();
-        var instance = polling();
+        const ready10 = assert.async();
+        const ready9 = assert.async();
+        const ready8 = assert.async();
+        const ready7 = assert.async(3);
+        const ready6 = assert.async();
+        const ready5 = assert.async(2);
+        const ready4 = assert.async(3);
+        const ready3 = assert.async(2);
+        const ready2 = assert.async();
+        const ready1 = assert.async(4);
+        const ready = assert.async();
+        const instance = polling();
 
-        var interval = 50;
-        var context = {
+        const interval = 50;
+        const context = {
             step: 0
         };
 
-        var action = function() {
-            var async;
+        const action = function() {
+            let async;
 
             assert.equal(instance.is('processing'), true, 'The instance must be in state processing');
 
@@ -185,7 +185,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
         instance.on('call', function() {
             assert.ok(
                 true,
-                'The polling instance triggers event when the action is called [step ' + context.step + ']'
+                `The polling instance triggers event when the action is called [step ${context.step}]`
             );
             ready1();
         });
@@ -195,9 +195,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
             assert.equal(instance.is('pending'), true, 'The instance must be in state pending');
             assert.ok(
                 true,
-                'The polling instance triggers event when the action is validated in async mode [step ' +
-                    context.step +
-                    ']'
+                `The polling instance triggers event when the action is validated in async mode [step ${context.step}]`
             );
             ready2();
         });
@@ -209,9 +207,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
             }
             assert.ok(
                 true,
-                'The polling instance triggers event when the action is canceled in async mode [step ' +
-                    context.step +
-                    ']'
+                `The polling instance triggers event when the action is canceled in async mode [step ${context.step}]`
             );
             ready3();
         });
@@ -219,7 +215,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
         instance.on('async', function(cb) {
             assert.ok(
                 true,
-                'The polling instance triggers event when the action is set to async mode [step ' + context.step + ']'
+                `The polling instance triggers event when the action is set to async mode [step ${context.step}]`
             );
             assert.equal(typeof cb, 'object', 'The first parameter of the async event is the resolve object');
             assert.ok(cb.resolve, 'The first parameter of the async event has a resolve method');
@@ -231,9 +227,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
             assert.equal(instance.is('stopped'), false, 'The instance must not be in state stopped');
             assert.ok(
                 true,
-                'The polling instance triggers event when the action is triggered immediately [step ' +
-                    context.step +
-                    ']'
+                `The polling instance triggers event when the action is triggered immediately [step ${context.step}]`
             );
             ready5();
         });
@@ -243,7 +237,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
             assert.equal(instance.is('stopped'), false, 'The instance must not be in state stopped');
             assert.ok(
                 true,
-                'The polling instance triggers event when the polling is started [step ' + context.step + ']'
+                `The polling instance triggers event when the polling is started [step ${context.step}]`
             );
             ready6();
         });
@@ -253,7 +247,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
             assert.equal(instance.is('stopped'), true, 'The instance must be in state stopped');
             assert.ok(
                 true,
-                'The polling instance triggers event when the polling is stopped [step ' + context.step + ']'
+                `The polling instance triggers event when the polling is stopped [step ${context.step}]`
             );
             ready7();
 
@@ -291,19 +285,19 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
     });
 
     QUnit.test('limit', function(assert) {
-        var ready1 = assert.async();
-        var ready = assert.async(3);
-        var instance = polling();
-        var max = 3;
-        var interval = 50;
-        var context = {
+        const ready1 = assert.async();
+        const ready = assert.async(3);
+        const instance = polling();
+        const max = 3;
+        const interval = 50;
+        const context = {
             step: 0
         };
 
-        var action = function() {
+        const action = function() {
             this.step++;
-            assert.equal(instance.getIteration(), this.step, 'The iteration is counted #' + this.step);
-            assert.ok(instance.getIteration() <= max, 'The number of iterations is under the max #' + this.step);
+            assert.equal(instance.getIteration(), this.step, `The iteration is counted #${  this.step}`);
+            assert.ok(instance.getIteration() <= max, `The number of iterations is under the max #${  this.step}`);
             ready();
         };
 
@@ -322,7 +316,7 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
 
         assert.equal(instance.getMax(), max, 'The mex number of iteration is correct');
 
-        var instance2 = polling({
+        const instance2 = polling({
             action: _.noop,
             max: 2
         });
@@ -333,8 +327,8 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
     });
 
     QUnit.test('autoStart', function(assert) {
-        var ready = assert.async();
-        var instance = polling({
+        const ready = assert.async();
+        const instance = polling({
             action: function() {
                 assert.ok(true, 'The instance has auto started the polling');
             },
@@ -352,10 +346,11 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
     });
 
     QUnit.test('next pending', function(assert) {
-        var ready = assert.async();
-        var instance = polling({
+        const ready = assert.async();
+        let count = 0;
+        const instance = polling({
             action: function() {
-                var async = this.async();
+                const async = this.async();
 
                 assert.ok(true, 'The next() method has force an iteration');
                 count++;
@@ -371,7 +366,6 @@ define(['jquery', 'lodash', 'core/polling'], function($, _, polling) {
             },
             interval: 200
         });
-        var count = 0;
 
         assert.expect(4);
 

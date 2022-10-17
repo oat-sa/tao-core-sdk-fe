@@ -49,16 +49,16 @@ define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise
         assert.equal(
             typeof instance[data.name],
             'function',
-            'The tokenHandler instance exposes a "' + data.name + '" function'
+            `The tokenHandler instance exposes a "${data.name}" function`
         );
     });
 
     QUnit.module('behaviour', {
         beforeEach: function() {
-            this.cachedModuleConfig = requirejs.s.contexts._.config.config['core/tokenHandler'];
+            this.cachedModuleConfig = window.requirejs.s.contexts._.config.config['core/tokenHandler'];
         },
         afterEach: function() {
-            requirejs.s.contexts._.config.config['core/tokenHandler'] = this.cachedModuleConfig;
+            window.requirejs.s.contexts._.config.config['core/tokenHandler'] = this.cachedModuleConfig;
         }
     });
 
@@ -133,7 +133,7 @@ define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise
         assert.expect(2);
 
         if (data.moduleOptions) {
-            requirejs.s.contexts._.config.config['core/tokenHandler'] = data.moduleOptions;
+            window.requirejs.s.contexts._.config.config['core/tokenHandler'] = data.moduleOptions;
         }
         tokenHandler = tokenHandlerFactory(data.options);
 

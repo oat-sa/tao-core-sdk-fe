@@ -128,13 +128,13 @@ define(['jquery', 'lodash', 'core/dataProvider/request', 'core/promise'], functi
                                 }
                                 response[0].data.requestHeaders = options.headers;
                             }
-                            cb.apply(null, response);
+                            cb(...response);
                         }
                         return this;
                     },
                     fail: function(cb) {
                         if (errors[options.url]) {
-                            cb.apply(null, errors[options.url]);
+                            cb(...errors[options.url]);
                         }
                         return this;
                     }

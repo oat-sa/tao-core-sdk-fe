@@ -58,7 +58,7 @@ define(['jquery', 'lodash', 'core/communicator', 'core/communicator/poll', 'jque
         assert.equal(
             typeof poll[data.name],
             'function',
-            'The communicator/poll api exposes a "' + data.name + '" function'
+            `The communicator/poll api exposes a "${data.name}" function`
         );
     });
 
