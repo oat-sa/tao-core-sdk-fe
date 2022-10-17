@@ -283,7 +283,7 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
             .then( ready );
     });
 
-    QUnit.test('load a bundle', function(assert) {
+    QUnit.test('load a bundle using RequireJS', function(assert) {
         var ready = assert.async();
         var module = {
             module: 'test/core/moduleLoader/mockAModule',
@@ -312,6 +312,42 @@ define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader
             })
             .catch(function(e) {
                 assert.ok(false, e);
+                ready();
+            });
+    });
+
+    QUnit.test('load a bundle using dynamic import', function (assert) {
+        const ready = assert.async();
+        const module = {
+            module: 'test/core/moduleLoader/mockAModule',
+            bundle: 'test/core/moduleLoader/mockBundle.min',
+            category: 'mock'
+        };
+
+        const define = window.define;
+        window.define = null;
+
+        assert.expect(5);
+
+        const loader = moduleLoader([], _.isFunction);
+
+        assert.equal(typeof loader, 'object', 'The loader is an object');
+        assert.deepEqual(loader.add(module), loader, 'The loader chains');
+
+        const promise = loader.load(true);
+
+        assert.ok(promise instanceof Promise, 'The load method returns a Promise');
+        assert.deepEqual(loader.getModules('mock'), [], 'The loader mock category is empty');
+
+        promise
+            .then(() => {
+                assert.equal(loader.getModules('mock').length, 1, 'The mock category contains now one module');
+            })
+            .catch(e => {
+                assert.ok(false, e);
+            })
+            .then(() => {
+                window.define = define;
                 ready();
             });
     });
