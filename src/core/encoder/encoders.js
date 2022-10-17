@@ -29,35 +29,34 @@ import entity from 'core/encoder/entity';
  * @param {string} name - the declaration : array(a,b)
  * @returns {array} of extracted args
  */
-var extractArgs = function extractArgs(name) {
-    var args = [];
-    var matches = [];
+function extractArgs(name) {
+    let args = [];
     if (name.indexOf('(') > -1) {
-        matches = /\((.+?)\)/.exec(name);
+        const matches = /\((.+?)\)/.exec(name);
         if (matches && matches.length >= 1) {
             args = matches[1].split(',');
         }
     }
     return args;
-};
+}
 
 /**
  * Extract the name from a function declaration:   "foo(a,b)" return foo
  * @param {string} name - the declaration : foo(a,b)
  * @returns {string} the name
  */
-var extractName = function extractName(name) {
+function extractName(name) {
     if (name.indexOf('(') > -1) {
         return name.substr(0, name.indexOf('('));
     }
     return name;
-};
+}
 
 /**
  * Provides multi sources encoding decoding
  * @exports core/encoder/encoders
  */
-var encoders = {
+const encoders = {
     number: number,
     float: float,
     time: time,
@@ -66,7 +65,7 @@ var encoders = {
     str2array: str2array,
     entity: entity,
 
-    register: function(name, encode, decode) {
+    register(name, encode, decode) {
         if (!_.isString(name)) {
             throw new Error('An encoder must have a valid name');
         }
@@ -76,29 +75,25 @@ var encoders = {
         if (!_.isFunction(decode)) {
             throw new Error('Decode must be a function');
         }
-        this[name] = { encode: encode, decode: decode };
+        this[name] = { encode, decode };
     },
 
-    encode: function(name, value) {
-        var encoder, args;
-
+    encode(name, value) {
         name = extractName(name);
         if (this[name]) {
-            encoder = this[name];
-            args = [value];
-            return encoder.encode.apply(encoder, args.concat(extractArgs(name)));
+            const encoder = this[name];
+            const args = [value, ...extractArgs(name)];
+            return encoder.encode(...args);
         }
         return value;
     },
 
-    decode: function(name, value) {
-        var decoder, args;
-
+    decode(name, value) {
         name = extractName(name);
         if (this[name]) {
-            decoder = this[name];
-            args = [value];
-            return decoder.decode.apply(decoder, args.concat(extractArgs(name)));
+            const decoder = this[name];
+            const args = [value, ...extractArgs(name)];
+            return decoder.decode(...args);
         }
         return value;
     }

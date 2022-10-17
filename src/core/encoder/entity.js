@@ -26,7 +26,7 @@
  * The list of chars to be encoded
  * @type {String[]}
  */
-var guiltyChars = ['&', '<', '>', '"'];
+const guiltyChars = ['&', '<', '>', '"'];
 
 export default {
     /**
@@ -34,13 +34,13 @@ export default {
      * @param {String} input
      * @returns {String} encoded input
      */
-    encode: function encode(input) {
-        input = input + '';
+    encode(input) {
+        input = `${input}`;
 
         return input
             .split('')
-            .map(function(character) {
-                return guiltyChars.indexOf(character) > -1 ? '&#' + character.charCodeAt() + ';' : character;
+            .map(function (character) {
+                return guiltyChars.indexOf(character) > -1 ? `&#${character.charCodeAt()};` : character;
             })
             .join('');
     },
@@ -50,10 +50,10 @@ export default {
      * @param {String} input - with html entity chars
      * @returns {String} decoded
      */
-    decode: function decode(input) {
-        input = input + '';
+    decode(input) {
+        input = `${input}`;
 
-        return input.replace(/&#(\d+);/g, function(matches, code) {
+        return input.replace(/&#(\d+);/g, function (matches, code) {
             return String.fromCharCode(code);
         });
     }

@@ -123,7 +123,7 @@ import eventifier from 'core/eventifier';
  * @type {Number}
  * @private
  */
-var _defaultInterval = 60 * 1000;
+const _defaultInterval = 60 * 1000;
 
 /**
  * Create a polling manager for a particular action
@@ -133,86 +133,36 @@ var _defaultInterval = 60 * 1000;
  * @param {Number|String} [config.max] - Set a max number of iterations, after what the polling is stopped.
  * @param {Boolean} [config.autoStart] - Whether or not the polling should start immediately
  * @param {Object} [config.context] - An optional context to apply on each action call
+ * @param {number} pollingInterval - The minimal time between two iterations (to be set when the first parameter is a function)
  * @returns {polling}
  */
-var pollingFactory = function pollingFactory(config) {
-    var timer, promise, interval, max, iter, action, context, autoStart;
-    var state = {};
-
-    /**
-     * Fires a new timer
-     */
-    var startTimer = function startTimer() {
-        timer = setTimeout(iteration, interval);
-        state.stopped = false;
-        state.pending = true;
-    };
-
-    /**
-     * Stops the current timer
-     */
-    var stopTimer = function stopTimer() {
-        clearTimeout(timer);
-        timer = null;
-        state.stopped = true;
-        state.pending = false;
-    };
-
-    /**
-     * Runs an iteration of the polling loop
-     */
-    var iteration = function iteration() {
-        // prevent more iterations than needed to be ran
-        if (max && iter >= max) {
-            // breaks the polling
-            polling.stop();
-            return;
-        }
-
-        // count the iteration
-        iter = (iter || 0) + 1;
-        state.processing = true;
-        state.pending = false;
-
-        /**
-         * Notifies the action is about to be called
-         * @event polling#call
-         */
-        polling.trigger('call');
-
-        // process the action in the right context
-        action.call(context, polling);
-
-        // next iteration in synchronous mode
-        if (!promise && !state.stopped) {
-            state.processing = false;
-            startTimer();
-        }
-    };
+function pollingFactory(config, pollingInterval = _defaultInterval) {
+    let timer, promise, interval, max, iter, action, context, autoStart;
+    const state = {};
 
     /**
      * Defines the polling manager
      * @type {Object}
      */
-    var polling = {
+    const polling = {
         /**
          * Gets the current action into asynchronous mode.
          * The next iteration won't be executed until the resolve method has been called.
          * However if the reject method is called, the polling is then stopped!
          * @returns {Object} Returns a promise resolver that provides resolve() and reject() methods
          */
-        async: function async() {
-            var resolver = {};
+        async() {
+            const resolver = {};
 
             // create a promise and extract the control callbacks
-            promise = new Promise(function(resolve, reject) {
+            promise = new Promise(function (resolve, reject) {
                 resolver.resolve = resolve;
                 resolver.reject = reject;
             });
 
             // directly install the pending actions
             promise
-                .then(function() {
+                .then(function () {
                     promise = null;
                     state.processing = false;
 
@@ -227,7 +177,7 @@ var pollingFactory = function pollingFactory(config) {
                      */
                     polling.trigger('resolved');
                 })
-                .catch(function() {
+                .catch(function () {
                     promise = null;
                     state.processing = false;
 
@@ -258,7 +208,7 @@ var pollingFactory = function pollingFactory(config) {
          * If the polling has been stopped, start it again.
          * @returns {polling}
          */
-        next: function next() {
+        next() {
             var _next;
 
             // reset the counter if the polling is stopped
@@ -299,7 +249,7 @@ var pollingFactory = function pollingFactory(config) {
          * Starts the polling if it is not currently running
          * @returns {polling}
          */
-        start: function start() {
+        start() {
             if (!timer) {
                 iter = 0;
                 startTimer();
@@ -317,7 +267,7 @@ var pollingFactory = function pollingFactory(config) {
          * Stops the polling if it is currently running
          * @returns {polling}
          */
-        stop: function stop() {
+        stop() {
             stopTimer();
 
             /**
@@ -334,7 +284,7 @@ var pollingFactory = function pollingFactory(config) {
          * @param {Number|String} value
          * @returns {polling}
          */
-        setInterval: function setInterval(value) {
+        setInterval(value) {
             interval = Math.abs(parseInt(value, 10) || _defaultInterval);
 
             /**
@@ -351,7 +301,7 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the minimum time interval between two actions
          * @returns {Number}
          */
-        getInterval: function getInterval() {
+        getInterval() {
             return interval;
         },
 
@@ -360,7 +310,7 @@ var pollingFactory = function pollingFactory(config) {
          * @param {Function} fn
          * @returns {polling}
          */
-        setAction: function setAction(fn) {
+        setAction(fn) {
             action = fn;
 
             /**
@@ -377,7 +327,7 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the polling action
          * @returns {Function}
          */
-        getAction: function getAction() {
+        getAction() {
             return action;
         },
 
@@ -386,7 +336,7 @@ var pollingFactory = function pollingFactory(config) {
          * @param {Object} ctx
          * @returns {polling}
          */
-        setContext: function setContext(ctx) {
+        setContext(ctx) {
             context = ctx || this;
 
             /**
@@ -403,7 +353,7 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the context applied on each action call
          * @returns {Object}
          */
-        getContext: function getContext() {
+        getContext() {
             return context;
         },
 
@@ -412,7 +362,7 @@ var pollingFactory = function pollingFactory(config) {
          * @param {Number} value
          * @returns {polling}
          */
-        setMax: function setMax(value) {
+        setMax(value) {
             max = Math.abs(parseInt(value, 10) || 0);
             return this;
         },
@@ -421,7 +371,7 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the max number of polling occurrences
          * @returns {Number}
          */
-        getMax: function getMax() {
+        getMax() {
             return max;
         },
 
@@ -429,7 +379,7 @@ var pollingFactory = function pollingFactory(config) {
          * Gets the number of ran iterations
          * @returns {Number}
          */
-        getIteration: function getIteration() {
+        getIteration() {
             return iter || 0;
         },
 
@@ -445,6 +395,57 @@ var pollingFactory = function pollingFactory(config) {
             return !!state[stateName];
         }
     };
+
+    /**
+     * Fires a new timer
+     */
+    function startTimer() {
+        timer = setTimeout(iteration, interval);
+        state.stopped = false;
+        state.pending = true;
+    }
+
+    /**
+     * Stops the current timer
+     */
+    function stopTimer() {
+        clearTimeout(timer);
+        timer = null;
+        state.stopped = true;
+        state.pending = false;
+    }
+
+    /**
+     * Runs an iteration of the polling loop
+     */
+    function iteration() {
+        // prevent more iterations than needed to be ran
+        if (max && iter >= max) {
+            // breaks the polling
+            polling.stop();
+            return;
+        }
+
+        // count the iteration
+        iter = (iter || 0) + 1;
+        state.processing = true;
+        state.pending = false;
+
+        /**
+         * Notifies the action is about to be called
+         * @event polling#call
+         */
+        polling.trigger('call');
+
+        // process the action in the right context
+        action.call(context, polling);
+
+        // next iteration in synchronous mode
+        if (!promise && !state.stopped) {
+            state.processing = false;
+            startTimer();
+        }
+    }
 
     eventifier(polling);
 
@@ -465,7 +466,7 @@ var pollingFactory = function pollingFactory(config) {
     // loads the config
     if (_.isObject(config)) {
         polling.setAction(config.action);
-        polling.setInterval(config.interval || arguments[1]);
+        polling.setInterval(config.interval || pollingInterval);
         polling.setContext(config.context);
         polling.setMax(config.max);
         autoStart = !!config.autoStart;
@@ -476,6 +477,6 @@ var pollingFactory = function pollingFactory(config) {
     }
 
     return polling;
-};
+}
 
 export default pollingFactory;

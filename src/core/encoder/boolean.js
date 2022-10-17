@@ -17,11 +17,11 @@
  */
 
 export default {
-    encode: function(modelValue) {
+    encode(modelValue) {
         return modelValue === true ? 'true' : 'false';
     },
 
-    decode: function(nodeValue) {
+    decode(nodeValue) {
         return nodeValue === 'true';
     }
 };

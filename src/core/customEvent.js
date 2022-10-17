@@ -19,8 +19,8 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 
-var createEvent;
-var dispatchEvent;
+let createEvent;
+let dispatchEvent;
 
 /**
  * Creates an event
@@ -30,7 +30,7 @@ var dispatchEvent;
  */
 if (window.CustomEvent) {
     createEvent = function createEventUsingCustomEvent(eventName, data) {
-        var event;
+        let event;
         try {
             event = new CustomEvent(eventName, {
                 detail: data,
@@ -45,14 +45,14 @@ if (window.CustomEvent) {
     };
 } else if (document.createEvent) {
     createEvent = function createEventUsingCreateEvent(eventName, data) {
-        var event = document.createEvent('Event');
+        const event = document.createEvent('Event');
         event.initEvent(eventName, true, true);
         event.detail = data;
         return event;
     };
 } else if (document.createEventObject) {
     createEvent = function createEventUsingCreateEventObject(eventName, data) {
-        var event = document.createEventObject();
+        const event = document.createEventObject();
         event.detail = data;
         return event;
     };
@@ -79,7 +79,7 @@ if (document.dispatchEvent) {
 } else if (document.fireEvent) {
     dispatchEvent = function dispatchEventUsingFireEvent(element, eventName, event) {
         if (element) {
-            element.fireEvent('on' + eventName, event);
+            element.fireEvent(`on${eventName}`, event);
             return true;
         }
         return false;
@@ -97,9 +97,9 @@ if (document.dispatchEvent) {
  * @param {*} data
  * @returns {Boolean} Returns true if the event has been successfully triggered
  */
-var triggerCustomEvent = function triggerCustomEvent(element, eventName, data) {
-    var event = createEvent(eventName, data);
+function triggerCustomEvent(element, eventName, data) {
+    const event = createEvent(eventName, data);
     return dispatchEvent(element, eventName, event);
-};
+}
 
 export default triggerCustomEvent;
