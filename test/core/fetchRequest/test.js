@@ -183,8 +183,8 @@ define([
         );
 
         request('/foo').catch(error => {
-            error.response.json().then(error => {
-                assert.equal(error.errorMessage, 'Cannot trigger ABC');
+            error.response.json().then(err => {
+                assert.equal(err.errorMessage, 'Cannot trigger ABC');
                 done();
             });
         });

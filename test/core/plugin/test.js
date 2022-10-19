@@ -25,17 +25,17 @@
 define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, eventifier) {
     'use strict';
 
-    var mockProvider = {
+    const mockProvider = {
         name: 'foo',
         init: _.noop
     };
 
-    var defaultConfig = {
+    const defaultConfig = {
         a: false,
         b: 10
     };
 
-    var mockHost = {
+    const mockHost = {
         on: _.noop,
         trigger: _.noop
     };
@@ -98,7 +98,7 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
     QUnit.test('instantiation', function(assert) {
         assert.expect(21);
 
-        var myPlugin = pluginFactory(mockProvider, defaultConfig);
+        const myPlugin = pluginFactory(mockProvider, defaultConfig);
 
         assert.throws(
             function() {
@@ -123,7 +123,7 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
             'My plugin factory provides different object on each call'
         );
 
-        var plugin = myPlugin(mockHost);
+        const plugin = myPlugin(mockHost);
         assert.equal(typeof plugin.init, 'function', 'The plugin instance has also the default function init');
         assert.equal(
             typeof plugin.getAreaBroker,
@@ -166,22 +166,22 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
     QUnit.test('config', function(assert) {
         assert.expect(8);
 
-        var myPlugin = pluginFactory(mockProvider, defaultConfig);
-        var myAreaBroker = {};
-        var instanceConfig = { c: 'c' };
-        var plugin = myPlugin(mockHost, myAreaBroker, instanceConfig);
+        const myPlugin = pluginFactory(mockProvider, defaultConfig);
+        const myAreaBroker = {};
+        const instanceConfig = { c: 'c' };
+        const plugin = myPlugin(mockHost, myAreaBroker, instanceConfig);
 
         assert.equal(typeof plugin, 'object', 'My plugin factory produce a plugin instance object');
 
-        var config1 = plugin.getConfig();
+        const config1 = plugin.getConfig();
         assert.equal(config1.a, defaultConfig.a, 'instance1 inherits the default config "a"');
         assert.equal(config1.b, defaultConfig.b, 'instance1 inherit the default config "b"');
         assert.equal(config1.c, instanceConfig.c, 'instance1 inherit the default config "c"');
 
-        var areaBroker = plugin.getAreaBroker();
+        const areaBroker = plugin.getAreaBroker();
         assert.equal(areaBroker, myAreaBroker, 'instance1 inherit the provided areaBroker');
 
-        var config2 = {
+        const config2 = {
             a: true,
             b: 999
         };
@@ -197,14 +197,14 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
     QUnit.test('methods', function(assert) {
         assert.expect(13);
 
-        var samplePluginImpl = {
+        const samplePluginImpl = {
             name: 'samplePluginImpl',
             install: function() {
                 assert.ok(true, 'called install');
                 assert.equal(this.getHost(), mockHost, 'instance1 has a host when install() is called');
             },
             init: function() {
-                var config = this.getConfig();
+                const config = this.getConfig();
                 assert.ok(true, 'called init');
 
                 assert.equal(config.a, defaultConfig.a, 'instance1 inherits the default config');
@@ -233,11 +233,11 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
             }
         };
 
-        var myPlugin = pluginFactory(samplePluginImpl, defaultConfig);
+        const myPlugin = pluginFactory(samplePluginImpl, defaultConfig);
 
         assert.equal(typeof myPlugin(mockHost), 'object', 'My plugin factory produce a plugin instance object');
 
-        var instance1 = myPlugin(mockHost);
+        const instance1 = myPlugin(mockHost);
         instance1.install();
         instance1.init();
         instance1.render();
@@ -250,14 +250,14 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
     });
 
     QUnit.test('state', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(14);
 
-        var myPlugin = pluginFactory(mockProvider);
+        const myPlugin = pluginFactory(mockProvider);
 
         assert.equal(typeof myPlugin(mockHost), 'object', 'My plugin factory produce a plugin instance object');
 
-        var instance1 = myPlugin(mockHost);
+        const instance1 = myPlugin(mockHost);
 
         assert.throws(
             function() {
@@ -310,10 +310,10 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
     QUnit.test('host name alias', function(assert) {
         assert.expect(3);
 
-        var myPlugin = pluginFactory(mockProvider, {
+        const myPlugin = pluginFactory(mockProvider, {
             hostName: 'fooStopper'
         });
-        var plugin = myPlugin(mockHost);
+        const plugin = myPlugin(mockHost);
 
         assert.equal(typeof plugin, 'object', 'My plugin factory produce a plugin instance object');
         assert.equal(typeof plugin.getFooStopper, 'function', 'Getter with alias has been created');
@@ -322,8 +322,8 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
 
     QUnit.test('host binding', function(assert) {
         assert.expect(4);
-        var value1 = 'xxx';
-        var host = {
+        const value1 = 'xxx';
+        const host = {
             prop1: 123,
             method1: function() {
                 return value1;
@@ -332,7 +332,7 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
             trigger: _.noop
         };
 
-        var samplePluginImpl = {
+        const samplePluginImpl = {
             name: 'hostPlugin',
             init: function() {
                 assert.ok(true, 'called init');
@@ -342,49 +342,49 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
             }
         };
 
-        var myPlugin = pluginFactory(samplePluginImpl);
+        const myPlugin = pluginFactory(samplePluginImpl);
 
-        var instance1 = myPlugin(host);
+        const instance1 = myPlugin(host);
         instance1.init();
         assert.strictEqual(instance1.getHost(), host, 'root component is set');
     });
 
     QUnit.test('root component event', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(6);
 
-        var eventParams = ['ABC', true, 12345];
-        var myPlugin = pluginFactory({
+        const eventParams = ['ABC', true, 12345];
+        const myPlugin = pluginFactory({
             name: 'pluginA',
             init: function() {
                 this.trigger('someEvent', eventParams[0], eventParams[1], eventParams[2]);
             }
         });
 
-        var host = eventifier()
-            .on('plugin-init.pluginA', function(plugin) {
-                assert.ok(true, 'root component knows knows that pluginA has been initialized');
-                assert.deepEqual(plugin, instance1, 'The given plugin instance is correct');
-                ready();
-            })
-            .on('plugin-someEvent.pluginA', function(plugin, arg1, arg2, arg3) {
-                assert.ok(true, 'someEvent triggered and forwarded to root component');
-                assert.strictEqual(eventParams[0], arg1, 'event param ok');
-                assert.strictEqual(eventParams[1], arg2, 'event param ok');
-                assert.strictEqual(eventParams[2], arg3, 'event param ok');
-            });
-
-        var instance1 = myPlugin(host);
+        const instance1 = myPlugin(
+            eventifier()
+                .on('plugin-init.pluginA', function (plugin) {
+                    assert.ok(true, 'root component knows knows that pluginA has been initialized');
+                    assert.deepEqual(plugin, instance1, 'The given plugin instance is correct');
+                    ready();
+                })
+                .on('plugin-someEvent.pluginA', function (plugin, arg1, arg2, arg3) {
+                    assert.ok(true, 'someEvent triggered and forwarded to root component');
+                    assert.strictEqual(eventParams[0], arg1, 'event param ok');
+                    assert.strictEqual(eventParams[1], arg2, 'event param ok');
+                    assert.strictEqual(eventParams[2], arg3, 'event param ok');
+                })
+        );
         instance1.init();
     });
 
     QUnit.test('get plugin name', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(3);
 
-        var name = 'foo-plugin';
+        const name = 'foo-plugin';
 
-        var samplePluginImpl = {
+        const samplePluginImpl = {
             name: name,
             init: function() {
                 assert.ok(true, 'called init');
@@ -393,22 +393,22 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
             }
         };
 
-        var myPlugin = pluginFactory(samplePluginImpl);
+        const myPlugin = pluginFactory(samplePluginImpl);
 
-        var instance1 = myPlugin(mockHost);
+        const instance1 = myPlugin(mockHost);
         assert.equal(instance1.getName(), name, 'The name matches');
         instance1.init();
     });
 
     QUnit.test('plugin content', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(4);
 
-        var name = 'foo-plugin';
-        var content1 = { foo: 'bar' };
-        var content2 = { foo: 'moo' };
+        const name = 'foo-plugin';
+        const content1 = { foo: 'bar' };
+        const content2 = { foo: 'moo' };
 
-        var myPlugin = pluginFactory({
+        const myPlugin = pluginFactory({
             name: name,
             init: function(data) {
                 assert.deepEqual(data, content1, 'The given content is correct');
@@ -416,7 +416,7 @@ define(['lodash', 'core/plugin', 'core/eventifier'], function(_, pluginFactory, 
             }
         });
 
-        var instance1 = myPlugin(mockHost);
+        const instance1 = myPlugin(mockHost);
         instance1.init(content1).then(function() {
             assert.deepEqual(instance1.setContent(content2), instance1, 'The method set content chains');
             assert.deepEqual(instance1.getContent(), content2, 'The given content is up to date');
