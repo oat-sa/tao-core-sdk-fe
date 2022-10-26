@@ -22,7 +22,7 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define(['util/url', 'context'], function(urlUtil, context) {
+define(['util/url', 'context'], function (urlUtil, context) {
     'use strict';
 
     var parseDataProvider;
@@ -34,7 +34,7 @@ define(['util/url', 'context'], function(urlUtil, context) {
 
     QUnit.module('API');
 
-    QUnit.test('util api', function(assert) {
+    QUnit.test('util api', function (assert) {
         assert.expect(8);
 
         assert.ok(typeof urlUtil === 'object', 'The urlUtil module exposes an object');
@@ -94,12 +94,12 @@ define(['util/url', 'context'], function(urlUtil, context) {
         }
     ];
 
-    QUnit.cases.init(parseDataProvider).test('parse ', function(data, assert) {
+    QUnit.cases.init(parseDataProvider).test('parse ', function (data, assert) {
         var key;
         var result = urlUtil.parse(data.url);
         assert.ok(typeof result === 'object', 'The result is an object');
         for (key in data.expected) {
-            assert.equal(result[key], data.expected[key], key + ' has the expected value');
+            assert.equal(result[key], data.expected[key], `${key} has the expected value`);
         }
     });
 
@@ -153,29 +153,29 @@ define(['util/url', 'context'], function(urlUtil, context) {
         }
     ];
 
-    QUnit.cases.init(isAbsoluteDataProvider).test('isAbsolute ', function(data, assert) {
+    QUnit.cases.init(isAbsoluteDataProvider).test('isAbsolute ', function (data, assert) {
         assert.equal(
             urlUtil.isAbsolute(data.url),
             data.absolute,
-            'The URL ' + data.url + ' ' + (data.absolute ? 'is' : 'is not') + ' absolute'
+            `The URL ${data.url} ${data.absolute ? 'is' : 'is not'} absolute`
         );
         assert.equal(
             urlUtil.isAbsolute(urlUtil.parse(data.url)),
             data.absolute,
-            'The parsed URL ' + data.url + ' ' + (data.absolute ? 'is' : 'is not') + ' absolute'
+            `The parsed URL ${data.url} ${data.absolute ? 'is' : 'is not'} absolute`
         );
     });
 
-    QUnit.cases.init(isAbsoluteDataProvider).test('isRelative ', function(data, assert) {
+    QUnit.cases.init(isAbsoluteDataProvider).test('isRelative ', function (data, assert) {
         assert.equal(
             urlUtil.isRelative(data.url),
             !data.absolute,
-            'The URL ' + data.url + ' ' + (!data.absolute ? 'is' : 'is not') + ' relative'
+            `'The URL ${data.url} ${!data.absolute ? 'is' : 'is not'} relative`
         );
         assert.equal(
             urlUtil.isRelative(urlUtil.parse(data.url)),
             !data.absolute,
-            'The parsed URL ' + data.url + ' ' + (!data.absolute ? 'is' : 'is not') + ' relative'
+            `The parsed URL ${data.url} ${!data.absolute ? 'is' : 'is not'} relative`
         );
     });
 
@@ -197,22 +197,17 @@ define(['util/url', 'context'], function(urlUtil, context) {
         },
         {
             title: 'base64 image',
-            url:
-                'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAFiSURBVBgZpcEhbpRRGIXh99x7IU0asGBJWEIdCLaAqcFiCArFCkjA0KRJF0EF26kkFbVVdEj6/985zJ0wBjfp8ygJD6G3n358fP3m5NvtJscJYBObchEHx6QKJ6SKsnn6eLm7urr5/PP76cU4eXVy/ujouD074hDHd5s6By7GZknb3P7mUH+WNLZGKnx595JDvf96zTQSM92vRYA4lMEEO5RNraHWUDH3FV48f0K5mAYJk5pQQpqIgixaE1JDKtRDd2OsYfJaTKNcTA2IBIIesMAOPdDUGYJSqGYml5lGHHYkSGhAJBBIkAoWREAT3Z3JLqZhF3uS2EloQCQ8xLBxoAEWO7aZxros7EgISIIkwlZCY6s1OlAJTWFal5VppMzUgbAlQcIkiT0DXSI2U2ymYZs9AWJL4n+df3pncsI0bn5dX344W05dhctUFbapZcE2ToiLVHBMbGymS7aUhIdoPNBf7Jjw/gQ77u4AAAAASUVORK5CYII=',
+            url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAFiSURBVBgZpcEhbpRRGIXh99x7IU0asGBJWEIdCLaAqcFiCArFCkjA0KRJF0EF26kkFbVVdEj6/985zJ0wBjfp8ygJD6G3n358fP3m5NvtJscJYBObchEHx6QKJ6SKsnn6eLm7urr5/PP76cU4eXVy/ujouD074hDHd5s6By7GZknb3P7mUH+WNLZGKnx595JDvf96zTQSM92vRYA4lMEEO5RNraHWUDH3FV48f0K5mAYJk5pQQpqIgixaE1JDKtRDd2OsYfJaTKNcTA2IBIIesMAOPdDUGYJSqGYml5lGHHYkSGhAJBBIkAoWREAT3Z3JLqZhF3uS2EloQCQ8xLBxoAEWO7aZxros7EgISIIkwlZCY6s1OlAJTWFal5VppMzUgbAlQcIkiT0DXSI2U2ymYZs9AWJL4n+df3pncsI0bn5dX344W05dhctUFbapZcE2ToiLVHBMbGymS7aUhIdoPNBf7Jjw/gQ77u4AAAAASUVORK5CYII=',
             b64: true
         }
     ];
 
-    QUnit.cases.init(isB64DataProvider).test('isBase64 ', function(data, assert) {
-        assert.equal(
-            urlUtil.isBase64(data.url),
-            data.b64,
-            'The URL ' + (data.b64 ? 'is' : 'is not') + ' encoded in base 64'
-        );
+    QUnit.cases.init(isB64DataProvider).test('isBase64 ', function (data, assert) {
+        assert.equal(urlUtil.isBase64(data.url), data.b64, `The URL ${data.b64 ? 'is' : 'is not'} encoded in base 64`);
         assert.equal(
             urlUtil.isBase64(urlUtil.parse(data.url)),
             data.b64,
-            'The URL ' + (data.b64 ? 'is' : 'is not') + ' encoded in base 64'
+            `The URL ${data.b64 ? 'is' : 'is not'} encoded in base 64`
         );
     });
 
@@ -246,7 +241,7 @@ define(['util/url', 'context'], function(urlUtil, context) {
         }
     ];
 
-    QUnit.cases.init(attributesDataProvider).test('encodeAsXmlAttr ', function(data, assert) {
+    QUnit.cases.init(attributesDataProvider).test('encodeAsXmlAttr ', function (data, assert) {
         assert.equal(urlUtil.encodeAsXmlAttr(data.url), data.encoded);
         assert.equal(decodeURIComponent(data.encoded), data.url);
     });
@@ -304,7 +299,7 @@ define(['util/url', 'context'], function(urlUtil, context) {
         }
     ];
 
-    QUnit.cases.init(buildDataProvider).test('from ', function(data, assert) {
+    QUnit.cases.init(buildDataProvider).test('from ', function (data, assert) {
         var result = urlUtil.build(data.path, data.params);
         assert.equal(result, data.expected, 'The URL is built');
     });
@@ -372,11 +367,11 @@ define(['util/url', 'context'], function(urlUtil, context) {
         }
     ];
 
-    QUnit.cases.init(routeDataProvider).test('route ', function(data, assert) {
+    QUnit.cases.init(routeDataProvider).test('route ', function (data, assert) {
         var result;
         if (data.exception) {
             assert.throws(
-                function() {
+                function () {
                     urlUtil.route(data.action, data.controller, data.extension, data.params, data.rootUrl);
                 },
                 TypeError,
