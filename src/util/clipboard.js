@@ -33,17 +33,16 @@ export default eventifier({
      * Cleans system clipboard
      * rewrites everything with space symbol (because some browsers don't replace content with empty string)
      */
-    clean: function clean() {
+    clean() {
         this.copy(' ');
     },
     /**
      * Place text to the system clipboard
-     * @param text
+     * @param {string} text
      */
-    copy: function copy(text) {
+    copy(text) {
         // create new el to copy from
-        var textAreaToSelContent;
-        textAreaToSelContent = document.createElement('textarea'); // Create a <textarea> element
+        const textAreaToSelContent = document.createElement('textarea'); // Create a <textarea> element
         textAreaToSelContent.setAttribute('id', 'clipboardCleanerPlugin');
         textAreaToSelContent.value = text; // Set its value to the string that you want copied
         textAreaToSelContent.setAttribute('readonly', ''); // Make it readonly to be tamper-proof
@@ -55,36 +54,37 @@ export default eventifier({
     },
     /**
      * Copy text from the element (js or jquery element)
-     * @param elem
+     * @param {jQuery|HTMLElement} elem
      * @fires clipboard#copied - content successfully stored in clipboard
      * @fires clipboard#copyError - content was not stored, returns reason
      */
-    copyFromEl: function copyFromEl(elem) {
-        var textRange, editable, readOnly, range, sel, successful, el;
-
-        el = elem instanceof $ ? elem.get(0) : elem;
+    copyFromEl(elem) {
+        const el = elem instanceof $ ? elem.get(0) : elem;
 
         // Copy textarea, pre, div, etc.
         if (document.body.createTextRange) {
             // IE
-            textRange = document.body.createTextRange();
+            const textRange = document.body.createTextRange();
             textRange.moveToElementText(el);
             textRange.select();
             textRange.execCommand('Copy');
             this.trigger('copied', { srcEl: el });
         } else if (window.getSelection && document.createRange) {
+            let editable;
+            let readOnly;
+
             // non-IE
-            if (el.hasOwnProperty('contentEditable')) {
+            if (Object.prototype.hasOwnProperty.call(el, 'contentEditable')) {
                 editable = el.contentEditable; // Record contentEditable status of element
                 el.contentEditable = true; // iOS will only select text on non-form elements if contentEditable = true;
             }
-            if (el.hasOwnProperty('readOnly')) {
+            if (Object.prototype.hasOwnProperty.call(el, 'readOnly')) {
                 readOnly = el.readOnly; // Record readOnly status of element
                 el.readOnly = false; // iOS will not select in a read only form element
             }
-            range = document.createRange();
+            const range = document.createRange();
             range.selectNodeContents(el);
-            sel = window.getSelection();
+            const sel = window.getSelection();
             sel.removeAllRanges();
             sel.addRange(range); // Does not work for Firefox if a textarea or input
             if (el.nodeName === 'TEXTAREA' || el.nodeName === 'INPUT') {
@@ -93,14 +93,14 @@ export default eventifier({
             if (el.setSelectionRange && navigator.userAgent.match(/ipad|ipod|iphone/i)) {
                 el.setSelectionRange(0, 999999); // iOS only selects "form" elements with SelectionRange
             }
-            if (el.hasOwnProperty('contentEditable')) {
+            if (Object.prototype.hasOwnProperty.call(el, 'contentEditable')) {
                 el.contentEditable = editable; // Restore previous contentEditable status
             }
-            if (el.hasOwnProperty('readOnly')) {
+            if (Object.prototype.hasOwnProperty.call(el, 'readOnly')) {
                 el.readOnly = readOnly; // Restore previous readOnly status
             }
             if (document.queryCommandSupported('copy')) {
-                successful = document.execCommand('copy');
+                const successful = document.execCommand('copy');
                 if (successful) {
                     this.trigger('copied', { srcEl: elem });
                 } else {
@@ -117,14 +117,12 @@ export default eventifier({
      * Paste from clipboard
      * doesn't work for many browsers
      * can be useful article to use it (if required): https://developers.google.com/web/updates/2018/03/clipboardapi
-     * @param elem
+     * @param {jQuery|HTMLElement} elem
      * @fires clipboard#pasted - content from clipboard pasted
      * @fires clipboard#pasteError - content wasn't pasted
      */
-    paste: function paste(elem) {
-        var el, editable, readOnly, range, sel, successful;
-
-        el = elem instanceof $ ? elem.get(0) : elem;
+    paste(elem) {
+        const el = elem instanceof $ ? elem.get(0) : elem;
 
         if (window.clipboardData) {
             // IE
@@ -137,13 +135,13 @@ export default eventifier({
             } else if (el.innerHTML.length < 1) {
                 el.innerHTML = '&nbsp;'; // iOS needs element not to be empty to select it and pop up 'paste' button
             }
-            editable = el.contentEditable; // Record contentEditable status of element
-            readOnly = el.readOnly; // Record readOnly status of element
+            const editable = el.contentEditable; // Record contentEditable status of element
+            const readOnly = el.readOnly; // Record readOnly status of element
             el.contentEditable = true; // iOS will only select text on non-form elements if contentEditable = true;
             el.readOnly = false; // iOS will not select in a read only form element
-            range = document.createRange();
+            const range = document.createRange();
             range.selectNodeContents(el);
-            sel = window.getSelection();
+            const sel = window.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
             if (el.nodeName === 'TEXTAREA' || el.nodeName === 'INPUT') {
@@ -153,7 +151,7 @@ export default eventifier({
                 el.setSelectionRange(0, 999999); // iOS only selects "form" elements with SelectionRange
             }
             if (document.queryCommandSupported('paste')) {
-                successful = document.execCommand('Paste');
+                const successful = document.execCommand('Paste');
                 if (successful) {
                     this.trigger('pasted', { srcEl: elem });
                 } else {

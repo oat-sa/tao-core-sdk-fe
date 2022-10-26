@@ -263,11 +263,11 @@ export default function request(options) {
 
                     const jwtTokenHandler = options.jwtTokenHandler;
                     /**
-                         * if access token expired then
-                         * get new token
-                         * update header with new token
-                         * retry request
-                         *  */
+                     * if access token expired then
+                     * get new token
+                     * update header with new token
+                     * retry request
+                     *  */
                     if (xhr.status === 401 && !isAccessTokenRefreshTried && jwtTokenHandler) {
                         isAccessTokenRefreshTried = true;
                         jwtTokenHandler

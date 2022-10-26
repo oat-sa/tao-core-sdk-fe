@@ -27,7 +27,7 @@ import moduleLoaderFactory from 'core/moduleLoader';
 
 /**
  * Checks a provider object
- * @param provider
+ * @param {object} provider
  * @returns {Boolean}
  */
 function validateProvider(provider) {
@@ -53,7 +53,7 @@ export default function providerLoader(requiredProviders) {
          * @param {String} [category] - to get the providers for a given category, if not set, we get everything
          * @returns {Function[]} the providers
          */
-        getProviders: function getProviders(category) {
+        getProviders(category) {
             return this.getModules(category);
         }
     });

@@ -120,7 +120,7 @@ define(['core/logger/api'], function(loggerFactory) {
     });
 
     QUnit.module('providers', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             loggerFactory.providers = false;
         }
     });
@@ -169,7 +169,7 @@ define(['core/logger/api'], function(loggerFactory) {
     });
 
     QUnit.module('logger behavior', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             loggerFactory.providers = [];
         }
     });
@@ -239,7 +239,7 @@ define(['core/logger/api'], function(loggerFactory) {
             });
 
             logger = loggerFactory(data.name);
-            logger[data.level].apply(logger, data.args);
+            logger[data.level](...data.args);
         });
 
     QUnit.test('minimum level', function(assert) {

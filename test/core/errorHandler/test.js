@@ -8,7 +8,7 @@ define(['core/errorHandler'], function(errorHandler) {
     });
 
     QUnit.module('Error', {
-        afterEach: function(assert) {
+        afterEach: function() {
             errorHandler._contexts = {};
         }
     });

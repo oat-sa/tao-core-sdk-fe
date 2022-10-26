@@ -22,39 +22,39 @@ import capitalize from 'util/capitalize';
 /**
  * Adapts the size of several elements
  */
-var adaptSize = (function() {
+const adaptSize = (function () {
     /**
      * The actual resize function
      *
-     * @param {jQueryElements} elements
+     * @param {jQueryElements} $elements
      * @param {Object} dimensions
      * @private
      */
-    var _resize = function($elements, dimensions) {
+    function _resize($elements, dimensions) {
         // This whole function is based on calculating the largest height/width.
         // Therefor the elements need to have style.height/width to be removed
         // otherwise we could never track when something is actually getting smaller than before.
-        $elements.each(function() {
-            for (var dimension in dimensions) {
-                if (dimensions.hasOwnProperty(dimension)) {
+        $elements.each(function () {
+            for (const dimension in dimensions) {
+                if (Object.prototype.hasOwnProperty.call(dimensions, dimension)) {
                     $(this)[dimension]('auto');
                 }
             }
         });
 
-        $elements.each(function() {
-            for (var dimension in dimensions) {
-                if (dimensions.hasOwnProperty(dimension)) {
+        $elements.each(function () {
+            for (const dimension in dimensions) {
+                if (Object.prototype.hasOwnProperty.call(dimensions, dimension)) {
                     dimensions[dimension] = Math.max(
                         Math.floor(dimensions[dimension] || 0),
-                        $(this)['outer' + capitalize(dimension)]()
+                        $(this)[`outer${capitalize(dimension)}`]()
                     );
                 }
             }
         });
 
         $elements.css(dimensions);
-    };
+    }
 
     return {
         /**
@@ -63,7 +63,7 @@ var adaptSize = (function() {
          * @param {jQueryElements} $elements
          * @param {Integer|undefined} [minWidth] default: 0
          */
-        width: function($elements, minWidth) {
+        width($elements, minWidth) {
             _resize($elements, { width: minWidth });
         },
 
@@ -73,7 +73,7 @@ var adaptSize = (function() {
          * @param {jQueryElements} $elements
          * @param {Integer|undefined}[minHeight] default: 0
          */
-        height: function($elements, minHeight) {
+        height($elements, minHeight) {
             _resize($elements, { height: minHeight });
         },
 
@@ -84,7 +84,7 @@ var adaptSize = (function() {
          * @param {Integer|undefined} [minWidth] default: 0
          * @param {Integer|undefined} [minHeight] default: 0
          */
-        both: function($elements, minWidth, minHeight) {
+        both($elements, minWidth, minHeight) {
             _resize($elements, { height: minHeight, width: minWidth });
         },
 
@@ -93,7 +93,7 @@ var adaptSize = (function() {
          *
          * @param {jQueryElements} $elements
          */
-        resetHeight: function($elements) {
+        resetHeight($elements) {
             $elements.height('auto');
         }
     };

@@ -12,7 +12,7 @@ define(['core/encoder/str2array'], function(str2array) {
 
     QUnit.module('encoder');
 
-    var encodeData = [
+    const encodeData = [
         { title: 'empty array', input: [], output: '' },
         { title: 'string', input: 'foo', output: 'foo' },
         { title: 'string array', input: ['bar', 'foo'], output: 'bar,foo' },
@@ -26,7 +26,7 @@ define(['core/encoder/str2array'], function(str2array) {
 
     QUnit.module('decoder');
 
-    var decodeData = [
+    const decodeData = [
         { title: 'empty string', input: '', output: [] },
         { title: 'blank string', input: ' ', output: [] },
         { title: 'number', input: 12, output: [] },

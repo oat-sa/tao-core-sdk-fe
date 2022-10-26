@@ -44,19 +44,19 @@ define(['jquery', 'core/communicator', 'core/communicator/request'], function($,
             assert.equal(
                 typeof requestProvider[data.name],
                 'function',
-                'The communicator/request api exposes a "' + data.name + '" function'
+                `The communicator/request api exposes a "${data.name}" function`
             );
         });
 
     QUnit.module('provider');
 
     QUnit.test('missing configuration', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(1);
 
         communicator.registerProvider('request', requestProvider);
 
-        var instance = communicator('request');
+        const instance = communicator('request');
 
         instance.init().catch(function() {
             assert.ok(true, 'The provider needs the a service config');
@@ -65,12 +65,12 @@ define(['jquery', 'core/communicator', 'core/communicator/request'], function($,
     });
 
     QUnit.test('lifecyle', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(8);
 
         communicator.registerProvider('request', requestProvider);
 
-        var instance = communicator('request', { service: 'service.url' })
+        const instance = communicator('request', { service: 'service.url' })
             .on('init', function() {
                 assert.ok(true, 'The communicator has fired the "init" event');
             })
@@ -117,12 +117,12 @@ define(['jquery', 'core/communicator', 'core/communicator/request'], function($,
     });
 
     QUnit.test('send', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(2);
 
         communicator.registerProvider('request', requestProvider);
 
-        var instance = communicator('request', {
+        const instance = communicator('request', {
             service: '/test/core/communicator/request/messages.json'
         }).on('receive', function(data) {
             assert.equal(typeof data, 'object', 'We got a response');

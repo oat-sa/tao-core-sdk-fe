@@ -30,7 +30,7 @@ export default {
      * @returns {Object}
      * @throws Error if a required entry is missing
      */
-    build: function build(config, defaults) {
+    build(config, defaults) {
         return _.defaults(config || {}, defaults);
     },
 
@@ -44,13 +44,13 @@ export default {
      * @returns {Object}
      * @throws Error if a required entry is missing
      */
-    from: function from(source, entries, defaults) {
-        var config = {};
-        _.forEach(entries, function(value, name) {
+    from(source, entries, defaults) {
+        const config = {};
+        _.forEach(entries, (value, name) => {
             if ('undefined' !== typeof source[name]) {
                 config[name] = source[name];
             } else if (value) {
-                throw new Error('The config entry "' + name + '" is required!');
+                throw new Error(`The config entry "${name}" is required!`);
             }
         });
         return _.defaults(config, defaults);

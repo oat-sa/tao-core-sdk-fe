@@ -29,7 +29,7 @@ import eventifier from 'core/eventifier';
  * @type {Object}
  * @private
  */
-var defaults = {
+const defaults = {
     timeout: 30 * 1000
 };
 
@@ -56,36 +56,34 @@ function communicatorFactory(providerName, config) {
      * The communicator config set
      * @type {Object}
      */
-    var extendedConfig = _(config || {})
+    const extendedConfig = _(config || {})
         .defaults(defaults)
         .value();
-
-    /**
-     * The communicator implementation
-     * @type {Object}
-     */
-    var communicator;
 
     /**
      * The function used to delegate the calls from the API to the provider.
      * @type {Function}
      */
-    var delegate;
+    let delegate;
 
     /**
      * The current states of the communicator
      * @type {Object}
      */
-    var states = {};
+    let states = {};
 
     /**
      * The selected communication provider
      * @type {Object}
      */
-    var provider = communicatorFactory.getProvider(providerName);
+    const provider = communicatorFactory.getProvider(providerName);
 
-    // creates the implementation by setting an API and delegating calls to the provider
-    communicator = eventifier({
+    /**
+     * The communicator implementation
+     * Creates the implementation by setting an API and delegating calls to the provider
+     * @type {Object}
+     */
+    const communicator = eventifier({
         /**
          * Initializes the communication implementation.
          * Sets the `ready` state.
@@ -93,15 +91,13 @@ function communicatorFactory(providerName, config) {
          * @fires init
          * @fires ready
          */
-        init: function init() {
-            var self = this;
-
+        init() {
             if (this.getState('ready')) {
                 return Promise.resolve();
             }
 
-            return delegate('init').then(function() {
-                self.setState('ready').trigger('ready');
+            return delegate('init').then(() => {
+                this.setState('ready').trigger('ready');
             });
         },
 
@@ -112,22 +108,21 @@ function communicatorFactory(providerName, config) {
          * @fires destroy
          * @fires destroyed
          */
-        destroy: function destroy() {
-            var self = this;
-            var stepPromise;
+        destroy() {
+            let stepPromise;
 
-            if (self.getState('open')) {
-                stepPromise = self.close();
+            if (this.getState('open')) {
+                stepPromise = this.close();
             } else {
                 stepPromise = Promise.resolve();
             }
 
-            return stepPromise.then(function() {
-                return delegate('destroy').then(function() {
-                    self.trigger('destroyed');
+            return stepPromise
+                .then(() => delegate('destroy'))
+                .then(() => {
+                    this.trigger('destroyed');
                     states = {};
                 });
-            });
         },
 
         /**
@@ -137,15 +132,13 @@ function communicatorFactory(providerName, config) {
          * @fires open
          * @fires opened
          */
-        open: function open() {
-            var self = this;
-
+        open() {
             if (this.getState('open')) {
                 return Promise.resolve();
             }
 
-            return delegate('open').then(function() {
-                self.setState('open').trigger('opened');
+            return delegate('open').then(() => {
+                this.setState('open').trigger('opened');
             });
         },
 
@@ -156,10 +149,9 @@ function communicatorFactory(providerName, config) {
          * @fires close
          * @fires closed
          */
-        close: function close() {
-            var self = this;
-            return delegate('close').then(function() {
-                self.setState('open', false).trigger('closed');
+        close() {
+            return delegate('close').then(() => {
+                this.setState('open', false).trigger('closed');
             });
         },
 
@@ -171,16 +163,14 @@ function communicatorFactory(providerName, config) {
          * @fires send
          * @fires sent
          */
-        send: function send(channel, message) {
-            var self = this;
-
+        send(channel, message) {
             if (!this.getState('open')) {
                 return Promise.reject();
             }
 
-            return delegate('send', channel, message).then(function(response) {
-                self.trigger('sent', channel, message, response);
-                return Promise.resolve(response);
+            return delegate('send', channel, message).then(response => {
+                this.trigger('sent', channel, message, response);
+                return response;
             });
         },
 
@@ -191,7 +181,7 @@ function communicatorFactory(providerName, config) {
          * @returns {communicator}
          * @throws TypeError if the name is missing or the handler is not a callback
          */
-        channel: function channel(name, handler) {
+        channel(name, handler) {
             if (!_.isString(name) || name.length <= 0) {
                 throw new TypeError('A channel must have a name');
             }
@@ -200,7 +190,7 @@ function communicatorFactory(providerName, config) {
                 throw new TypeError('A handler must be attached to a channel');
             }
 
-            this.on('channel-' + name, handler);
+            this.on(`channel-${name}`, handler);
 
             return this;
         },
@@ -209,7 +199,7 @@ function communicatorFactory(providerName, config) {
          * Gets the implementation config set
          * @returns {Object}
          */
-        getConfig: function getConfig() {
+        getConfig() {
             return extendedConfig;
         },
 
@@ -219,7 +209,7 @@ function communicatorFactory(providerName, config) {
          * @param {Boolean} [state] - The state itself (default: true)
          * @returns {communicator}
          */
-        setState: function setState(name, state) {
+        setState(name, state) {
             if (_.isUndefined(state)) {
                 state = true;
             }
@@ -232,14 +222,14 @@ function communicatorFactory(providerName, config) {
          * @param {String} name - The name of the state to get
          * @returns {Boolean}
          */
-        getState: function getState(name) {
+        getState(name) {
             return !!states[name];
         }
     });
 
     // all messages comes through a message event, then each is dispatched to the right channel
-    communicator.on('message', function(channel, message) {
-        this.trigger('channel-' + channel, message);
+    communicator.on('message', function (channel, message) {
+        this.trigger(`channel-${channel}`, message);
     });
 
     // use a delegate function to make a bridge between API and provider

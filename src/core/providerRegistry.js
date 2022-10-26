@@ -33,7 +33,7 @@ import _ from 'lodash';
  * @returns {Object} the target itself
  */
 function providerRegistry(target, validator) {
-    var _providers = {};
+    let _providers = {};
     target = target || {};
 
     /**
@@ -50,7 +50,7 @@ function providerRegistry(target, validator) {
      * @throws TypeError when a wrong provider is given or an empty name.
      */
     function registerProvider(name, provider) {
-        var valid = true;
+        let valid = true;
 
         //type checking
         if (!_.isString(name) || name.length <= 0) {
@@ -76,7 +76,7 @@ function providerRegistry(target, validator) {
      * @returns {Object} provider
      */
     function getProvider(providerName) {
-        var provider;
+        let provider;
 
         //check a provider is available
         if (!_providers || _.size(_providers) === 0) {
@@ -101,7 +101,7 @@ function providerRegistry(target, validator) {
 
     /**
      * Expose the list of registered providers
-     * @return {String[]} the list of provider names
+     * @returns {String[]} the list of provider names
      */
     function getAvailableProviders() {
         return _.keys(_providers);

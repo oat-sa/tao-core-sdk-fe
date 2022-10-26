@@ -241,7 +241,7 @@ define(['core/store', 'core/promise'], function(store, Promise) {
     });
 
     QUnit.module('CRUD', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             mockedData = {};
         }
     });

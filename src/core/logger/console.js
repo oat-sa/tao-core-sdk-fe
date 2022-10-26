@@ -24,10 +24,10 @@
  */
 import _ from 'lodash';
 
-var config = {
+let config = {
     level: 'info'
 };
-var mapping = {
+const mapping = {
     trace: 'debug',
     debug: 'debug',
     info: 'info',
@@ -38,23 +38,23 @@ var mapping = {
 
 /**
  * Initialize the logger API with the console provider
- * @returns {logger} the logger
+ * @type {logger} the logger
  */
 export default {
-    setConfig: function setConfig(newConfig) {
+    setConfig(newConfig) {
         config = _.defaults(newConfig || {}, config);
     },
-    log: function log(record) {
-        var level = record.level;
+    log(record) {
+        const level = record.level;
         if (this.checkMinLevel(config.level, level)) {
             if (_.isFunction(window.console[mapping[level]])) {
                 if (record.err) {
-                    window.console[mapping[level]].call(window.console, record.name, record.msg, record.err, record);
+                    window.console[mapping[level]](record.name, record.msg, record.err, record);
                 } else {
-                    window.console[mapping[level]].call(window.console, record.name, record.msg, record);
+                    window.console[mapping[level]](record.name, record.msg, record);
                 }
             } else {
-                window.console.log('[' + level.toUpperCase() + ']', record.name, record.msg, record);
+                window.console.log(`[${level.toUpperCase()}]`, record.name, record.msg, record);
             }
         }
     }
