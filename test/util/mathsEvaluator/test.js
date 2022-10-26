@@ -151,7 +151,7 @@ define(['jquery', 'lodash', 'util/mathsEvaluator', 'json!test/util/mathsEvaluato
         }
 
         function showResult(expression, result) {
-            var $expr = $(`'<p class="expression">${expression}</p>'`);
+            var $expr = $(`<p class="expression">${expression}</p>`);
             var $res = $(`<p class="result">${result}</p>`);
             var currentScrollTop, scrollTop;
             $screen.append($expr);
