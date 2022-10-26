@@ -24,21 +24,19 @@
  */
 import _ from 'lodash';
 import $ from 'jquery';
-import url from 'util/url';
+import urlHelper from 'util/url';
 
-var defaultConfig = {
-    url: url.route('log', 'Log', 'tao'),
+const defaultConfig = {
+    url: urlHelper.route('log', 'Log', 'tao'),
     level: 'warning',
     delay: 500 //milliseconds of delay to flush
 };
-var config;
-var logQueue = [];
-var debouncedFlush;
+let config = Object.assign({}, defaultConfig);
+let logQueue = [];
 
 /**
  * Push log message into log queue
  * @param {Object} message - log message
- * @returns {Promise} resolves when the message is stored
  */
 function push(message) {
     logQueue.push(message);
@@ -46,10 +44,9 @@ function push(message) {
 
 /**
  * Flush the log messages store and retrieve the data
- * @returns {Promise} resolves with the flushed data
  */
 function flush() {
-    var messages = logQueue;
+    const messages = logQueue;
     logQueue = [];
     send(messages);
 }
@@ -66,32 +63,32 @@ function send(messages) {
         data: { messages: JSON.stringify(messages) },
         dataType: 'json',
         global: false,
-        error: function() {
-            _.forEach(flush, function(message) {
+        error() {
+            _.forEach(flush, function (message) {
                 push(message);
             });
         }
     });
 }
 
-debouncedFlush = _.debounce(flush, defaultConfig.delay);
+let debouncedFlush = _.debounce(flush, defaultConfig.delay);
 
 /**
- * @returns {logger} the logger
+ * @type {logger} the logger
  */
 export default {
-    setConfig: function setConfig(newConfig) {
+    setConfig(newConfig) {
         config = _.defaults(newConfig || {}, defaultConfig);
         if (_.isArray(config.url)) {
-            config.url = url.route.apply(url, config.url);
+            config.url = urlHelper.route(...config.url);
         }
         debouncedFlush = _.debounce(flush, config.delay);
     },
     /**
      * log message
-     * @param {Object} record - See core/logger/api::log() method
+     * @param {Object} message - See core/logger/api::log() method
      */
-    log: function log(message) {
+    log(message) {
         if (this.checkMinLevel(config.level, message.level)) {
             push(message);
             debouncedFlush();

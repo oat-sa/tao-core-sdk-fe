@@ -20,12 +20,10 @@
  */
 import _ from 'lodash';
 
-var defaults = {
+const defaults = {
     name: 'provided',
     eventifier: true
 };
-
-var _slice = [].slice;
 
 /**
  * Creates a function that delegates api calls to an provider
@@ -41,12 +39,12 @@ var _slice = [].slice;
  * @returns {delegate} - The delegate function
  */
 function delegator(api, provider, config) {
-    var extendedConfig = _.defaults(config || {}, defaults);
-    var eventifier = !!(extendedConfig.eventifier && api && api.trigger);
-    var context = extendedConfig.forward ? provider : api;
-    var defaultProvider = _.isFunction(extendedConfig.defaultProvider) ? extendedConfig.defaultProvider : _.noop;
-    var wrapper = _.isFunction(extendedConfig.wrapper) ? extendedConfig.wrapper : null;
-    var name = extendedConfig.name;
+    const extendedConfig = _.defaults(config || {}, defaults);
+    const eventifier = !!(extendedConfig.eventifier && api && api.trigger);
+    const context = extendedConfig.forward ? provider : api;
+    let defaultProvider = _.isFunction(extendedConfig.defaultProvider) ? extendedConfig.defaultProvider : _.noop;
+    const wrapper = _.isFunction(extendedConfig.wrapper) ? extendedConfig.wrapper : null;
+    const name = extendedConfig.name;
 
     if (extendedConfig.required) {
         defaultProvider = null;
@@ -57,19 +55,16 @@ function delegator(api, provider, config) {
      * If the api supports eventifier, fires the related event
      *
      * @param {String} fnName - The name of the delegated method to call
-     * @param {Object} ... - Following parameters will be forwarded as is
+     * @param {...*} [args] - Following parameters will be forwarded as is
      * @returns {Object} - The delegated method must return a response
      * @private
      * @throws Error
      */
-    function delegate(fnName) {
-        var response, args;
+    function delegate(fnName, ...args) {
+        let response;
 
         if (provider) {
             if (_.isFunction(provider[fnName]) || defaultProvider) {
-                // need real array of params, even if empty
-                args = _slice.call(arguments, 1);
-
                 // delegate the call to the provider
                 response = (provider[fnName] || defaultProvider).apply(context, args);
 
@@ -80,13 +75,13 @@ function delegator(api, provider, config) {
                 // if supported fires the method related event
                 if (eventifier) {
                     // the response has to be provided as first argument in all events
-                    api.trigger.apply(api, [fnName, response].concat(args));
+                    api.trigger(fnName, response, ...args);
                 }
             } else {
-                throw new Error('There is no method called ' + fnName + ' in the ' + name + ' provider!');
+                throw new Error(`There is no method called ${fnName} in the ${name} provider!`);
             }
         } else {
-            throw new Error('There is no ' + name + ' provider!');
+            throw new Error(`There is no ${name} provider!`);
         }
 
         return response;

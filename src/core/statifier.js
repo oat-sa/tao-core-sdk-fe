@@ -75,14 +75,14 @@ import _ from 'lodash';
  * @returns {Object} the target for convenience
  */
 function statifierFactory(target) {
-    var states = {};
-    var statesApi = {
+    let states = {};
+    const statesApi = {
         /**
          * Tells if the state is set
          * @param {String} name
          * @returns {Boolean}
          */
-        getState: function getState(name) {
+        getState(name) {
             return !!states[name];
         },
 
@@ -99,7 +99,7 @@ function statifierFactory(target) {
          * @param {Boolean} [value]
          * @returns {statesApi}
          */
-        setState: function setState(name, value) {
+        setState(name, value) {
             if (typeof value === 'undefined') {
                 value = true;
             }
@@ -111,7 +111,7 @@ function statifierFactory(target) {
          * Cleans up all states
          * @returns {statesApi}
          */
-        clearStates: function clearStates() {
+        clearStates() {
             states = {};
             return this;
         },
@@ -120,10 +120,10 @@ function statifierFactory(target) {
          * Returns all current states set
          * @returns {Array}
          */
-        getStates: function getStates() {
+        getStates() {
             return _.reduce(
                 states,
-                function(result, state, key) {
+                function (result, state, key) {
                     if (state) {
                         result.push(key);
                     }
@@ -138,9 +138,8 @@ function statifierFactory(target) {
 
     _(statesApi)
         .functions()
-        .forEach(function(method) {
-            target[method] = function delegate() {
-                var args = [].slice.call(arguments);
+        .forEach(function (method) {
+            target[method] = function delegate(...args) {
                 return statesApi[method].apply(target, args);
             };
         });

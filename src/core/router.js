@@ -35,7 +35,7 @@ import UrlParser from 'util/urlParser';
 import loggerFactory from 'core/logger';
 import Promise from 'core/promise';
 
-var logger = loggerFactory('router');
+const logger = loggerFactory('router');
 
 /**
  * The router helps you to execute a controller when an URL maps a defined route.
@@ -46,33 +46,28 @@ var logger = loggerFactory('router');
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  * @exports router
  */
-var router = {
+const router = {
     /**
      * Routing dispatching: execute the controller for the given URL.
      * If more than one URL is provided, we try to dispatch until a valid routing if found
      * (used mainly for forward/redirects).
      *
-     * @param {Array|String} url - the urls to try to dispatch
+     * @param {Array|String} urls - the urls to try to dispatch
      * @param {Function} cb - a callback executed once dispatched
+     * @returns {Promise}
      */
-    dispatch: function dispatch(urls, cb) {
-        var self = this;
-
+    dispatch(urls, cb) {
         if (!_.isArray(urls)) {
             urls = [urls];
         }
 
-        return Promise.all(
-            urls.map(function(url) {
-                return self.dispatchUrl(url);
-            })
-        )
-            .then(function() {
+        return Promise.all(urls.map(url => this.dispatchUrl(url)))
+            .then(function () {
                 if (_.isFunction(cb)) {
                     cb();
                 }
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 logger.error(err);
             });
     },
@@ -82,14 +77,12 @@ var router = {
      * @param {String} url - the URL to parse
      * @returns {Object} the route structure
      */
-    parseMvcUrl: function parseMvcUrl(url) {
-        var route = null;
-        var parser;
-        var paths;
+    parseMvcUrl(url) {
+        let route = null;
 
         if (_.isString(url) && !_.isEmpty(url)) {
-            parser = new UrlParser(url);
-            paths = parser.getPaths();
+            const parser = new UrlParser(url);
+            const paths = parser.getPaths();
             if (paths.length >= 3) {
                 route = {
                     action: paths[paths.length - 1],
@@ -108,15 +101,15 @@ var router = {
      * @param {String} route.extension
      * @returns {Promise} once loaded
      */
-    loadRouteBundle: function loadRouteBundle(route) {
+    loadRouteBundle(route) {
         //only for bundle mode and route which are not TAO (self contained)
         if (route && route.extension && context.bundle && route.extension !== 'tao') {
-            return new Promise(function(resolve) {
-                var routeBundle = route.extension + '/loader/' + route.extension + '.min';
+            return new Promise(function (resolve) {
+                const routeBundle = `${route.extension}/loader/${route.extension}.min`;
 
-                window.require([routeBundle], resolve, function(err) {
+                window.require([routeBundle], resolve, function (err) {
                     //do not break in case of error, module loading will take over
-                    logger.warn('Unable to load ' + routeBundle + ' : ' + err.message);
+                    logger.warn(`Unable to load ${routeBundle} : ${err.message}`);
 
                     resolve();
                 });
@@ -132,11 +125,11 @@ var router = {
      * @param {String} route.extension
      * @returns {Promise<Object>} resolves with the routes data
      */
-    loadRoute: function loadRoute(route) {
+    loadRoute(route) {
         if (route && route.extension) {
-            return new Promise(function(resolve, reject) {
-                var routeModule =
-                    route.extension === 'tao' ? 'controller/routes' : route.extension + '/controller/routes';
+            return new Promise(function (resolve, reject) {
+                const routeModule =
+                    route.extension === 'tao' ? 'controller/routes' : `${route.extension}/controller/routes`;
 
                 //loads the routing for the current extensino
                 window.require([routeModule], resolve, reject);
@@ -153,31 +146,26 @@ var router = {
      *  - load the route's controllers
      *  - execute the start method of those controllers
      * @param {String} url - the
+     * @returns {Promise}
      */
-    dispatchUrl: function dispatchUrl(url) {
-        var self = this;
-
+    dispatchUrl(url) {
         //parse the URL
-        var route = this.parseMvcUrl(url);
+        const route = this.parseMvcUrl(url);
 
-        logger.debug('Dispatch URL ' + url);
+        logger.debug(`Dispatch URL ${url}`);
 
         return this.loadRouteBundle(route)
-            .then(function() {
-                return self.loadRoute(route);
-            })
-            .then(function(routes) {
-                var moduleRoutes;
-                var dependencies = [];
-                var styles = [];
-                var moduleConfig = {};
-                var action;
-                var mapStyle = function mapStyle(style) {
-                    return 'css!' + route.extension + 'Css/' + style;
-                };
+            .then(() => this.loadRoute(route))
+            .then(function (routes) {
+                let dependencies = [];
+                let styles = [];
+                const moduleConfig = {};
+                function mapStyle(style) {
+                    return `css!${route.extension}Css/${style}`;
+                }
                 if (routes && routes[route.module]) {
                     //get the dependencies for the current context
-                    moduleRoutes = routes[route.module];
+                    const moduleRoutes = routes[route.module];
 
                     //resolve controller dependencies
                     if (moduleRoutes.deps) {
@@ -190,7 +178,7 @@ var router = {
 
                     //resolve actions dependencies
                     if ((moduleRoutes.actions && moduleRoutes.actions[route.action]) || moduleRoutes[route.action]) {
-                        action = moduleRoutes.actions[route.action] || moduleRoutes[route.action];
+                        const action = moduleRoutes.actions[route.action] || moduleRoutes[route.action];
                         if (_.isString(action) || _.isArray(action)) {
                             dependencies = dependencies.concat(action);
                         }
@@ -204,13 +192,13 @@ var router = {
                     }
 
                     //alias controller/ to extension/controller
-                    dependencies = _.map(dependencies, function(dep) {
-                        return /^controller/.test(dep) && route.extension !== 'tao' ? route.extension + '/' + dep : dep;
+                    dependencies = _.map(dependencies, function (dep) {
+                        return /^controller/.test(dep) && route.extension !== 'tao' ? `${route.extension}/${dep}` : dep;
                     });
 
                     //URL parameters are given by default to the required module (through module.confid())
                     if (!_.isEmpty(route.params)) {
-                        _.forEach(dependencies, function(dependency) {
+                        _.forEach(dependencies, function (dependency) {
                             //inject parameters using the curent requirejs contex. This rely on a private api...
                             moduleConfig[dependency] = _.merge(
                                 _.clone(window.requirejs.s.contexts._.config.config[dependency] || {}),
@@ -222,22 +210,22 @@ var router = {
                 }
                 return dependencies;
             })
-            .then(function(dependencies) {
+            .then(function (dependencies) {
                 if (dependencies && dependencies.length) {
-                    logger.debug('Load controllers : ' + dependencies.join(', '));
+                    logger.debug(`Load controllers : ${dependencies.join(', ')}`);
 
                     //loads module and action's dependencies and start the controllers.
-                    return new Promise(function(resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         window.require(
                             dependencies,
-                            function() {
-                                _.forEach(arguments, function(dependency) {
+                            function (...args) {
+                                _.forEach(args, function (dependency) {
                                     if (dependency && _.isFunction(dependency.start)) {
                                         dependency.start();
                                     }
                                 });
 
-                                logger.debug(arguments.length + ' controllers started');
+                                logger.debug(`${args.length} controllers started`);
                                 resolve();
                             },
                             reject

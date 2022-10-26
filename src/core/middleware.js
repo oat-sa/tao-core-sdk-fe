@@ -34,24 +34,31 @@ function middlewareFactory() {
      * The registered middlewares
      * @type {Object}
      */
-    var middlewares = {};
+    const middlewares = {};
 
     /**
      * @typedef {middlewareHandler}
      */
-    var middlewareHandler = eventifier({
+    const middlewareHandler = eventifier({
         /**
          * Add a middleware
          * @param {String} [command] The command queue in which add the middleware (default: 'all')
-         * @param {Function} [callback] A middleware callback. Must accept 2 parameters (request and response) and can return a promise.
+         * @param {...Function} [callback] A middleware callback. Must accept 2 parameters (request and response) and can return a promise.
          * @returns {proxy}
          */
-        use: function use(command) {
-            var queue = command && _.isString(command) ? command : 'all';
-            var list = middlewares[queue] || [];
+        use(command, ...callback) {
+            let queue = 'all';
+
+            if (command && _.isString(command)) {
+                queue = command;
+            } else {
+                callback = [command, ...callback];
+            }
+
+            const list = middlewares[queue] || [];
             middlewares[queue] = list;
 
-            _.forEach(arguments, function(cb) {
+            _.forEach(callback, function (cb) {
                 if (_.isFunction(cb)) {
                     list.push(cb);
 
@@ -76,17 +83,17 @@ function middlewareFactory() {
          * @param {Object} [context] - An optional context object to apply on middlewares
          * @returns {Promise}
          */
-        apply: function apply(request, response, context) {
-            var stack = getMiddlewares(request.command);
-            var pointer = 0;
+        apply(request, response, context) {
+            const stack = getMiddlewares(request.command);
+            let pointer = 0;
 
             // apply each middleware in series, then resolve or reject the promise
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 function next() {
-                    var middleware = stack[pointer++];
+                    const middleware = stack[pointer++];
                     if (middleware) {
                         Promise.resolve(middleware.call(context, request, response))
-                            .then(function(res) {
+                            .then(function (res) {
                                 if (res !== false) {
                                     next();
                                 } else {
@@ -101,7 +108,7 @@ function middlewareFactory() {
 
                 next();
             })
-                .then(function() {
+                .then(function () {
                     // handle implicit error from response descriptor
                     if (response.success === false) {
                         return Promise.reject(response);
@@ -117,7 +124,7 @@ function middlewareFactory() {
 
                     return response;
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     /**
                      * @event failed
                      * @param {Object} request - The request descriptor
@@ -137,7 +144,7 @@ function middlewareFactory() {
      * @returns {Array}
      */
     function getMiddlewares(queue) {
-        var list = middlewares[queue] || [];
+        let list = middlewares[queue] || [];
         if (middlewares.all) {
             list = list.concat(middlewares.all);
         }

@@ -24,29 +24,29 @@
 import $ from 'jquery';
 import _ from 'lodash';
 
-var defaults = {
+const defaults = {
     container: false,
     listenerEvent: 'click',
     useTarget: true,
     bubbled: false
 };
 
-var letDefaultOn = [':radio', ':checkbox'];
+const letDefaultOn = [':radio', ':checkbox'];
 
 /**
  * Some elements (listed in letDefaultOn) need the usual action to be triggered, check that
- * @param {jQueryElement} $elt
+ * @param {jQuery} $elt
  * @returns {boolean}
  */
-var shouldPreventDefault = function shouldPreventDefault($elt) {
+function shouldPreventDefault($elt) {
     return !$elt.is(letDefaultOn.join(','));
-};
+}
 
 /**
  * This callback is used either to perform actions on data-attr element
  * @callback dataAttrCallback
- * @params {jQueryElmement} $elt - the element that contains the data-attr
- * @params {jQueryElmement} $target - the element targeted by the data-attr
+ * @params {jQuery} $elt - the element that contains the data-attr
+ * @params {jQuery} $target - the element targeted by the data-attr
  */
 
 /**
@@ -54,21 +54,20 @@ var shouldPreventDefault = function shouldPreventDefault($elt) {
  * and bound a jQuery plugin behavior.
  * @exports core/dataattrhandler
  *
- * @contructor
+ * @constructor
  * @param {string} attrName - the name of the attribute, ie. `toggle` for `data-toggle`
  * @param {Object} options - the handler options
  * @param {string} options.namespace - the jQuery plugin namespace
- * @param {jQueryElement|boolean} [options.container = false] - the root context to listen in
+ * @param {jQuery|boolean} [options.container = false] - the root context to listen in
  * @param {string} [options.listenerEvent = 'click'] - the event to listen on
  * @param {boolean} [options.preventDefault = true] - to prevent the default event to be fired
  * @param {string} [options.inner] - a selector inside the element to bind the event to
  * @param {boolean} [options.useTarget = true] - if the content of the data-attr is as target or not
  * @param {boolean} [options.bubbled = false] - handle the event if bubbled from a child
  */
-var DataAttrHandler = function construct(attrName, options) {
-    var self = this;
+function DataAttrHandler(attrName, options) {
     this.options = _.defaults(options, defaults);
-    var selector = '[data-' + attrName + ']';
+    let selector = `[data-${attrName}]`;
 
     //check namespace
     if (!_.has(this.options, 'namespace') || !_.isString(this.options.namespace)) {
@@ -76,57 +75,57 @@ var DataAttrHandler = function construct(attrName, options) {
     }
 
     if (this.options.container && this.options.container.selector) {
-        selector = this.options.container.selector + ' ' + selector;
+        selector = `${this.options.container.selector} ${selector}`;
     }
 
     if (this.options.inner) {
-        selector += ' ' + this.options.inner;
+        selector += ` ${this.options.inner}`;
     }
 
     //listen for events on selector (the listening works even though the DOM changes).
     $(document)
         .off(this.options.listenerEvent, selector)
-        .on(this.options.listenerEvent, selector, function(e) {
-            var $elt = $(e.target);
-            if (self.options.bubbled === true || $elt.is(selector)) {
-                var $target, $outer;
+        .on(this.options.listenerEvent, selector, e => {
+            let $elt = $(e.target);
+            if (this.options.bubbled === true || $elt.is(selector)) {
+                let $outer;
 
-                if ($elt.data(attrName) === undefined && (self.options.inner || self.options.bubbled)) {
+                if (typeof $elt.data(attrName) === 'undefined' && (this.options.inner || this.options.bubbled)) {
                     $outer = $elt;
-                    $elt = $elt.parents('[data-' + attrName + ']');
+                    $elt = $elt.parents(`[data-${attrName}]`);
                 }
 
-                $target =
-                    self.options.useTarget === true
-                        ? DataAttrHandler.getTarget(attrName, $elt)
-                        : self.options.inner
-                        ? $outer
-                        : undefined;
+                let $target;
+                if (this.options.useTarget === true) {
+                    $target = DataAttrHandler.getTarget(attrName, $elt);
+                } else if (this.options.inner) {
+                    $target = $outer;
+                }
 
                 //check if the plugin is already bound to the element
-                if (!$elt.data(self.options.namespace)) {
-                    if (typeof self.createPlugin === 'function') {
-                        self.createPlugin($elt, $target);
+                if (!$elt.data(this.options.namespace)) {
+                    if (typeof this.createPlugin === 'function') {
+                        this.createPlugin($elt, $target);
                     }
 
                     //for radio bind also the method call to the group...
                     if ($elt.is(':radio') && $elt.attr('name')) {
-                        $(':radio[name="' + $elt.attr('name') + '"]')
+                        $(`:radio[name="${$elt.attr('name')}"]`)
                             .not($elt)
-                            .on(self.options.listenerEvent, function(e) {
-                                if (typeof self.callPluginMethod === 'function') {
-                                    self.callPluginMethod($elt, $target);
+                            .on(this.options.listenerEvent, ev => {
+                                if (typeof this.callPluginMethod === 'function') {
+                                    this.callPluginMethod($elt, $target);
                                 }
                                 if (shouldPreventDefault($elt)) {
-                                    e.preventDefault();
+                                    ev.preventDefault();
                                 }
                             });
                     }
                 }
 
                 //call the method bound to this event
-                if (typeof self.callPluginMethod === 'function') {
-                    self.callPluginMethod($elt, $target);
+                if (typeof this.callPluginMethod === 'function') {
+                    this.callPluginMethod($elt, $target);
                 } /*else {
                     //if there is no action to call we top listening (init plugin only)
                     $(document).off(self.options.listenerEvent, selector);
@@ -137,7 +136,7 @@ var DataAttrHandler = function construct(attrName, options) {
                 }
             }
         });
-};
+}
 
 /**
  * Add the callback used to initialise the plugin,
@@ -145,7 +144,7 @@ var DataAttrHandler = function construct(attrName, options) {
  * @param {dataAttrCallback} cb - callback
  * @returns {DataAttrHandler} for chaining
  */
-DataAttrHandler.prototype.init = function(cb) {
+DataAttrHandler.prototype.init = function init(cb) {
     this.createPlugin = cb;
 
     return this;
@@ -156,7 +155,7 @@ DataAttrHandler.prototype.init = function(cb) {
  * @param {dataAttrCallback} cb - callback
  * @returns {DataAttrHandler} for chaining
  */
-DataAttrHandler.prototype.trigger = function(cb) {
+DataAttrHandler.prototype.trigger = function trigger(cb) {
     this.callPluginMethod = cb;
 
     return this;
@@ -167,18 +166,18 @@ DataAttrHandler.prototype.trigger = function(cb) {
  * The value of the data-attr is a CSS selector, it will be applied directly or with $elt as context.
  *
  * @param {String} attrName - the name of the attribute, ie. `toggle` for `data-toggle`
- * @param {jQueryElement} $elt - the element that holds the data attr
- * @returns {jQueryElement} the target
+ * @param {jQuery} $elt - the element that holds the data attr
+ * @returns {jQuery} the target
  */
 DataAttrHandler.getTarget = function getTarget(attrName, $elt) {
-    var relativeRegex = /^(\+|>|~|:parent|<)/;
-    var $target = [];
-    var targetSelector = $elt.attr('data-' + attrName) || $elt.attr('href') || $elt.attr('attrName');
+    const relativeRegex = /^(\+|>|~|:parent|<)/;
+    let $target = [];
+    const targetSelector = $elt.attr(`data-${attrName}`) || $elt.attr('href') || $elt.attr('attrName');
     if (!_.isEmpty(targetSelector)) {
         //try to contextualize from the current element before selcting globally
-        var matches = relativeRegex.exec(targetSelector);
+        const matches = relativeRegex.exec(targetSelector);
         if (matches !== null) {
-            var selector = targetSelector.replace(relativeRegex, '');
+            const selector = targetSelector.replace(relativeRegex, '');
             if (matches[0] === ':parent' || matches[0] === '<') {
                 $target = $elt.parents(selector);
             } else if (matches[0] === '~') {

@@ -49,15 +49,15 @@ import uuid from 'lib/uuid';
  */
 export default function promiseQueueFactory() {
     //where we keep the pending promises
-    var queue = {};
+    let queue = {};
 
-    var getId = function getId() {
-        var id = 'promise-' + uuid(6);
+    function getId() {
+        const id = `promise-${uuid(6)}`;
         if (typeof queue[id] === 'undefined') {
             return id;
         }
         return getId();
-    };
+    }
 
     /**
      * @typedef {promiseQueue}
@@ -66,9 +66,9 @@ export default function promiseQueueFactory() {
         /**
          * Just add another promise to the queue
          * @param {Promise} promise
-         * @return {promiseQueue} chains
+         * @returns {promiseQueue} chains
          */
-        add: function add(promise) {
+        add(promise) {
             queue[getId()] = promise;
             return this;
         },
@@ -77,15 +77,15 @@ export default function promiseQueueFactory() {
          * Get the queue values
          * @returns {Promise[]} the array of promises in the queue
          */
-        getValues: function getValues() {
+        getValues() {
             return _.values(queue);
         },
 
         /**
          * Empty the queue
-         * @return {promiseQueue} chains
+         * @returns {promiseQueue} chains
          */
-        clear: function clear() {
+        clear() {
             queue = {};
             return this;
         },
@@ -95,17 +95,17 @@ export default function promiseQueueFactory() {
          * @param {Function} promiseFn - a function that returns a promise
          * @returns {Promise}
          */
-        serie: function serie(promiseFn) {
-            var id = getId();
+        serie(promiseFn) {
+            const id = getId();
 
             //the actual queue to execute before running the given promise
-            var currentQueue = this.getValues();
+            const currentQueue = this.getValues();
 
             //use an emitter to notify the promise fulfillment, internally.
-            var emitter = eventifier();
+            const emitter = eventifier();
 
             //add a waiting promise into the queue (for others who are calling the queue)
-            queue[id] = new Promise(function(resolve) {
+            queue[id] = new Promise(function (resolve) {
                 emitter.on('fulfilled', resolve);
             });
 
@@ -113,17 +113,17 @@ export default function promiseQueueFactory() {
             //then run the given promise
             //and resolve the waiting promise (for others)
             return Promise.all(currentQueue)
-                .then(function() {
+                .then(function () {
                     if (_.isFunction(promiseFn)) {
                         return promiseFn();
                     }
                 })
-                .then(function(data) {
+                .then(function (data) {
                     emitter.trigger('fulfilled');
                     delete queue[id];
                     return data;
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     queue = {};
                     throw err;
                 });

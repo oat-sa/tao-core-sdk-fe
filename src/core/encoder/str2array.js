@@ -31,7 +31,7 @@ export default {
      * @param {String} [glue = ','] - the join glue
      * @returns {String} the encoded string
      */
-    encode: function encode(modelValue, glue) {
+    encode(modelValue, glue) {
         glue = glue || ',';
         return _.isArray(modelValue) ? modelValue.join(glue) : modelValue;
     },
@@ -42,9 +42,9 @@ export default {
      * @param {String} [glue = ','] - the split glue
      * @returns {String[]} the encoded array
      */
-    decode: function decode(nodeValue, glue) {
+    decode(nodeValue, glue) {
         glue = glue || ',';
-        var input = _.isString(nodeValue) ? nodeValue.trim() : nodeValue;
+        const input = _.isString(nodeValue) ? nodeValue.trim() : nodeValue;
         return _.isEmpty(input) ? [] : input.split(glue);
     }
 };
