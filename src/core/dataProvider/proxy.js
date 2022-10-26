@@ -25,7 +25,7 @@ import Promise from 'core/promise';
 import providerRegistry from 'core/providerRegistry';
 import tokenHandlerFactory from 'core/tokenHandler';
 
-var _defaults = {};
+const _defaults = {};
 
 /**
  * Defines a CRUD proxy bound to a particular adapter. Each adapter will have to provide the following API:
@@ -43,16 +43,16 @@ var _defaults = {};
  * @returns {proxy} - The proxy instance, bound to the selected proxy adapter
  */
 function crudProxyFactory(proxyName, middlewares) {
-    var proxyAdapter = crudProxyFactory.getProvider(proxyName);
-    var tokenHandler = tokenHandlerFactory();
-    var extraParams = {};
-    var initialized = false;
-    var initConfig;
+    const proxyAdapter = crudProxyFactory.getProvider(proxyName);
+    const tokenHandler = tokenHandlerFactory();
+    let extraParams = {};
+    let initialized = false;
+    let initConfig;
 
     /**
      * @typedef {proxy}
      */
-    var proxy = eventifier({
+    const proxy = eventifier({
         /**
          * Initializes the proxy
          * @param {Object} [config] - Some optional config depending of implementation,
@@ -62,7 +62,7 @@ function crudProxyFactory(proxyName, middlewares) {
          *                      Any error will be provided if rejected.
          * @fires init
          */
-        init: function init(config) {
+        init(config) {
             initConfig = _.defaults({}, config, _defaults);
 
             /**
@@ -70,7 +70,7 @@ function crudProxyFactory(proxyName, middlewares) {
              * @param {Promise} promise
              * @param {Object} params
              */
-            return delegate('init', initConfig).then(function() {
+            return delegate('init', initConfig).then(function () {
                 // If the delegate call succeed the proxy is initialized.
                 initialized = true;
                 return proxy;
@@ -83,12 +83,12 @@ function crudProxyFactory(proxyName, middlewares) {
          *                      Any error will be provided if rejected.
          * @fires destroy
          */
-        destroy: function destroy() {
+        destroy() {
             /**
              * @event destroy
              * @param {Promise} promise
              */
-            return delegate('destroy').then(function() {
+            return delegate('destroy').then(function () {
                 // The proxy is now destroyed. A call to init() is mandatory to be able to use it again.
                 initialized = false;
                 initConfig = null;
@@ -103,7 +103,7 @@ function crudProxyFactory(proxyName, middlewares) {
          *                      Any error will be provided if rejected.
          * @fires create
          */
-        create: function create(params) {
+        create(params) {
             /**
              * @event create
              * @param {Promise} promise
@@ -119,7 +119,7 @@ function crudProxyFactory(proxyName, middlewares) {
          *                      Any error will be provided if rejected.
          * @fires read
          */
-        read: function read(params) {
+        read(params) {
             /**
              * @event read
              * @param {Promise} promise
@@ -135,7 +135,7 @@ function crudProxyFactory(proxyName, middlewares) {
          *                      Any error will be provided if rejected.
          * @fires write
          */
-        write: function write(params) {
+        write(params) {
             /**
              * @event write
              * @param {Promise} promise
@@ -151,7 +151,7 @@ function crudProxyFactory(proxyName, middlewares) {
          *                      Any error will be provided if rejected.
          * @fires remove
          */
-        remove: function remove(params) {
+        remove(params) {
             /**
              * @event remove
              * @param {Promise} promise
@@ -168,7 +168,7 @@ function crudProxyFactory(proxyName, middlewares) {
          *                      Any error will be provided if rejected.
          * @fires action
          */
-        action: function action(name, params) {
+        action(name, params) {
             /**
              * @event action
              * @param {Promise} promise
@@ -183,7 +183,7 @@ function crudProxyFactory(proxyName, middlewares) {
          * @param {Object} params - the extra parameters
          * @returns {proxy}
          */
-        addExtraParams: function addExtraParams(params) {
+        addExtraParams(params) {
             if (_.isPlainObject(params)) {
                 _.merge(extraParams, params);
             }
@@ -194,7 +194,7 @@ function crudProxyFactory(proxyName, middlewares) {
          * Gets the security token handler
          * @returns {tokenHandler}
          */
-        getTokenHandler: function getTokenHandler() {
+        getTokenHandler() {
             return tokenHandler;
         },
 
@@ -202,7 +202,7 @@ function crudProxyFactory(proxyName, middlewares) {
          * Gets the config object
          * @returns {Object}
          */
-        getConfig: function getConfig() {
+        getConfig() {
             return initConfig;
         },
 
@@ -210,7 +210,7 @@ function crudProxyFactory(proxyName, middlewares) {
          * Gets the middlewares handler
          * @returns {middlewareHandler}
          */
-        getMiddlewares: function getMidlewares() {
+        getMiddlewares() {
             return middlewares;
         },
 
@@ -219,15 +219,15 @@ function crudProxyFactory(proxyName, middlewares) {
          * @param {middlewareHandler} [handler] - An optional middlewares handler
          * @returns {proxy}
          */
-        setMiddlewares: function setMidlewares(handler) {
+        setMiddlewares(handler) {
             middlewares = handler;
             return this;
         }
     });
 
-    var delegateProxy = delegator(proxy, proxyAdapter, {
+    const delegateProxy = delegator(proxy, proxyAdapter, {
         name: 'proxy',
-        wrapper: function proxyWrapper(response) {
+        wrapper(response) {
             return Promise.resolve(response);
         }
     });
@@ -235,11 +235,11 @@ function crudProxyFactory(proxyName, middlewares) {
     /**
      * Gets parameters merged with extra parameters
      * @param {Object} [params]
-     * @return {Object}
+     * @returns {Object}
      * @private
      */
     function getParams(params) {
-        var mergedParams = _.merge({}, params, extraParams);
+        const mergedParams = _.merge({}, params, extraParams);
         extraParams = {};
         return mergedParams;
     }
@@ -248,24 +248,24 @@ function crudProxyFactory(proxyName, middlewares) {
      * Delegates the call to the proxy implementation and apply the middleware.
      *
      * @param {String} fnName - The name of the delegated method to call
+     * @param {...*} [params] - Additional parameters
      * @returns {Promise} - The delegated method must return a promise
      * @private
      * @throws Error
      */
-    function delegate(fnName) {
-        var request = { command: fnName, params: Array.prototype.slice.call(arguments, 1) };
+    function delegate(fnName, ...params) {
+        const request = { command: fnName, params };
         if (!initialized && fnName !== 'init') {
             return Promise.reject(new Error('Proxy is not properly initialized or has been destroyed!'));
         }
-        return delegateProxy
-            .apply(null, arguments)
-            .then(function(data) {
+        return delegateProxy(fnName, ...params)
+            .then(function (data) {
                 if (middlewares) {
                     return middlewares.apply(request, data);
                 }
                 return data;
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 proxy.trigger('error', err);
                 return Promise.reject(err);
             });

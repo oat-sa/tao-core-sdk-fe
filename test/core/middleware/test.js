@@ -51,7 +51,7 @@ define(['core/middleware'], function(middlewaresHandlerFactory) {
         assert.equal(
             typeof instance[data.title],
             'function',
-            'The middlewaresHandlerFactory instance exposes a "' + data.title + '" function'
+            `The middlewaresHandlerFactory instance exposes a "${data.title}" function`
         );
     });
 
@@ -103,6 +103,7 @@ define(['core/middleware'], function(middlewaresHandlerFactory) {
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });

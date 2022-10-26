@@ -27,7 +27,7 @@ define(['jquery', 'core/databinder'], function($, DataBinder) {
     var model;
 
     QUnit.module('2 ways data binding', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             model = {
                 title: 'testTitle',
                 testParts: [
@@ -113,7 +113,7 @@ define(['jquery', 'core/databinder'], function($, DataBinder) {
 
         $title.trigger('delete');
 
-        assert.strictEqual(model.title, undefined, 'model title has been removed');
+        assert.strictEqual(model.title, void 0, 'model title has been removed');
     });
 
     QUnit.test('Array assignment', function(assert) {
@@ -175,7 +175,6 @@ define(['jquery', 'core/databinder'], function($, DataBinder) {
         var $sectionParts = $('ul', $container);
         var $firstPart;
         var $thirdPart;
-        var index;
 
         assert.expect(7);
 
@@ -216,7 +215,7 @@ define(['jquery', 'core/databinder'], function($, DataBinder) {
             .find('[data-bind="href"]')
             .text('toto')
             .trigger('change');
-        index = $sectionParts.find('li:nth-child(2)').attr('data-bind-index');
+
         assert.equal(
             model.testParts[0].assessmentSections[0].sectionParts[1].href,
             'toto',

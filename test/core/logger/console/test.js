@@ -25,11 +25,11 @@ define(['core/logger/console'], function(consoleLogger) {
     'use strict';
 
     //Keep a ref of the global functions
-    var cerr = window.console.error;
-    var cwarn = window.console.warn;
-    var cinfo = window.console.info;
-    var clog = window.console.log;
-    var cdebug = window.console.debug;
+    const cerr = window.console.error;
+    const cwarn = window.console.warn;
+    const cinfo = window.console.info;
+    const clog = window.console.log;
+    const cdebug = window.console.debug;
 
     //Mock checkMinLevel function which should be propogated by core/logger/api module
     consoleLogger.checkMinLevel = function() {
@@ -57,7 +57,7 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.test('trace log', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(4);
 
         window.console.debug = function(name, message, record) {
@@ -76,9 +76,9 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.test('debug log', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
 
-        var field = {
+        const field = {
             array: ['a', 'b', 'c'],
             obj: {
                 prop: true,
@@ -106,7 +106,7 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.test('info log', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(5);
 
         window.console.info = function(name, message, record) {
@@ -127,7 +127,7 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.test('warn log', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(4);
 
         window.console.warn = function(name, message, record) {
@@ -146,7 +146,7 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.test('error log', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(5);
 
         window.console.error = function(name, message, err, record) {
@@ -167,7 +167,7 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.test('fatal log', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(5);
 
         window.console.error = function(name, message, err, record) {
@@ -188,14 +188,14 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.module('fallback logging', {
-        beforeEach: function(assert) {
-            window.console.error = undefined;
-            window.console.warn = undefined;
-            window.console.info = undefined;
-            window.console.log = undefined;
-            window.console.debug = undefined;
+        beforeEach: function() {
+            window.console.error = void 0;
+            window.console.warn = void 0;
+            window.console.info = void 0;
+            window.console.log = void 0;
+            window.console.debug = void 0;
         },
-        afterEach: function(assert) {
+        afterEach: function() {
             window.console.error = cerr;
             window.console.warn = cwarn;
             window.console.info = cinfo;
@@ -205,7 +205,7 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.test('no native warn', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(5);
 
         window.console.log = function(level, name, message, record) {
@@ -225,7 +225,7 @@ define(['core/logger/console'], function(consoleLogger) {
     });
 
     QUnit.test('no native debug', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(5);
 
         window.console.log = function(level, name, message, record) {

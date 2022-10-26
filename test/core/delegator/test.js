@@ -117,9 +117,9 @@ define(['core/delegator'], function(delegator) {
     QUnit.test('delegate event disabled', function(assert) {
         var delegate;
         var api = {
-            action: function() {
+            action: function(...args) {
                 assert.ok(true, 'Action called from the api');
-                return delegate('action', arguments);
+                return delegate('action', args);
             },
 
             trigger: function() {

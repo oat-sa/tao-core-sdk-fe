@@ -40,13 +40,13 @@ import namespaceHelper from 'util/namespace';
 /**
  * All shortcuts have a namespace, this one is the default
  */
-var defaultNs = '*';
+const defaultNs = '*';
 
 /**
  * Translation map from name of modifiers to event property
  * @type {Object}
  */
-var modifiers = {
+const modifiers = {
     ctrl: 'ctrlKey',
     alt: 'altKey',
     option: 'altKey',
@@ -60,7 +60,7 @@ var modifiers = {
  * Translation map from normalized name of keys
  * @type {Object}
  */
-var translateKeys = {
+const translateKeys = {
     escape: 'esc',
     arrowdown: 'down',
     arrowleft: 'left',
@@ -72,7 +72,7 @@ var translateKeys = {
  * List of special keys with their codes
  * @type {Object}
  */
-var specialKeys = {
+const specialKeys = {
     8: 'backspace',
     9: 'tab',
     13: 'enter',
@@ -117,9 +117,9 @@ function registerEvent(target, eventName, listener) {
     if (target.addEventListener) {
         target.addEventListener(eventName, listener, false);
     } else if (target.attachEvent) {
-        target.attachEvent('on' + eventName, listener);
+        target.attachEvent(`on${eventName}`, listener);
     } else {
-        target['on' + eventName] = listener;
+        target[`on${eventName}`] = listener;
     }
 }
 
@@ -133,9 +133,9 @@ function unregisterEvent(target, eventName, listener) {
     if (target.removeEventListener) {
         target.removeEventListener(eventName, listener, false);
     } else if (target.detachEvent) {
-        target.detachEvent('on' + eventName, listener);
+        target.detachEvent(`on${eventName}`, listener);
     } else {
-        target['on' + eventName] = null;
+        target[`on${eventName}`] = null;
     }
 }
 
@@ -146,15 +146,15 @@ function unregisterEvent(target, eventName, listener) {
  */
 function getActualKey(event) {
     // Get the code of the key, used to identify special keys on browser that does not support the full KeyboardEvent API
-    var code = event.which || event.keyCode;
-    var character = code >= 32 ? String.fromCharCode(code).toLowerCase() : '';
+    const code = event.which || event.keyCode;
+    const character = code >= 32 ? String.fromCharCode(code).toLowerCase() : '';
 
     // Get the name of the key on browser that have a good support of the KeyboardEvent API
-    var key = event.key && event.key.toLowerCase();
+    let key = event.key && event.key.toLowerCase();
 
     // If the browser supports the KeyboardEvent API it may provide the result of the shortcut instead of the actual key.
     // For instance on Mac if you input "Alt+V" the key property will contain "◊"
-    var keyName = event.code && event.code.toLowerCase();
+    const keyName = event.code && event.code.toLowerCase();
     if (keyName) {
         if (keyName.indexOf('key') === 0) {
             // fix the result key only if the actual key name is not alpha (diff due to local layout)
@@ -175,10 +175,10 @@ function getActualKey(event) {
 /**
  * Gets the pressed buttons
  * @param {MouseEvent} event
- * @return {Object}
+ * @returns {Object}
  */
 function getActualButton(event) {
-    var buttons = {
+    const buttons = {
         clickLeft: false,
         clickRight: false,
         clickMiddle: false,
@@ -222,7 +222,7 @@ function getActualButton(event) {
 /**
  * Gets the scroll direction
  * @param {WheelEvent} event
- * @return {Object}
+ * @returns {Object}
  */
 function getActualScroll(event) {
     return {
@@ -237,8 +237,8 @@ function getActualScroll(event) {
  * @returns {String}
  */
 function normalizeCommand(descriptor) {
-    var key = translateKeys[descriptor.key] || descriptor.key;
-    var parts = [];
+    const key = translateKeys[descriptor.key] || descriptor.key;
+    const parts = [];
 
     if (descriptor.ctrlKey) {
         parts.push('control');
@@ -289,8 +289,8 @@ function normalizeCommand(descriptor) {
  * @returns {Object}
  */
 function parseCommand(shortcut) {
-    var parts = namespaceHelper.getName(shortcut).split('+');
-    var descriptor = {
+    const parts = namespaceHelper.getName(shortcut).split('+');
+    const descriptor = {
         keyboardInvolved: false,
         mouseClickInvolved: false,
         mouseWheelInvolved: false,
@@ -308,7 +308,7 @@ function parseCommand(shortcut) {
         clickForward: null
     };
 
-    _.forEach(parts, function(part) {
+    _.forEach(parts, function (part) {
         if (modifiers[part]) {
             descriptor[modifiers[part]] = true;
         } else if (part.indexOf('mouse') >= 0) {
@@ -356,17 +356,17 @@ function parseCommand(shortcut) {
  * @returns {shortcut}
  */
 export default function shortcutFactory(root, defaultOptions) {
-    var keyboardIsRegistered = false;
-    var mouseClickIsRegistered = false;
-    var mouseWheelIsRegistered = false;
+    let keyboardIsRegistered = false;
+    let mouseClickIsRegistered = false;
+    let mouseWheelIsRegistered = false;
 
-    var keyboardCount = 0;
-    var mouseClickCount = 0;
-    var mouseWheelCount = 0;
+    let keyboardCount = 0;
+    let mouseClickCount = 0;
+    let mouseWheelCount = 0;
 
-    var shortcuts = {};
-    var handlers = {};
-    var states = {};
+    let shortcuts = {};
+    let handlers = {};
+    const states = {};
 
     /**
      * Gets the handlers for a shortcut
@@ -388,7 +388,7 @@ export default function shortcutFactory(root, defaultOptions) {
     function getCommandHandlers(command) {
         return _.reduce(
             handlers,
-            function(acc, nsHandlers) {
+            function (acc, nsHandlers) {
                 if (nsHandlers[command]) {
                     acc = acc.concat(nsHandlers[command]);
                 }
@@ -407,7 +407,7 @@ export default function shortcutFactory(root, defaultOptions) {
         if (namespace && !command) {
             handlers[namespace] = {};
         } else {
-            _.forEach(handlers, function(nsHandlers, ns) {
+            _.forEach(handlers, function (nsHandlers, ns) {
                 if (nsHandlers[command] && (namespace === defaultNs || namespace === ns)) {
                     nsHandlers[command] = [];
                 }
@@ -532,7 +532,7 @@ export default function shortcutFactory(root, defaultOptions) {
      * @param {String} command
      */
     function unregisterCommand(command) {
-        var descriptor = shortcuts[command];
+        const descriptor = shortcuts[command];
         shortcuts[command] = null;
 
         if (descriptor) {
@@ -609,14 +609,12 @@ export default function shortcutFactory(root, defaultOptions) {
      * @param {Object} descriptor
      */
     function processShortcut(event, descriptor) {
-        var command = normalizeCommand(descriptor);
-        var shortcut = shortcuts[command];
-        var shortcutHandlers;
-        var $target;
+        const command = normalizeCommand(descriptor);
+        const shortcut = shortcuts[command];
 
         if (shortcut && !states.disabled) {
             if (shortcut.options.avoidInput === true) {
-                $target = $(event.target);
+                const $target = $(event.target);
                 if ($target.closest('[type="text"],textarea').length) {
                     if (!shortcut.options.allowIn || !$target.closest(shortcut.options.allowIn).length) {
                         return;
@@ -630,10 +628,10 @@ export default function shortcutFactory(root, defaultOptions) {
                 event.preventDefault();
             }
 
-            shortcutHandlers = getCommandHandlers(command);
+            const shortcutHandlers = getCommandHandlers(command);
 
             if (shortcutHandlers) {
-                _.forEach(shortcutHandlers, function(handler) {
+                _.forEach(shortcutHandlers, function (handler) {
                     handler(event, command);
                 });
             }
@@ -661,10 +659,10 @@ export default function shortcutFactory(root, defaultOptions) {
          * the provided CSS class, even if the shortcut is triggered from an input field.
          * @returns {shortcut} this
          */
-        set: function set(shortcut, options) {
-            _.forEach(namespaceHelper.split(shortcut, true), function(normalized) {
-                var descriptor = parseCommand(normalized);
-                var command = normalizeCommand(descriptor);
+        set(shortcut, options) {
+            _.forEach(namespaceHelper.split(shortcut, true), function (normalized) {
+                const descriptor = parseCommand(normalized);
+                const command = normalizeCommand(descriptor);
 
                 setOptions(descriptor, options);
                 registerCommand(command, descriptor);
@@ -685,12 +683,12 @@ export default function shortcutFactory(root, defaultOptions) {
          * the provided CSS class, even if the shortcut is triggered from an input field.
          * @returns {shortcut} this
          */
-        add: function add(shortcut, handler, options) {
+        add(shortcut, handler, options) {
             if (_.isFunction(handler)) {
-                _.forEach(namespaceHelper.split(shortcut, true), function(normalized) {
-                    var namespace = namespaceHelper.getNamespace(normalized, defaultNs);
-                    var descriptor = parseCommand(normalized);
-                    var command = normalizeCommand(descriptor);
+                _.forEach(namespaceHelper.split(shortcut, true), function (normalized) {
+                    const namespace = namespaceHelper.getNamespace(normalized, defaultNs);
+                    const descriptor = parseCommand(normalized);
+                    const command = normalizeCommand(descriptor);
 
                     setOptions(descriptor, options);
                     registerCommand(command, descriptor);
@@ -706,11 +704,11 @@ export default function shortcutFactory(root, defaultOptions) {
          * @param {String} shortcut
          * @returns {shortcut} this
          */
-        remove: function remove(shortcut) {
-            _.forEach(namespaceHelper.split(shortcut, true), function(normalized) {
-                var namespace = namespaceHelper.getNamespace(normalized, defaultNs);
-                var descriptor = parseCommand(normalized);
-                var command = normalizeCommand(descriptor);
+        remove(shortcut) {
+            _.forEach(namespaceHelper.split(shortcut, true), function (normalized) {
+                const namespace = namespaceHelper.getNamespace(normalized, defaultNs);
+                const descriptor = parseCommand(normalized);
+                const command = normalizeCommand(descriptor);
 
                 clearHandlers(command, namespace);
 
@@ -727,14 +725,12 @@ export default function shortcutFactory(root, defaultOptions) {
          * @param {String} shortcut
          * @returns {Boolean}
          */
-        exists: function exists(shortcut) {
-            var normalized = String(shortcut)
-                .trim()
-                .toLowerCase();
-            var namespace = namespaceHelper.getNamespace(normalized, defaultNs);
-            var descriptor = parseCommand(normalized);
-            var command = normalizeCommand(descriptor);
-            var shortcutExists = false;
+        exists(shortcut) {
+            const normalized = String(shortcut).trim().toLowerCase();
+            const namespace = namespaceHelper.getNamespace(normalized, defaultNs);
+            const descriptor = parseCommand(normalized);
+            const command = normalizeCommand(descriptor);
+            let shortcutExists = false;
 
             if (shortcuts[command]) {
                 shortcutExists = namespace === defaultNs || !!getHandlers(command, namespace).length;
@@ -749,7 +745,7 @@ export default function shortcutFactory(root, defaultOptions) {
          * Removes all registered shortcuts
          * @returns {shortcut} this
          */
-        clear: function clear() {
+        clear() {
             shortcuts = {};
             handlers = {};
             keyboardCount = 0;
@@ -768,7 +764,7 @@ export default function shortcutFactory(root, defaultOptions) {
          * @param {String} name
          * @returns {Boolean}
          */
-        getState: function getState(name) {
+        getState(name) {
             return !!states[name];
         },
 
@@ -778,7 +774,7 @@ export default function shortcutFactory(root, defaultOptions) {
          * @param {Boolean} state
          * @returns {shortcut}
          */
-        setState: function setState(name, state) {
+        setState(name, state) {
             states[name] = !!state;
             return this;
         },
@@ -787,7 +783,7 @@ export default function shortcutFactory(root, defaultOptions) {
          * Enables the shortcuts to be listened
          * @returns {shortcut}
          */
-        enable: function enable() {
+        enable() {
             this.setState('disabled', false);
             return this;
         },
@@ -796,7 +792,7 @@ export default function shortcutFactory(root, defaultOptions) {
          * Prevents the shortcuts to be listened
          * @returns {shortcut}
          */
-        disable: function disable() {
+        disable() {
             this.setState('disabled', true);
             return this;
         }

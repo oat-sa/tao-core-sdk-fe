@@ -56,7 +56,7 @@ define([
         assert.equal(
             typeof ajaxProvider[data.title],
             'function',
-            'The proxy/ajax provider exposes a "' + data.title + '" function'
+            `The proxy/ajax provider exposes a "${data.title}" function`
         );
     });
 
@@ -110,6 +110,7 @@ define([
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -186,6 +187,7 @@ define([
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -256,6 +258,7 @@ define([
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -355,6 +358,7 @@ define([
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -425,6 +429,7 @@ define([
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -521,6 +526,7 @@ define([
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });

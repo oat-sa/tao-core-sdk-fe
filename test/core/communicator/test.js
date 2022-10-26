@@ -22,10 +22,10 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
     'use strict';
 
     QUnit.module('communicator factory', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             communicator.registerProvider('mock', { init: _.noop });
         },
-        afterEach: function(assert) {
+        afterEach: function() {
             communicator.clearProviders();
         }
     });
@@ -51,7 +51,7 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
         );
     });
 
-    var communicatorApi = [
+    const communicatorApi = [
         { name: 'init', title: 'init' },
         { name: 'destroy', title: 'destroy' },
 
@@ -72,25 +72,25 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
     ];
 
     QUnit.cases.init(communicatorApi).test('api', function(data, assert) {
-        var instance = communicator('mock');
+        const instance = communicator('mock');
         assert.equal(
             typeof instance[data.name],
             'function',
-            'The communicator instance exposes a "' + data.name + '" function'
+            `The communicator instance exposes a "${data.name}" function`
         );
     });
 
     QUnit.module('provider', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             communicator.clearProviders();
         }
     });
 
     QUnit.test('init()', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(5);
 
-        var expectedContextValue = 'yo!';
+        const expectedContextValue = 'yo!';
 
         communicator.registerProvider('foo', {
             init: function() {
@@ -99,7 +99,7 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
             }
         });
 
-        var instance = communicator('foo')
+        const instance = communicator('foo')
             .on('init', function() {
                 assert.ok(true, 'The communicator has fired the "init" event');
             })
@@ -122,10 +122,10 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
     });
 
     QUnit.test('destroy()', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(5);
 
-        var expectedContextValue = 'yo!';
+        const expectedContextValue = 'yo!';
 
         communicator.registerProvider('foo', {
             init: function() {
@@ -139,7 +139,7 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
             }
         });
 
-        var instance = communicator('foo')
+        const instance = communicator('foo')
             .on('destroy', function() {
                 assert.ok(true, 'The communicator has fired the "destroy" event');
             })
@@ -158,10 +158,10 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
     });
 
     QUnit.test('open()', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(6);
 
-        var expectedContextValue = 'yo!';
+        const expectedContextValue = 'yo!';
 
         communicator.registerProvider('foo', {
             init: function() {
@@ -175,7 +175,7 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
             }
         });
 
-        var instance = communicator('foo')
+        const instance = communicator('foo')
             .on('open', function() {
                 assert.ok(true, 'The communicator has fired the "open" event');
             })
@@ -200,10 +200,10 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
     });
 
     QUnit.test('close()', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(15);
 
-        var expectedContextValue = 'yo!';
+        const expectedContextValue = 'yo!';
 
         communicator.registerProvider('foo', {
             init: function() {
@@ -225,7 +225,7 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
             }
         });
 
-        var instance = communicator('foo')
+        const instance = communicator('foo')
             .on('close', function() {
                 assert.ok(true, 'The communicator has fired the "close" event');
             })
@@ -260,10 +260,10 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
     });
 
     QUnit.test('send()', function(assert) {
-        var ready = assert.async();
-        var expectedChannel = 'foo';
-        var expectedMessage = 'bar';
-        var expectedResponse = 'ok';
+        const ready = assert.async();
+        const expectedChannel = 'foo';
+        const expectedMessage = 'bar';
+        const expectedResponse = 'ok';
 
         assert.expect(15);
 
@@ -284,7 +284,7 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
             }
         });
 
-        var instance = communicator('foo')
+        const instance = communicator('foo')
             .on('send', function(promise, channel, message) {
                 assert.ok(true, 'The communicator has fired the "send" event');
                 assert.ok(promise instanceof Promise, 'The promise is provided');
@@ -318,14 +318,14 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
     });
 
     QUnit.test('channel()', function(assert) {
-        var ready = assert.async();
-        var expectedMessage = 'Hello';
+        const ready = assert.async();
+        const expectedMessage = 'Hello';
 
         assert.expect(4);
 
         communicator.registerProvider('foo', { init: _.noop });
 
-        var instance = communicator('foo');
+        const instance = communicator('foo');
 
         assert.throws(function() {
             instance.channel(null, _.noop);
@@ -345,30 +345,30 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
     });
 
     QUnit.test('getConfig()', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(1);
 
-        var config = {
+        const config = {
             timeout: 15000,
             moo: 'norz'
         };
 
         communicator.registerProvider('foo', {
             init: function() {
-                var myConfig = this.getConfig();
+                const myConfig = this.getConfig();
                 assert.deepEqual(myConfig, config, 'The retrieved config is the right one');
                 return Promise.resolve();
             }
         });
 
-        var instance = communicator('foo', config);
+        const instance = communicator('foo', config);
         instance.init().then(function() {
             ready();
         });
     });
 
     QUnit.test('setState()', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(4);
 
         communicator.registerProvider('foo', {
@@ -377,7 +377,7 @@ define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, com
             }
         });
 
-        var instance = communicator('foo');
+        const instance = communicator('foo');
         instance.init().then(function() {
             assert.ok(!instance.getState('foo'), 'The state "foo" is not set');
 

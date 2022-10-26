@@ -98,7 +98,7 @@ if (document.dispatchEvent) {
 } else if (document.fireEvent) {
     dispatchEvent = function dispatchEventUsingFireEvent(element, eventName, event) {
         if (element) {
-            element.fireEvent('on' + eventName, event);
+            element.fireEvent(`on${eventName}`, event);
             return true;
         }
         return false;

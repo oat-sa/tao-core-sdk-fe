@@ -27,8 +27,8 @@ import eventifier from 'core/eventifier';
 import statifier from 'core/statifier';
 import Promise from 'core/promise';
 
-var historyRouter;
-var location = (window.history.location || window.location) + '';
+let historyRouter;
+const location = `${window.history.location || window.location}`;
 
 /**
  * Create an history router
@@ -41,7 +41,7 @@ var location = (window.history.location || window.location) + '';
  * @returns {historyRouter} the router (same instance)
  */
 function historyRouterFactory() {
-    var pendingPromise;
+    let pendingPromise;
 
     if (historyRouter) {
         return historyRouter;
@@ -59,7 +59,7 @@ function historyRouterFactory() {
              * @param {String} url
              * @returns {Promise}
              */
-            redirect: function redirect(url) {
+            redirect(url) {
                 return this.pushState(url);
             },
 
@@ -70,9 +70,9 @@ function historyRouterFactory() {
              * @param {String} url
              * @returns {Promise}
              */
-            forward: function forward(url) {
-                var state = _.isString(url) ? { url: url } : url;
-                window.history.replaceState(state, '', window.location + '');
+            forward(url) {
+                const state = _.isString(url) ? { url: url } : url;
+                window.history.replaceState(state, '', `${window.location}`);
                 return this.dispatch(state, false);
             },
 
@@ -81,7 +81,7 @@ function historyRouterFactory() {
              * @param {String} url
              * @returns {Promise}
              */
-            replace: function replace(url) {
+            replace(url) {
                 return this.dispatch(url, true);
             },
 
@@ -95,9 +95,8 @@ function historyRouterFactory() {
              * @fires historyRouter#dispatching before dispatch
              * @fires historyRouter#dispatched  once dispatch succeed
              */
-            dispatch: function dispatch(state, replace) {
-                var self = this;
-                function doDispatch() {
+            dispatch(state, replace) {
+                const doDispatch = () => {
                     if (_.isString(state)) {
                         state = { url: state };
                     }
@@ -109,22 +108,22 @@ function historyRouterFactory() {
                      * @event historyRouter#dispatching
                      * @param {String} url
                      */
-                    self.setState('dispatching').trigger('dispatching', state.url);
+                    this.setState('dispatching').trigger('dispatching', state.url);
 
                     if (replace === true) {
                         window.history.replaceState(state, '', state.url);
                     }
 
-                    return router.dispatch(state.url).then(function() {
+                    return router.dispatch(state.url).then(() => {
                         /**
                          * @event historyRouter#dispatched
                          * @param {String} url
                          */
-                        self.trigger('dispatched', state.url).setState('dispatching', false);
+                        this.trigger('dispatched', state.url).setState('dispatching', false);
 
                         return state.url;
                     });
-                }
+                };
 
                 if (pendingPromise) {
                     pendingPromise = pendingPromise.then(doDispatch).catch(doDispatch);
@@ -141,7 +140,7 @@ function historyRouterFactory() {
              * @param {String} state.url - if the state is an object, then it must have an URL to dispatch
              * @returns {Promise}
              */
-            pushState: function pushState(state) {
+            pushState(state) {
                 if (_.isString(state)) {
                     state = { url: state };
                 }
@@ -155,12 +154,12 @@ function historyRouterFactory() {
     window.history.replaceState({ url: location }, '', location);
 
     //back & forward button, and push state
-    $(window).on('popstate', function() {
+    $(window).on('popstate', function () {
         historyRouter.dispatch(window.history.state);
     });
 
     //listen for dispatch event in order to push a state
-    historyRouter.on('dispatch', function(state) {
+    historyRouter.on('dispatch', function (state) {
         if (state) {
             this.pushState(state);
         }
