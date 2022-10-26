@@ -40,9 +40,7 @@ const type = iOS ? 'data:application/octet-stream' : 'data:text/plain';
  * @throws {TypeError}
  * @returns {Boolean}
  */
-var download = function download(filename, content) {
-    var element;
-
+function download(filename, content) {
     if (_.isEmpty(filename) || !_.isString(filename)) {
         throw new TypeError('Invalid filename');
     }
@@ -60,16 +58,16 @@ var download = function download(filename, content) {
         return true;
     }
 
-    element = document.createElement('a');
+    const element = document.createElement('a');
     iOS && element.setAttribute('target', '_blank');
-    element.setAttribute('href', type + ';charset=utf-8,' + encodeURIComponent(content));
+    element.setAttribute('href', `${type};charset=utf-8,${encodeURIComponent(content)}`);
     element.setAttribute('download', filename);
     element.style.display = 'none';
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
     return true;
-};
+}
 
 /**
  * @exports download
