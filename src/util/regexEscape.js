@@ -24,6 +24,6 @@
  * @author dieter <dieter@taotesting.com>
  */
 
-export default function(s) {
-    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+export default function (s) {
+    return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }

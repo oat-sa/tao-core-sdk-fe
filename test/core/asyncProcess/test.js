@@ -18,57 +18,54 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asyncProcessFactory) {
+define(['lodash', 'core/promise', 'core/asyncProcess'], function (_, Promise, asyncProcessFactory) {
     'use strict';
 
     QUnit.module('asyncProcess');
 
-    QUnit.test('factory', function(assert) {
+    QUnit.test('factory', function (assert) {
         assert.expect(3);
         assert.ok(typeof asyncProcessFactory === 'function', 'the module exposes a function');
         assert.ok(typeof asyncProcessFactory() === 'object', 'the factory produces an object');
-        assert.ok(
-            asyncProcessFactory() !== asyncProcessFactory(),
+        assert.notEqual(
+            asyncProcessFactory(),
+            asyncProcessFactory(),
             'the factory produces a different object at each call'
         );
     });
 
-    var asyncProcessApi = [
+    const asyncProcessApi = [
         { name: 'isRunning', title: 'isRunning' },
         { name: 'start', title: 'start' },
         { name: 'addStep', title: 'addStep' },
         { name: 'done', title: 'done' }
     ];
 
-    QUnit.cases.init(asyncProcessApi).test('asyncProcess API ', function(data, assert) {
+    QUnit.cases.init(asyncProcessApi).test('asyncProcess API ', function (data, assert) {
         assert.expect(1);
 
-        var asyncProcess = asyncProcessFactory();
+        const asyncProcess = asyncProcessFactory();
 
-        assert.equal(
-            typeof asyncProcess[data.name],
-            'function',
-            'The asyncProcess expose a "' + data.name + '" function'
-        );
+        assert.equal(typeof asyncProcess[data.name], 'function', `The asyncProcess expose a "${data.name}" function`);
     });
 
-    QUnit.test('simple process', function(assert) {
-        var ready = assert.async(4);
+    QUnit.test('simple process', function (assert) {
+        const ready = assert.async(4);
 
         assert.expect(11);
 
-        var asyncProcess = asyncProcessFactory();
+        const asyncProcess = asyncProcessFactory();
 
         asyncProcess
-            .on('start', function() {
+            .on('start', function () {
                 assert.ok(true, 'The process is started');
                 ready();
             })
-            .on('resolve', function() {
+            .on('resolve', function () {
                 assert.ok(true, 'The process is finished and the resolve event has been triggered');
                 ready();
             })
-            .on('reject', function() {
+            .on('reject', function () {
                 assert.ok(false, 'The process is finished and the reject event has been triggered');
                 ready();
             });
@@ -81,7 +78,7 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
 
         assert.equal(asyncProcess.isRunning(), true, 'There is a running process at this time');
 
-        var p = asyncProcess.done(function(err) {
+        const p = asyncProcess.done(function (err) {
             assert.ok(!err, 'No error is reported by the handler');
             assert.equal(asyncProcess.isRunning(), false, 'The process is now finished');
             ready();
@@ -90,31 +87,31 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
         assert.ok('object' === typeof p, 'The done method returns an object');
         assert.ok('function' === typeof p.then && 'function' === typeof p.catch, 'The done method returns a promise');
 
-        p.then(function() {
+        p.then(function () {
             assert.ok(true, 'The promise is resolved');
             ready();
-        }).catch(function() {
+        }).catch(function () {
             assert.ok(false, 'The promise must not be rejected');
             ready();
         });
     });
 
-    QUnit.test('deferred process', function(assert) {
-        var ready = assert.async(4);
+    QUnit.test('deferred process', function (assert) {
+        const ready = assert.async(4);
         assert.expect(13);
 
-        var asyncProcess = asyncProcessFactory();
+        const asyncProcess = asyncProcessFactory();
 
         asyncProcess
-            .on('start', function() {
+            .on('start', function () {
                 assert.ok(true, 'The process is started');
                 ready();
             })
-            .on('resolve', function() {
+            .on('resolve', function () {
                 assert.ok(true, 'The process is finished and the resolve event has been triggered');
                 ready();
             })
-            .on('reject', function() {
+            .on('reject', function () {
                 assert.ok(false, 'The process is finished and the reject event has been triggered');
                 ready();
             });
@@ -123,8 +120,8 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
             assert.ok(true, 'The process main has been called');
             assert.ok(asyncProcess.isRunning(), 'The process is running');
 
-            setTimeout(function() {
-                var p = asyncProcess.done(function(err) {
+            setTimeout(function () {
+                const p = asyncProcess.done(function (err) {
                     assert.ok(!err, 'No error is reported by the handler');
                     assert.equal(asyncProcess.isRunning(), false, 'The process is now finished');
                     ready();
@@ -136,10 +133,10 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
                     'The done method returns a promise'
                 );
 
-                p.then(function() {
+                p.then(function () {
                     assert.ok(true, 'The promise is resolved');
                     ready();
-                }).catch(function() {
+                }).catch(function () {
                     assert.ok(false, 'The promise must not be rejected');
                     ready();
                 });
@@ -159,22 +156,22 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
         assert.equal(asyncProcess.isRunning(), true, 'There is a running process at this time');
     });
 
-    QUnit.test('process with steps', function(assert) {
-        var ready = assert.async(6);
+    QUnit.test('process with steps', function (assert) {
+        const ready = assert.async(6);
         assert.expect(24);
 
-        var asyncProcess = asyncProcessFactory();
+        const asyncProcess = asyncProcessFactory();
 
         asyncProcess
-            .on('start', function() {
+            .on('start', function () {
                 assert.ok(true, 'The process is started');
                 ready();
             })
-            .on('step', function() {
+            .on('step', function () {
                 assert.ok(true, 'A step has been added');
                 ready();
             })
-            .on('resolve', function(data) {
+            .on('resolve', function (data) {
                 assert.ok(true, 'The process is finished and the resolve event has been triggered');
 
                 assert.ok(_.isArray(data), 'The resolved data has been provided');
@@ -182,7 +179,7 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
                 assert.ok(_.indexOf(data, 2) !== -1, 'The data contains the second resolved step');
                 ready();
             })
-            .on('reject', function() {
+            .on('reject', function () {
                 assert.ok(false, 'The process is finished and the reject event has been triggered');
                 ready();
             });
@@ -192,23 +189,23 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
             assert.ok(asyncProcess.isRunning(), 'The process is running');
 
             asyncProcess.addStep(
-                new Promise(function(resolve) {
-                    setTimeout(function() {
+                new Promise(function (resolve) {
+                    setTimeout(function () {
                         resolve(1);
                     }, 300);
                 })
             );
 
             asyncProcess.addStep(
-                new Promise(function(resolve) {
-                    setTimeout(function() {
+                new Promise(function (resolve) {
+                    setTimeout(function () {
                         resolve(2);
                     }, 400);
                 })
             );
 
-            setTimeout(function() {
-                var p = asyncProcess.done(function(err, data) {
+            setTimeout(function () {
+                const p = asyncProcess.done(function (err, data) {
                     assert.ok(!err, 'No error is reported by the handler');
                     assert.equal(asyncProcess.isRunning(), false, 'The process is now finished');
 
@@ -225,7 +222,7 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
                     'The done method returns a promise'
                 );
 
-                p.then(function(data) {
+                p.then(function (data) {
                     assert.ok(true, 'The promise is resolved');
 
                     assert.ok(_.isArray(data), 'The resolved data has been provided');
@@ -233,7 +230,7 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
                     assert.ok(_.indexOf(data, 2) !== -1, 'The data contains the second resolved step');
 
                     ready();
-                }).catch(function() {
+                }).catch(function () {
                     assert.ok(false, 'The promise must not be rejected');
                     ready();
                 });
@@ -253,22 +250,22 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
         assert.equal(asyncProcess.isRunning(), true, 'There is a running process at this time');
     });
 
-    QUnit.test('process with errors', function(assert) {
-        var ready = assert.async(4);
+    QUnit.test('process with errors', function (assert) {
+        const ready = assert.async(4);
         assert.expect(14);
 
-        var asyncProcess = asyncProcessFactory();
+        const asyncProcess = asyncProcessFactory();
 
         asyncProcess
-            .on('start', function() {
+            .on('start', function () {
                 assert.ok(true, 'The process is started');
                 ready();
             })
-            .on('resolve', function() {
+            .on('resolve', function () {
                 assert.ok(false, 'The process is finished and the resolve event has been triggered');
                 ready();
             })
-            .on('reject', function(err) {
+            .on('reject', function (err) {
                 assert.ok(true, 'The process is finished and the reject event has been triggered');
                 assert.equal(err, 'oups', 'An error is reported by the handler');
                 ready();
@@ -279,23 +276,23 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
             assert.ok(asyncProcess.isRunning(), 'The process is running');
 
             asyncProcess.addStep(
-                new Promise(function(resolve, reject) {
-                    setTimeout(function() {
+                new Promise(function (resolve, reject) {
+                    setTimeout(function () {
                         reject('oups');
                     }, 300);
                 })
             );
 
             asyncProcess.addStep(
-                new Promise(function(resolve) {
-                    setTimeout(function() {
+                new Promise(function (resolve) {
+                    setTimeout(function () {
                         resolve(2);
                     }, 400);
                 })
             );
 
-            setTimeout(function() {
-                var p = asyncProcess.done(function(err) {
+            setTimeout(function () {
+                const p = asyncProcess.done(function (err) {
                     assert.equal(err, 'oups', 'An error is reported by the handler');
                     assert.equal(asyncProcess.isRunning(), false, 'The process is now finished');
 
@@ -308,10 +305,10 @@ define(['lodash', 'core/promise', 'core/asyncProcess'], function(_, Promise, asy
                     'The done method returns a promise'
                 );
 
-                p.then(function() {
+                p.then(function () {
                     assert.ok(false, 'The promise must be rejected!');
                     ready();
-                }).catch(function(err) {
+                }).catch(function (err) {
                     assert.equal(err, 'oups', 'An error is reported by the handler');
                     ready();
                 });

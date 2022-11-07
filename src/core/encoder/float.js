@@ -17,11 +17,11 @@
  */
 
 export default {
-    encode: function(modelValue) {
-        return modelValue + '';
+    encode(modelValue) {
+        return `${modelValue}`;
     },
 
-    decode: function(nodeValue) {
+    decode(nodeValue) {
         return parseFloat(nodeValue.replace(',', '.'));
     }
 };

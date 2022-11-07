@@ -45,15 +45,15 @@ define(['core/connectivity'], function(connectivity) {
             assert.equal(
                 typeof connectivity[data.title],
                 'function',
-                'The tokenHandler instanceexposes a "' + data.name + '" function'
+                `The tokenHandler instanceexposes a "${data.name}" function`
             );
         });
 
     QUnit.module('Behavior', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             connectivity.setOnline();
         },
-        afterEach: function teardown(assert) {
+        afterEach: function teardown() {
             connectivity.off('online offline change');
         }
     });

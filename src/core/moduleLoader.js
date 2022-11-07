@@ -52,35 +52,35 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
     /**
      * The list of loaded modules
      */
-    var loaded = {};
+    const loaded = {};
 
     /**
      * Retains the AMD modules to load
      */
-    var modules = {};
+    const modules = {};
 
     /**
      * The modules to exclude
      */
-    var excludes = [];
+    const excludes = [];
 
     /**
      * Bundles to require
      */
-    var bundles = [];
+    const bundles = [];
 
     /**
      * The module loader
      * @typedef {loader}
      */
-    var loader = {
+    const loader = {
         /**
          * Adds a list of dynamic modules to load
          * @param {moduleDefinition[]} moduleList - the modules to add
          * @returns {loader} chains
          * @throws {TypeError} misuse
          */
-        addList: function addList(moduleList) {
+        addList(moduleList) {
             _.forEach(moduleList, this.add, this);
             return this;
         },
@@ -125,7 +125,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
          * @returns {loader} chains
          * @throws {TypeError} misuse
          */
-        append: function append(def) {
+        append(def) {
             return this.add(_.merge({ position: 'append' }, def));
         },
 
@@ -135,7 +135,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
          * @returns {loader} chains
          * @throws {TypeError} misuse
          */
-        prepend: function prepend(def) {
+        prepend(def) {
             return this.add(_.merge({ position: 'prepend' }, def));
         },
 
@@ -145,7 +145,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
          * @returns {loader} chains
          * @throws {TypeError} misuse
          */
-        remove: function remove(module) {
+        remove(module) {
             excludes.push(module);
             return this;
         },
@@ -156,24 +156,17 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
          * @returns {Promise}
          */
         load(loadBundles) {
-            var self = this;
-
             //compute the providers dependencies
-            var dependencies = _(modules)
-                .values()
-                .flatten()
-                .uniq()
-                .difference(excludes)
-                .value();
+            const dependencies = _(modules).values().flatten().uniq().difference(excludes).value();
 
             /**
              * Loads AMD modules and wrap then into a Promise
              * @param {String[]} amdModules - the list of modules to require
              * @returns {Promise} resolves with the loaded modules
              */
-            var loadModules = function loadModules(amdModules = []) {
+            const loadModules = (amdModules = []) => {
                 if (_.isArray(amdModules) && amdModules.length) {
-                    if (typeof define === 'function' && define.amd) {
+                    if (typeof window.define === 'function' && window.define.amd) {
                         return new Promise((resolve, reject) => {
                             window.require(
                                 amdModules,
@@ -184,13 +177,9 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
                             );
                         });
                     } else {
-                        return Promise
-                            .all( amdModules.map( module => (
-                                //eslint-disable
-                                import(/* webpackIgnore: true */ `${module}`)
-                                //eslint-enable
-                            )))
-                            .then( loadedModules => Promise.resolve(...loadModules) );
+                        return Promise.all(
+                            amdModules.map(module => import(/* webpackIgnore: true */ `${module}`))
+                        ).then(loadedModules => loadedModules.map(module => module.default));
                     }
                 }
                 return Promise.resolve();
@@ -200,10 +189,9 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
             // 2. load dependencies
             // 3. add them to the modules list
             return loadModules(loadBundles ? bundles : [])
-                .then( () => loadModules(dependencies) )
-                .then( loadedModules => {
+                .then(() => loadModules(dependencies))
+                .then(loadedModules => {
                     _.forEach(dependencies, (dependency, index) => {
-
                         const module = loadedModules[index];
                         const category = _.findKey(modules, val => _.contains(val, dependency));
 
@@ -216,7 +204,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
                             loaded[category].push(module);
                         }
                     });
-                    return self.getModules();
+                    return this.getModules();
                 });
         },
 
@@ -226,23 +214,19 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
          * @param {String} [category] - to get the modules for a given category, if not set, we get everything
          * @returns {Object[]} the modules
          */
-        getModules: function getModules(category) {
+        getModules(category) {
             if (_.isString(category)) {
                 return loaded[category] || [];
             }
 
-            return _(loaded)
-                .values()
-                .flatten()
-                .uniq()
-                .value();
+            return _(loaded).values().flatten().uniq().value();
         },
 
         /**
          * Get the module categories
          * @returns {String[]} the categories
          */
-        getCategories: function getCategories() {
+        getCategories() {
             return _.keys(loaded);
         }
     };
@@ -250,7 +234,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
     validate = _.isFunction(validate) ? validate : _.isPlainObject;
 
     //verify and add the required modules
-    _.forEach(requiredModules, function(moduleList, category) {
+    _.forEach(requiredModules, function (moduleList, category) {
         if (_.isEmpty(category) || !_.isString(category)) {
             throw new TypeError('Modules must belong to a category');
         }
@@ -274,10 +258,8 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
     if (specs) {
         _(specs)
             .functions()
-            .forEach(function(method) {
-                loader[method] = function delegate() {
-                    return specs[method].apply(loader, [].slice.call(arguments));
-                };
+            .forEach(function (method) {
+                loader[method] = (...args) => specs[method].apply(loader, args);
             });
     }
 

@@ -50,7 +50,7 @@ define(['core/providerRegistry'], function(providerRegistry) {
             assert.equal(
                 typeof registry[data.name],
                 'function',
-                'The providerRegistry helper has injected the "' + data.name + '" API'
+                `The providerRegistry helper has injected the "${data.name}" API`
             );
         });
 
@@ -65,7 +65,7 @@ define(['core/providerRegistry'], function(providerRegistry) {
             assert.expect(1);
             assert.throws(function() {
                 providerRegistry().registerProvider(data.name, data.provider);
-            }, 'registerProvider must throw error when ' + data.title);
+            }, `registerProvider must throw error when ${data.title}`);
         });
 
     QUnit.test('registerProvider validator', function(assert) {

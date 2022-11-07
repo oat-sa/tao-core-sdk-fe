@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define(['util/namespace'], function(namespaceHelper) {
+define(['util/namespace'], function (namespaceHelper) {
     'use strict';
 
     var namespaceApi = [
@@ -30,22 +30,22 @@ define(['util/namespace'], function(namespaceHelper) {
 
     QUnit.module('namespace');
 
-    QUnit.test('module', function(assert) {
+    QUnit.test('module', function (assert) {
         assert.expect(1);
 
         assert.equal(typeof namespaceHelper, 'object', 'The namespaceHelper module exposes an object');
     });
 
-    QUnit.cases.init(namespaceApi).test('has API ', function(data, assert) {
+    QUnit.cases.init(namespaceApi).test('has API ', function (data, assert) {
         assert.expect(1);
         assert.equal(
             typeof namespaceHelper[data.name],
             'function',
-            'The namespaceHelper exposes a "' + data.name + '" function'
+            `The namespaceHelper exposes a "${data.name}" function`
         );
     });
 
-    QUnit.test('split', function(assert) {
+    QUnit.test('split', function (assert) {
         assert.expect(7);
 
         assert.deepEqual(namespaceHelper.split(), [], 'An empty array is returned from an undefined list');
@@ -65,7 +65,7 @@ define(['util/namespace'], function(namespaceHelper) {
         );
     });
 
-    QUnit.test('getName', function(assert) {
+    QUnit.test('getName', function (assert) {
         assert.expect(6);
 
         assert.equal(namespaceHelper.getName(), '', 'An empty name is returned from an undefined string');
@@ -88,7 +88,7 @@ define(['util/namespace'], function(namespaceHelper) {
         );
     });
 
-    QUnit.test('getNamespace', function(assert) {
+    QUnit.test('getNamespace', function (assert) {
         assert.expect(7);
 
         assert.equal(namespaceHelper.getNamespace(), '', 'An empty namespace is returned from an undefined string');
@@ -116,7 +116,7 @@ define(['util/namespace'], function(namespaceHelper) {
         );
     });
 
-    QUnit.test('namespaceAll', function(assert) {
+    QUnit.test('namespaceAll', function (assert) {
         assert.expect(20);
 
         assert.equal(namespaceHelper.namespaceAll(), '', 'An empty list is returned from an undefined string');

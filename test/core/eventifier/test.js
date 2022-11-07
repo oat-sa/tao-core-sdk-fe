@@ -366,7 +366,7 @@ define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogge
     });
 
     QUnit.module('before', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             testLogger.reset();
         }
     });
@@ -668,9 +668,8 @@ define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogge
 
     QUnit.test('events context (multi)', function(assert) {
         var emitter = eventifier();
-
-        assert.expect(80);
         var ready = assert.async(8);
+        assert.expect(80);
 
         emitter
             .on('ev1', function() {
@@ -779,7 +778,7 @@ define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogge
     });
 
     QUnit.module('on/between', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             testLogger.reset();
         }
     });
@@ -924,7 +923,7 @@ define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogge
     });
 
     QUnit.module('after', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             testLogger.reset();
         }
     });
@@ -1075,7 +1074,7 @@ define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogge
     });
 
     QUnit.module('stopEvent', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             testLogger.reset();
         }
     });
@@ -1435,7 +1434,7 @@ define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogge
     });
 
     QUnit.module('spread', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             testLogger.reset();
         }
     });
@@ -1601,7 +1600,7 @@ define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogge
     });
 
     QUnit.module('error and rejection', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             testLogger.reset();
         }
     });

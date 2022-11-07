@@ -47,7 +47,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
     ];
 
     QUnit.module('proxyFactory', {
-        beforeEach: function(assert) {
+        beforeEach: function() {
             proxyFactory.clearProviders();
         }
     });
@@ -85,7 +85,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
         assert.equal(
             typeof instance[data.title],
             'function',
-            'The proxyFactory instance exposes a "' + data.title + '" function'
+            `The proxyFactory instance exposes a "${data.title}" function`
         );
     });
 
@@ -141,6 +141,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -188,6 +189,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -257,6 +259,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -323,6 +326,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -392,6 +396,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -461,6 +466,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -529,6 +535,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -661,6 +668,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
@@ -750,6 +758,7 @@ define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promis
             })
             .catch(function(err) {
                 assert.ok(false, 'The promise should not be rejected');
+                // eslint-disable-next-line
                 console.error(err);
                 ready();
             });
