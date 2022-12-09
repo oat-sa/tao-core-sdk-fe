@@ -29,7 +29,8 @@ const { srcDir, outputDir } = require('./path');
 
 const isDev = process.env.NODE_ENV === 'development';
 
-const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
+const globPath = p => p.replace(/\\/g, '/');
+const inputs = glob.sync(globPath(path.join(srcDir, '**', '*.js')));
 
 const localExternals = inputs.map(input => (
     path
