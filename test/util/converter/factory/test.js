@@ -194,4 +194,60 @@ define(['util/converter/factory'], function (converterFactory) {
 
         assert.strictEqual(converter.convert(text), ' this is a test!', 'The text is converted');
     });
+
+    QUnit.test('forward builtin config to the processors', function (assert) {
+        const text = '12,34 this is a test!';
+        const converter = converterFactory(
+            [
+                {
+                    name: 'comma',
+                    convert(str, { separator = '.' } = {}) {
+                        return str.replace(/,+/g, separator);
+                    }
+                }
+            ],
+            { separator: ':' }
+        );
+
+        assert.strictEqual(converter.convert(text), '12:34 this is a test!', 'The text is converted');
+    });
+
+    QUnit.test('forward runtime config to the processors', function (assert) {
+        const text = '12,34 this is a test!';
+        const converter = converterFactory([
+            {
+                name: 'comma',
+                convert(str, { separator = '.' } = {}) {
+                    return str.replace(/,+/g, separator);
+                }
+            }
+        ]);
+
+        assert.strictEqual(
+            converter.convert(text, { separator: ':' }),
+            '12:34 this is a test!',
+            'The text is converted'
+        );
+    });
+
+    QUnit.test('merge builtin and runtime config', function (assert) {
+        const text = '12,34 this is a test!';
+        const converter = converterFactory(
+            [
+                {
+                    name: 'comma',
+                    convert(str, { separator = '.' } = {}) {
+                        return str.replace(/,+/g, separator);
+                    }
+                }
+            ],
+            { separator: ':' }
+        );
+
+        assert.strictEqual(
+            converter.convert(text, { separator: '-' }),
+            '12-34 this is a test!',
+            'The text is converted'
+        );
+    });
 });

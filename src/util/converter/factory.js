@@ -53,9 +53,11 @@ function validateProcessor(processor) {
 /**
  * Creates a text converter.
  * @param {converterProcessor[]} builtinProcessors - A list of built-in converter processors.
+ * @param {object} [builtinConfig] - An optional default config object that may contain processor specific configuration.
+ *                                   It will be forwarded to each call to the converter.
  * @returns {converter} - Returns the text converter, ready for use.
  */
-export default function converterFactory(builtinProcessors = []) {
+export default function converterFactory(builtinProcessors = [], builtinConfig = {}) {
     let processors = [];
 
     // find the index of the named processor
@@ -69,11 +71,13 @@ export default function converterFactory(builtinProcessors = []) {
          * Converts a text with respect to the registered converter processors.
          * @param {string} text - The text to convert.
          * @param {object} [config] - An optional config object that may contain processor specific configuration.
+         *                            It will be merged with the possible builtin config.
          * @returns {string} - Returns the converted text.
          */
         convert(text, config = {}) {
+            const localConfig = Object.assign({}, builtinConfig, config);
             for (const processor of processors) {
-                text = processor.convert.call(converter, text, config);
+                text = processor.convert.call(converter, text, localConfig);
             }
 
             return text;
