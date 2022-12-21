@@ -37,6 +37,8 @@ const defaultMapping = {
  * Converter processor to register with the converter produce by 'util/converter/factory'.
  *
  * Processor that converts ambiguous unicode symbols into plain ASCII equivalent.
+ *
+ * @export 'util/converter/ambiguousSymbols'
  */
 export default {
     name: 'ambiguousSymbols',

@@ -56,6 +56,7 @@ function validateProcessor(processor) {
  * @param {object} [builtinConfig] - An optional default config object that may contain processor specific configuration.
  *                                   It will be forwarded to each call to the converter.
  * @returns {converter} - Returns the text converter, ready for use.
+ * @export 'util/converter/factory'
  */
 export default function converterFactory(builtinProcessors = [], builtinConfig = {}) {
     let processors = [];
