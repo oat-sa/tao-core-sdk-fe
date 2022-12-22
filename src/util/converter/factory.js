@@ -62,8 +62,6 @@ export default function converterFactory(builtinProcessors = [], builtinConfig =
     let processors = [];
 
     // find the index of the named processor
-    const findProcessor = name => processors.findIndex(processor => processor.name === name);
-
     /**
      * @typedef {object} converter
      */
@@ -94,7 +92,7 @@ export default function converterFactory(builtinProcessors = [], builtinConfig =
                 throw new TypeError('The given processor is not valid!');
             }
 
-            if (findProcessor(processor.name) > -1) {
+            if (converter.isRegistered(processor.name)) {
                 throw new TypeError(`The processor "${name}" is already registered!`);
             }
 
@@ -134,7 +132,7 @@ export default function converterFactory(builtinProcessors = [], builtinConfig =
          * @returns {boolean} - Returns `true` if the converter processor is registered ; returns `false` otherwise.
          */
         isRegistered(name) {
-            return findProcessor(name) > -1;
+            return processors.findIndex(processor => processor.name === name) > -1;
         }
     };
 
