@@ -133,7 +133,7 @@ export default function converterFactory(builtinProcessors = [], builtinConfig =
         }
 
         if (converter.isRegistered(processor.name)) {
-            throw new TypeError(`The processor "${name}" is already registered!`);
+            throw new TypeError(`The processor "${processor.name}" is already registered!`);
         }
     }
 
