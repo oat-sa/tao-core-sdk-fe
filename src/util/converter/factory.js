@@ -42,7 +42,6 @@
 export default function converterFactory(builtinProcessors = [], builtinConfig = {}) {
     let processors = [];
 
-    // find the index of the named processor
     /**
      * @typedef {object} converter
      */
@@ -56,6 +55,7 @@ export default function converterFactory(builtinProcessors = [], builtinConfig =
          */
         convert(text, config = {}) {
             const localConfig = Object.assign({}, builtinConfig, config);
+
             for (const processor of processors) {
                 text = processor.convert.call(converter, text, localConfig);
             }
