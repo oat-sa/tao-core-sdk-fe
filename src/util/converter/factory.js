@@ -72,21 +72,7 @@ export default function converterFactory(builtinProcessors = [], builtinConfig =
          * @throws {TypeError} - If the processor does not comply with the requirements.
          */
         register(processor) {
-            if ('object' !== typeof processor) {
-                throw new TypeError('The given processor must be an object!');
-            }
-
-            if ('string' !== typeof processor.name || !processor.name) {
-                throw new TypeError('A processor needs a name to identify it!');
-            }
-
-            if ('function' !== typeof processor.convert) {
-                throw new TypeError('A processor needs a runtime function for converting the text!');
-            }
-
-            if (converter.isRegistered(processor.name)) {
-                throw new TypeError(`The processor "${name}" is already registered!`);
-            }
+            validateProcessor(processor);
 
             processors.push(processor);
 
@@ -127,6 +113,29 @@ export default function converterFactory(builtinProcessors = [], builtinConfig =
             return processors.findIndex(processor => processor.name === name) > -1;
         }
     };
+
+    /**
+     * Checks a converter processor is valid, and throws an error if not.
+     * @param {converterProcessor} processor - The converter processor to validate.
+     * @throws {TypeError} - If the processor does not comply with the requirements.
+     */
+    function validateProcessor(processor) {
+        if ('object' !== typeof processor) {
+            throw new TypeError('The given processor must be an object!');
+        }
+
+        if ('string' !== typeof processor.name || !processor.name) {
+            throw new TypeError('A processor needs a name to identify it!');
+        }
+
+        if ('function' !== typeof processor.convert) {
+            throw new TypeError('A processor needs a runtime function for converting the text!');
+        }
+
+        if (converter.isRegistered(processor.name)) {
+            throw new TypeError(`The processor "${name}" is already registered!`);
+        }
+    }
 
     for (const processor of builtinProcessors) {
         converter.register(processor);
