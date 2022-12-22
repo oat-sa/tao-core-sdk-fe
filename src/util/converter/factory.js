@@ -34,23 +34,6 @@ import _ from 'lodash';
  */
 
 /**
- * Checks a converter processor is valid.
- * @param {converterProcessor} processor - The converter processor to validate.
- * @returns {boolean} - Returns `true` if the converter processor is valid ; returns `false` otherwise.
- */
-function validateProcessor(processor) {
-    if (!_.isPlainObject(processor)) {
-        return false;
-    }
-
-    if ('string' !== typeof processor.name || !processor.name) {
-        return false;
-    }
-
-    return 'function' === typeof processor.convert;
-}
-
-/**
  * Creates a text converter.
  * @param {converterProcessor[]} builtinProcessors - A list of built-in converter processors.
  * @param {object} [builtinConfig] - An optional default config object that may contain processor specific configuration.
@@ -84,12 +67,23 @@ export default function converterFactory(builtinProcessors = [], builtinConfig =
 
         /**
          * Registers a converter processor.
+         * A processor is an object that contains both a `name`, which must be unique,
+         * and a `convert()` function for converting the given text.
          * @param {converterProcessor} processor - The converter processor to register.
          * @returns {converter} - Chains the instance.
+         * @throws {TypeError} - If the processor does not comply with the requirements.
          */
         register(processor) {
-            if (!validateProcessor(processor)) {
-                throw new TypeError('The given processor is not valid!');
+            if ('object' !== typeof processor) {
+                throw new TypeError('The given processor must be an object!');
+            }
+
+            if ('string' !== typeof processor.name || !processor.name) {
+                throw new TypeError('A processor needs a name to identify it!');
+            }
+
+            if ('function' !== typeof processor.convert) {
+                throw new TypeError('A processor needs a runtime function for converting the text!');
             }
 
             if (converter.isRegistered(processor.name)) {
