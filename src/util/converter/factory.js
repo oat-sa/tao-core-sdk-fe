@@ -16,8 +16,6 @@
  * Copyright (c) 2022 (original work) Open Assessment Technologies SA ;
  */
 
-import _ from 'lodash';
-
 /**
  * Defines a converter processor runtime.
  * @callback converterProcessorRuntime
