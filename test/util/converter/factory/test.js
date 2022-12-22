@@ -65,7 +65,7 @@ define(['util/converter/factory'], function (converterFactory) {
             convert() {}
         };
 
-        assert.throws(() => converter.register(new Date()), 'A processor is a plain object');
+        assert.throws(() => converter.register(true), 'A processor is a plain object');
         assert.throws(() => converter.register({ convert() {} }), 'A processor needs a name');
         assert.throws(() => converter.register({ name: '', convert() {} }), 'The processor name cannot be empty');
         assert.throws(() => converter.register({ name: true, convert() {} }), 'The processor name must be a string');
