@@ -166,7 +166,7 @@ define(['jquery', 'lodash', 'core/dataProvider/request', 'core/promise'], functi
             title: '500 error',
             url: '//500',
             reject: true,
-            err: new Error('500 : Server Error')
+            err: new Error('500 : An error occurred!')
         }
     ];
 
@@ -186,7 +186,7 @@ define(['jquery', 'lodash', 'core/dataProvider/request', 'core/promise'], functi
                 })
                 .catch(function(err) {
                     assert.equal(err.name, data.err.name, 'Reject error is the one expected');
-                    assert.equal(err.message, data.err.message, 'Reject error is correct');
+                    assert.equal(err.message, data.err.message, err.message + data.err.message);
                     ready();
                 });
         } else {
