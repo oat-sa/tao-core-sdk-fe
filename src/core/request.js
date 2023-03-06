@@ -61,7 +61,7 @@ const createError = (response, fallbackMessage, httpCode, httpSent) => {
     if (response) {
         const code = response.errorCode || response.code;
         const message = response.errorMsg || response.errorMessage || response.error || response.message;
-        if (typeof code === 'string' && typeof message === 'string') {
+        if (code && message) {
             err = new Error(`${code} : ${message}`);
         } else {
             err = new Error(fallbackMessage);
@@ -305,7 +305,7 @@ export default function request(options) {
                         sent: xhr.readyState > 0,
                         type: 'error',
                         textStatus: textStatus,
-                        message: errorThrown || __('An error occurred!')
+                        message: errorThrown
                     };
 
                     const enhancedResponse = Object.assign({}, responseExtras, response);
