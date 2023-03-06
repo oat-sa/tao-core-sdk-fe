@@ -186,7 +186,7 @@ define(['jquery', 'lodash', 'core/dataProvider/request', 'core/promise'], functi
                 })
                 .catch(function(err) {
                     assert.equal(err.name, data.err.name, 'Reject error is the one expected');
-                    assert.equal(err.message, data.err.message, err.message + data.err.message);
+                    assert.equal(err.message, data.err.message, 'Reject error is correct');
                     ready();
                 });
         } else {
