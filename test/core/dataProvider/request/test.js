@@ -166,7 +166,7 @@ define(['jquery', 'lodash', 'core/dataProvider/request', 'core/promise'], functi
             title: '500 error',
             url: '//500',
             reject: true,
-            err: new Error('500 : An error occurred!')
+            err: new Error('500 : Server Error')
         }
     ];
 

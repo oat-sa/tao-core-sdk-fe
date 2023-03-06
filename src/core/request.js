@@ -58,12 +58,14 @@ const logger = loggerFactory('core/request');
  */
 const createError = (response, fallbackMessage, httpCode, httpSent) => {
     let err;
-    if (response && response.errorCode) {
-        err = new Error(`${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`);
-    } else if (response && response.code) {
-        err = new Error(`${response.code} : ${response.message}`);
-    } else {
-        err = new Error(fallbackMessage);
+    if (response) {
+        const code = response.errorCode || response.code;
+        const message = response.errorMsg || response.errorMessage || response.error || response.message;
+        if (typeof code === 'string' && typeof message === 'string') {
+            err = new Error(`${code} : ${message}`);
+        } else {
+            err = new Error(fallbackMessage);
+        }
     }
     err.response = response;
     err.sent = httpSent;
