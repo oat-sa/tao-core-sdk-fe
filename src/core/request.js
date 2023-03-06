@@ -305,7 +305,7 @@ export default function request(options) {
                         sent: xhr.readyState > 0,
                         type: 'error',
                         textStatus: textStatus,
-                        message: errorThrown
+                        message: errorThrown || xhr.statusText || __('An error occurred!')
                     };
 
                     const enhancedResponse = Object.assign({}, responseExtras, response);
