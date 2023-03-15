@@ -63,6 +63,8 @@ const createError = (response, fallbackMessage, httpCode, httpSent) => {
         const message = response.errorMsg || response.errorMessage || response.error || response.message;
         if (code && message) {
             err = new Error(`${code} : ${message}`);
+        } else if (message) {
+            err = new Error(`${message}`);
         } else {
             err = new Error(fallbackMessage);
         }
