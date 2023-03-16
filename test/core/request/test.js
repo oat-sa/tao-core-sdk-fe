@@ -397,7 +397,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                 title: 'disconnected',
                 url: '//offline',
                 reject: true,
-                err: new Error('0 : timeout'),
+                err: new Error('timeout'),
                 reuseToken: true
             }
         ])
@@ -522,7 +522,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
             code: 0,
             sent: false,
             source: 'network',
-            message: '0 : timeout'
+            message: 'timeout'
         },
         '//202': {
             code: 202,
