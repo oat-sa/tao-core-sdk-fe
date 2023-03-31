@@ -30,18 +30,15 @@ const { srcDir, outputDir } = require('./path');
 const isDev = process.env.NODE_ENV === 'development';
 
 const globPath = p => p.replace(/\\/g, '/');
+const removeExt = p => p.replace(/\.js$/, '');
 const inputs = glob.sync(globPath(path.join(srcDir, '**', '*.js')));
 
-const localExternals = inputs.map(input => (
-    path
-        .relative(srcDir, input)
-        .replace(/\\/g, '/')
-        .replace(/\.js$/, '')
-));
+const localExternals = inputs.map(input => removeExt(globPath(path.relative(srcDir, input))));
 
 export default inputs.map(input => {
-    const name = path.relative(srcDir, input).replace(/\.js$/, '');
-    const dir = path.dirname(path.relative(srcDir, input));
+    const relative = path.relative(srcDir, input);
+    const name = removeExt(relative);
+    const dir = path.dirname(relative);
 
     return {
         input,
@@ -62,8 +59,6 @@ export default inputs.map(input => {
             'i18n',
             'jquery',
             'jquery.fileDownload',
-            'lib/decimal/decimal',
-            'lib/expr-eval/expr-eval',
             'lib/uuid',
             'lodash',
             'module',
