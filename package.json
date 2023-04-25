@@ -52,7 +52,7 @@
         "dompurify": "^2.4.0",
         "eslint": "^8.39.0",
         "eslint-plugin-es": "^4.1.0",
-        "eslint-plugin-jsdoc": "^43.1.1",
+        "eslint-plugin-jsdoc": "^40.1.1",
         "fetch-mock": "^9.11.0",
         "gamp": "0.2.1",
         "glob": "^8.0.3",
