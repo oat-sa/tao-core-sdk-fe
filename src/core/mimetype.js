@@ -117,7 +117,7 @@ const mimetypeHelper = {
     /**
      * Get the category of a type
      * @param {String} type
-     * @returns {String} category
+     * @returns {String|undefined} category
      */
     getCategory(type) {
         if (categories[type]) {
@@ -157,7 +157,7 @@ const mimetypeHelper = {
  * Get the file extension from the file name
  *
  * @param {String} fileName
- * @returns {String}
+ * @returns {String|undefined}
  */
 function getFileExtension(fileName) {
     const extMatch = fileName.match(/\.([0-9a-z]+)(?:[?#]|$)/i);
