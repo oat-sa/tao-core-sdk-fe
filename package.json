@@ -47,7 +47,7 @@
         "@oat-sa/eslint-config-tao": "^2.0.0",
         "@oat-sa/prettier-config": "^0.1.1",
         "@oat-sa/tao-core-libs": "https://github.com/oat-sa/tao-core-libs-fe.git#feature/ADF-1417/upgrade-to-node18",
-        "@oat-sa/tao-qunit-testrunner": "1.0.3",
+        "@oat-sa/tao-qunit-testrunner": "https://github.com/oat-sa/tao-qunit-testrunner-fe.git#feature/ADF-1417/upgrade-to-node18",
         "async": "^0.2.10",
         "dompurify": "^2.4.0",
         "eslint": "^8.39.0",
