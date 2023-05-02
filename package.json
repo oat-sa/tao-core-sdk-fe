@@ -51,8 +51,6 @@
         "async": "^0.2.10",
         "dompurify": "^2.4.0",
         "eslint": "^8.39.0",
-        "eslint-plugin-es": "^4.1.0",
-        "eslint-plugin-jsdoc": "^40.1.1",
         "fetch-mock": "^9.11.0",
         "gamp": "0.2.1",
         "glob": "^8.1.0",
