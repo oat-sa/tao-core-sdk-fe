@@ -45,7 +45,7 @@ const errorHandler = {
     /**
      * Get a context by it's name and create it if it doesn't exists
      * @param {String} name - the context name
-     * @returns {Object} the handling context
+     * @returns {Object|undefined} the handling context
      */
     getContext(name) {
         if (_.isString(name) && name.length) {
@@ -83,7 +83,7 @@ const errorHandler = {
      * Throw an error in this context
      * @param {String} name - the context name
      * @param {Error} err - the error with a message
-     * @returns {boolean}
+     * @returns {boolean|undefined}
      */
     throw(name, err) {
         const context = this.getContext(name);

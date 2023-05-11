@@ -153,7 +153,7 @@ function loggerFactory(name, minLevel, fields) {
 
             //without providers or not the level, we don't log.
             if (loggerFactory.providers === false || !checkMinLevel(minLevel || defaultLevel, level)) {
-                return;
+                return this;
             }
 
             if (_.isString(recordFields) || recordFields instanceof Error) {
