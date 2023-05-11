@@ -31,7 +31,7 @@ export default {
      *
      * @param {HTMLElement} container - the container
      * @param {HTMLElement} element - the element to check against the container
-     * @returns {Boolean*} or undefined if the parameters are incorrect, so check your return value type.
+     * @returns {Boolean|undefined} or undefined if the parameters are incorrect, so check your return value type.
      */
     isInside: function isInside(container, element) {
         var containerCoords;
@@ -64,7 +64,7 @@ export default {
      *
      * @param {HTMLElement} container - the container
      * @param {HTMLElement} element - the element to check against the container
-     * @returns {Boolean*} or undefined if the parameters are incorrect, so check your return value type.
+     * @returns {Boolean|undefined} or undefined if the parameters are incorrect, so check your return value type.
      */
     isOver: function isInside(container, element) {
         var containerCoords;
