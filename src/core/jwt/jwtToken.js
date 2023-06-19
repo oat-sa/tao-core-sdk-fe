@@ -30,7 +30,11 @@
  */
 export function parseJwtPayload(token) {
     try {
-        return JSON.parse(atob(token.split('.')[1]));
+        let base64Payload = token.split('.')[1];
+        base64Payload = base64Payload.replace(/-/g, '+'); // replace - with +
+        base64Payload = base64Payload.replace(/_/g, '/'); // replace _ with /
+
+        return JSON.parse(atob(base64Payload));
     } catch (e) {
         return null;
     }
