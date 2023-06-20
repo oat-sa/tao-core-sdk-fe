@@ -48,6 +48,14 @@ define(['core/jwt/jwtToken'], jwtToken => {
         assert.equal(parseJwtPayload(), null, 'missing token returns null');
     });
 
+    QUnit.test('parses payload object from full token with unsupported characters', assert => {
+        assert.expect(2);
+        const token = 'eyJhbGciOiJIUzI1NiJ9.eyJmb28iOiI_In0.qXbg9lEnmvDekuDfNqiAdqYb3Yx1iTLw7RyUGoz5I9w';
+        const result = parseJwtPayload(token);
+        assert.ok(typeof result === 'object', 'parsed payload is an object');
+        assert.equal(result.foo, '?');
+    });
+
     QUnit.module('getJwtTTL');
 
     const time1 = 1620651921250;
