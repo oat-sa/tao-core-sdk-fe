@@ -42,23 +42,23 @@ define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise
         {name: 'getClientConfigTokens'},
         {name: 'clearStore'},
         {name: 'getQueueLength'},
-        {name: 'setMaxSize'}
+        {name: 'setMaxSize'},
     ]).test('instance API ', function(data, assert) {
         var instance = tokenHandlerFactory();
         assert.expect(1);
         assert.equal(
             typeof instance[data.name],
             'function',
-            'The tokenHandler instance exposes a "' + data.name + '" function'
+            `The tokenHandler instance exposes a "${data.name}" function`
         );
     });
 
     QUnit.module('behaviour', {
         beforeEach: function() {
-            this.cachedModuleConfig = requirejs.s.contexts._.config.config['core/tokenHandler'];
+            this.cachedModuleConfig = window.requirejs.s.contexts._.config.config['core/tokenHandler'];
         },
         afterEach: function() {
-            requirejs.s.contexts._.config.config['core/tokenHandler'] = this.cachedModuleConfig;
+            window.requirejs.s.contexts._.config.config['core/tokenHandler'] = this.cachedModuleConfig;
         }
     });
 
@@ -133,7 +133,7 @@ define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise
         assert.expect(2);
 
         if (data.moduleOptions) {
-            requirejs.s.contexts._.config.config['core/tokenHandler'] = data.moduleOptions;
+            window.requirejs.s.contexts._.config.config['core/tokenHandler'] = data.moduleOptions;
         }
         tokenHandler = tokenHandlerFactory(data.options);
 
@@ -254,6 +254,45 @@ define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise
                 assert.equal(typeof token, 'string', 'A token string was fetched');
 
                 return tokenHandler.clearStore();
+            })
+            .then(function() {
+                ready();
+            })
+            .catch(function(err) {
+                assert.ok(false, err.message);
+                ready();
+            });
+    });
+
+    QUnit.test('validateTokens', function(assert) {
+        var ready = assert.async();
+        var tokenHandler = new tokenHandlerFactory({ maxSize: 5, validateTokens: false});
+
+        assert.expect(6);
+
+        tokenHandler.getToken()
+            .then(function($token) {
+                assert.equal($token, 'token1', 'The token1 is correct');
+                return tokenHandler.getToken();
+            })
+            .then(function($token) {
+                assert.equal($token, 'token2', 'The token2 is correct');
+                return tokenHandler.getToken();
+            })
+            .then(function($token) {
+                assert.equal($token, 'token3', 'The token3 is correct');
+                return tokenHandler.getToken();
+            })
+            .then(function($token) {
+                assert.equal($token, 'token4', 'The token4 is correct');
+                return tokenHandler.getToken();
+            })
+            .then(function($token) {
+                assert.equal($token, 'token5', 'The token5 is correct');
+                return tokenHandler.getToken();
+            })
+            .then(function($token) {
+                assert.equal($token, 'token1', 'The token1 is correct');
             })
             .then(function() {
                 ready();

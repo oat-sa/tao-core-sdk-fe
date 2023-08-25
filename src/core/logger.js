@@ -34,7 +34,7 @@ import loggerFactory from 'core/logger/api';
  * The default configuration if nothing
  * is found on the module config
  */
-var defaultConfig = {
+const defaultConfig = {
     level: loggerFactory.levels.warn,
     loggers: {
         'core/logger/console': {
@@ -44,23 +44,22 @@ var defaultConfig = {
 };
 
 //the logger providers are configured through the AMD module config
-var config = _.defaults(module.config() || {}, defaultConfig);
-var logger = loggerFactory('core/logger');
+const config = _.defaults(module.config() || {}, defaultConfig);
+const logger = loggerFactory('core/logger');
 
 loggerFactory.setDefaultLevel(config.level);
 loggerFactory.load(config.loggers);
 
 /**
  * Catch uncaught errors
- * @param msg - error message
- * @param url - current url
- * @param line - line number
- * @param col - column number
- * @param error - error object (not all browsers support).
+ * @param {string} msg - error message
+ * @param {string} url - current url
+ * @param {number} line - line number
+ * @param {number} col - column number
  * @return {boolean}
  */
-window.onerror = function(msg, url, line, col, error) {
-    logger.error("Caught[via window.onerror]: '" + msg + "' from " + url + ':' + line + ':' + col);
+window.onerror = function onError(msg, url, line, col) {
+    logger.error(`Caught[via window.onerror]: '${msg}' from ${url}:${line}:${col}`);
 };
 
 /**

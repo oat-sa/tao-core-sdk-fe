@@ -21,13 +21,14 @@
  *
  * @author Martin Nicholson <martin@taotesting.com>
  */
-define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTokenHandler', 'core/logger', 'jquery.mockjax'], function(
+define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTokenHandler', 'core/logger', 'fetch-mock', 'jquery.mockjax'], function(
     $,
     _,
     request,
     tokenHandlerFactory,
     jwtTokenHandlerFactory,
-    loggerFactory
+    loggerFactory,
+    fetchMock
 ) {
     'use strict';
 
@@ -396,7 +397,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                 title: 'disconnected',
                 url: '//offline',
                 reject: true,
-                err: new Error('0 : timeout'),
+                err: new Error('timeout'),
                 reuseToken: true
             }
         ])
@@ -521,7 +522,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
             code: 0,
             sent: false,
             source: 'network',
-            message: '0 : timeout'
+            message: 'timeout'
         },
         '//202': {
             code: 202,
@@ -616,11 +617,12 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
 
     QUnit.module('JWT token', {
         beforeEach: function() {
-            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '//refreshUrl' });
+            this.handler = jwtTokenHandlerFactory({ refreshTokenUrl: '/refreshUrl' });
         },
         afterEach: function() {
             this.handler.clearStore();
             $.mockjax.clear();
+            fetchMock.restore();
         }
     });
 
@@ -662,6 +664,12 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
         const accessToken = 'some access token';
         const refreshToken = 'some refresh token';
 
+        fetchMock.mock('/refreshUrl', function(uri, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return JSON.stringify({ accessToken });
+        });
+
         $.mockjax([
             {
                 url: /^\/\/200$/,
@@ -673,15 +681,6 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                         'Authorization token header is sent'
                     );
                     this.responseText = JSON.stringify({});
-                }
-            },
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 200,
-                response: function(requestData) {
-                    const data = JSON.parse(requestData.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: accessToken });
                 }
             }
         ]);
@@ -703,6 +702,12 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
         const validAccessToken = 'valid access token';
         const refreshToken = 'some refresh token';
 
+        fetchMock.mock('/refreshUrl', function(uri, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return JSON.stringify({ accessToken: validAccessToken });
+        });
+
         $.mockjax([
             {
                 url: /^\/\/endpoint$/,
@@ -717,15 +722,6 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                         this.status = 200;
                         this.responseText = JSON.stringify({});
                     }
-                }
-            },
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 200,
-                response: function(requestData) {
-                    const data = JSON.parse(requestData.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: validAccessToken });
                 }
             }
         ]);
@@ -754,6 +750,12 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
             error: 'some error'
         };
 
+        fetchMock.mock('/refreshUrl', function(uri, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return JSON.stringify({ accessToken: expiredAccessToken });
+        });
+
         $.mockjax([
             {
                 url: /^\/\/endpoint$/,
@@ -765,15 +767,6 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                         'called with expired access token'
                     );
                     this.responseText = JSON.stringify(originalError);
-                }
-            },
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 200,
-                response: function(requestData) {
-                    const data = JSON.parse(requestData.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
-                    this.responseText = JSON.stringify({ accessToken: expiredAccessToken });
                 }
             }
         ]);
@@ -803,6 +796,12 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
             error: 'some error'
         };
 
+        fetchMock.mock('/refreshUrl', function(uri, opts) {
+            const data = JSON.parse(opts.body);
+            assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
+            return new Response(JSON.stringify({ accessToken: expiredAccessToken }), { status: 401 });
+        });
+
         $.mockjax([
             {
                 url: /^\/\/endpoint$/,
@@ -814,14 +813,6 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                         'enpoint called with expired access token'
                     );
                     this.responseText = JSON.stringify(originalError);
-                }
-            },
-            {
-                url: /^\/\/refreshUrl$/,
-                status: 401,
-                response: function(requestData) {
-                    const data = JSON.parse(requestData.data);
-                    assert.equal(data.refreshToken, refreshToken, 'refresh token is sent to the api');
                 }
             }
         ]);

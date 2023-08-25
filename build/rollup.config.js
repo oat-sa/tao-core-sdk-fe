@@ -29,18 +29,16 @@ const { srcDir, outputDir } = require('./path');
 
 const isDev = process.env.NODE_ENV === 'development';
 
-const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
+const globPath = p => p.replace(/\\/g, '/');
+const removeExt = p => p.replace(/\.js$/, '');
+const inputs = glob.sync(globPath(path.join(srcDir, '**', '*.js')));
 
-const localExternals = inputs.map(input => (
-    path
-        .relative(srcDir, input)
-        .replace(/\\/g, '/')
-        .replace(/\.js$/, '')
-));
+const localExternals = inputs.map(input => removeExt(globPath(path.relative(srcDir, input))));
 
 export default inputs.map(input => {
-    const name = path.relative(srcDir, input).replace(/\.js$/, '');
-    const dir = path.dirname(path.relative(srcDir, input));
+    const relative = path.relative(srcDir, input);
+    const name = removeExt(relative);
+    const dir = path.dirname(relative);
 
     return {
         input,
@@ -51,7 +49,7 @@ export default inputs.map(input => {
             name
         },
         watch: {
-            clearScreen : false
+            clearScreen: false
         },
         external: [
             ...localExternals,
@@ -61,16 +59,18 @@ export default inputs.map(input => {
             'i18n',
             'jquery',
             'jquery.fileDownload',
-            'lib/decimal/decimal',
-            'lib/expr-eval/expr-eval',
             'lib/uuid',
             'lodash',
             'module',
             'moment'
         ],
         plugins: [
-            resolve(),
-            commonJS(),
+            resolve({ mainFields: ['main'] }),
+            commonJS({
+                namedExports: {
+                    fastestsmallesttextencoderdecoder: ['TextEncoder']
+                }
+            }),
             alias({
                 resolve: ['.js', '.json'],
                 core: path.resolve(srcDir, 'core'),
@@ -81,11 +81,15 @@ export default inputs.map(input => {
             }),
             ...(process.env.COVERAGE ? [istanbul()] : []),
             babel({
-                presets: [[
-                    '@babel/env', {
-                        useBuiltIns: false
-                    }
-                ]]
+                presets: [
+                    [
+                        '@babel/env',
+                        {
+                            useBuiltIns: false,
+                            include: ['@babel/plugin-proposal-object-rest-spread']
+                        }
+                    ]
+                ]
             })
         ]
     };

@@ -58,10 +58,16 @@ const logger = loggerFactory('core/request');
  */
 const createError = (response, fallbackMessage, httpCode, httpSent) => {
     let err;
-    if (response && response.errorCode) {
-        err = new Error(`${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`);
-    } else {
-        err = new Error(fallbackMessage);
+    if (response) {
+        const code = response.errorCode || response.code;
+        const message = response.errorMsg || response.errorMessage || response.error || response.message;
+        if (code && message) {
+            err = new Error(`${code} : ${message}`);
+        } else if (message) {
+            err = new Error(`${message}`);
+        } else {
+            err = new Error(fallbackMessage);
+        }
     }
     err.response = response;
     err.sent = httpSent;
@@ -263,11 +269,11 @@ export default function request(options) {
 
                     const jwtTokenHandler = options.jwtTokenHandler;
                     /**
-                         * if access token expired then
-                         * get new token
-                         * update header with new token
-                         * retry request
-                         *  */
+                     * if access token expired then
+                     * get new token
+                     * update header with new token
+                     * retry request
+                     *  */
                     if (xhr.status === 401 && !isAccessTokenRefreshTried && jwtTokenHandler) {
                         isAccessTokenRefreshTried = true;
                         jwtTokenHandler
@@ -301,7 +307,7 @@ export default function request(options) {
                         sent: xhr.readyState > 0,
                         type: 'error',
                         textStatus: textStatus,
-                        message: errorThrown || __('An error occurred!')
+                        message: errorThrown || xhr.statusText || __('An error occurred!')
                     };
 
                     const enhancedResponse = Object.assign({}, responseExtras, response);

@@ -27,7 +27,7 @@ import extensions from 'core/mimetype/extensions.json';
  * Helps you to retrieve file type and categories based on a file mime type
  * @exports core/mimetype
  */
-var mimetypeHelper = {
+const mimetypeHelper = {
     /**
      * Gets the MIME type of a resource.
      *
@@ -38,20 +38,20 @@ var mimetypeHelper = {
      *                                the second is the MIME type if the request succeed.
      * @returns {mimetype}
      */
-    getResourceType: function getResourceType(url, callback) {
+    getResourceType(url, callback) {
         $.ajax({
             type: 'HEAD',
             async: true,
             url: url,
-            success: function onSuccess(message, text, jqXHR) {
-                var mime = jqXHR.getResponseHeader('Content-Type');
+            success(message, text, jqXHR) {
+                const mime = jqXHR.getResponseHeader('Content-Type');
                 if (callback) {
                     callback(null, mime);
                 }
             },
 
-            error: function onError(jqXHR) {
-                var error = jqXHR.status || 404;
+            error(jqXHR) {
+                const error = jqXHR.status || 404;
                 if (callback) {
                     callback(error);
                 }
@@ -67,10 +67,9 @@ var mimetypeHelper = {
      * @param {String} [file.name] - the file name
      * @returns {String} the type
      */
-    getFileType: function getFileType(file) {
-        var type;
-        var mime = file.mime;
-        var ext;
+    getFileType(file) {
+        let type;
+        const mime = file.mime;
 
         if (mime) {
             //lookup for exact mime
@@ -88,7 +87,7 @@ var mimetypeHelper = {
 
         //try by extension
         if (!type) {
-            ext = getFileExtension(file.name);
+            const ext = getFileExtension(file.name);
             if (ext) {
                 type = _.findKey(categories, {
                     extensions: [ext]
@@ -102,15 +101,15 @@ var mimetypeHelper = {
     /**
      * Check if a given mime type matches some filters
      * @param {String} type - the mime type
-     * @param {String[]} filters - the validTypes
+     * @param {String[]} validTypes - the validTypes
      * @returns {String} category
      */
-    match: function match(type, validTypes) {
+    match(type, validTypes) {
         // Under rare circumstances a browser may report the mime type
         // with quotes (e.g. "application/foo" instead of application/foo)
-        var checkType = type.replace(/^["']+|['"]+$/g, '');
+        const checkType = type.replace(/^["']+|['"]+$/g, '');
 
-        var starType = checkType.replace(/\/.*$/, '/*');
+        const starType = checkType.replace(/\/.*$/, '/*');
 
         return _.contains(validTypes, checkType) || _.contains(validTypes, starType);
     },
@@ -118,9 +117,9 @@ var mimetypeHelper = {
     /**
      * Get the category of a type
      * @param {String} type
-     * @returns {String} category
+     * @returns {String|undefined} category
      */
-    getCategory: function getCategory(type) {
+    getCategory(type) {
         if (categories[type]) {
             return categories[type].category;
         }
@@ -135,18 +134,17 @@ var mimetypeHelper = {
      * @param {File} file
      * @returns {String} the mime type
      */
-    getMimeType: function getMimeType(file) {
-        var ext,
-            type = file.type,
-            category = mimetypeHelper.getFileType({
-                name: file.name,
-                mime: type
-            });
+    getMimeType(file) {
+        const type = file.type;
+        const category = mimetypeHelper.getFileType({
+            name: file.name,
+            mime: type
+        });
 
         if (type && !type.match(/invalid/) && category !== 'generic') {
             return type;
         } else {
-            ext = getFileExtension(file.name);
+            const ext = getFileExtension(file.name);
             if (ext && extensions[ext]) {
                 return extensions[ext];
             }
@@ -159,10 +157,10 @@ var mimetypeHelper = {
  * Get the file extension from the file name
  *
  * @param {String} fileName
- * @returns {String}
+ * @returns {String|undefined}
  */
 function getFileExtension(fileName) {
-    var extMatch = fileName.match(/\.([0-9a-z]+)(?:[\?#]|$)/i);
+    const extMatch = fileName.match(/\.([0-9a-z]+)(?:[?#]|$)/i);
     if (extMatch && extMatch.length > 1) {
         return extMatch[1];
     }

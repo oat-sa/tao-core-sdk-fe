@@ -68,7 +68,8 @@ define(['core/promise'], function(Promise) {
                             return Promise.reject(new Error('Cannot access storage!'));
                         }
 
-                        _stores[name] = data = {};
+                        data = {};
+                        _stores[name] = data;
                         return Promise.resolve(true);
                     },
                     removeStore: function removeStore() {

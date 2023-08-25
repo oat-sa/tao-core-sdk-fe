@@ -25,18 +25,18 @@
 import _ from 'lodash';
 import context from 'context';
 
-var parsers = {
+const parsers = {
     absolute: /^(?:[a-z]+:)?\/\//i,
-    base64: /^data:[^\/]+\/[^;]+(;charset=[\w]+)?;base64,/,
+    base64: /^data:[^/]+\/[^;]+(;charset=[\w]+)?;base64,/,
     query: /(?:^|&)([^&=]*)=?([^&]*)/g,
-    url: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/
+    url: /^(?:([^:/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:/?#]*)(?::(\d*))?))?((((?:[^?#/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/
 };
 
 /**
  * The Url util
  * @exports util/url
  */
-var urlUtil = {
+const urlUtil = {
     /*
      * The parse method is a adaptation of parseUri from
      * Steven Levithan <stevenlevithan.com> under the MIT License
@@ -52,9 +52,8 @@ var urlUtil = {
      * @param {String} url - the URL to parse
      * @returns {Object} parsedUrl with the properties available in key below and query that contains query string key/values.
      */
-    parse: function parse(url) {
-        var matches;
-        var keys = [
+    parse(url) {
+        const keys = [
             'source',
             'protocol',
             'authority',
@@ -70,9 +69,9 @@ var urlUtil = {
             'queryString',
             'hash'
         ];
-        var i = keys.length;
-        var parsed = Object.create({
-            toString: function() {
+
+        const parsed = Object.create({
+            toString: function () {
                 return this.source;
             }
         });
@@ -82,12 +81,13 @@ var urlUtil = {
         if (parsed.base64) {
             parsed.source = url;
         } else {
-            matches = parsers.url.exec(url);
+            const matches = parsers.url.exec(url);
+            let i = keys.length;
             while (i--) {
                 parsed[keys[i]] = matches[i] || '';
             }
             parsed.query = {};
-            parsed.queryString.replace(parsers.query, function($0, $1, $2) {
+            parsed.queryString.replace(parsers.query, function ($0, $1, $2) {
                 if ($1) {
                     parsed.query[$1] = $2;
                 }
@@ -101,9 +101,9 @@ var urlUtil = {
      * @param {String|Object} url - the url to check. It can be a parsed URL (result of {@link util/url#parse})
      * @returns {Boolean|undefined} true if the url is absolute, or undefined if the URL cannot be checked
      */
-    isAbsolute: function isAbsolute(url) {
+    isAbsolute(url) {
         //url from parse
-        if (typeof url === 'object' && url.hasOwnProperty('source')) {
+        if (typeof url === 'object' && Object.prototype.hasOwnProperty.call(url, 'source')) {
             return url.source !== url.relative;
         }
         if (typeof url === 'string') {
@@ -116,8 +116,8 @@ var urlUtil = {
      * @param {String|Object} url - the url to check. It can be a parsed URL (result of {@link util/url#parse})
      * @returns {Boolean|undefined} true if the url is relative, or undefined if the URL cannot be checked
      */
-    isRelative: function isRelative(url) {
-        var absolute = this.isAbsolute(url);
+    isRelative(url) {
+        const absolute = this.isAbsolute(url);
         if (typeof absolute === 'boolean') {
             return !absolute;
         }
@@ -128,8 +128,8 @@ var urlUtil = {
      * @param {String|Object} url - the url to check. It can be a parsed URL (result of {@link util/url#parse})
      * @returns {Boolean|undefined} true if the url is base64, or undefined if the URL cannot be checked
      */
-    isBase64: function isBase64(url) {
-        if (typeof url === 'object' && url.hasOwnProperty('source')) {
+    isBase64(url) {
+        if (typeof url === 'object' && Object.prototype.hasOwnProperty.call(url, 'source')) {
             return url.base64;
         }
         if (typeof url === 'string') {
@@ -139,10 +139,10 @@ var urlUtil = {
 
     /**
      * Determine whether encoding is required to match XML standards for attributes
-     * @param {String} url
+     * @param {String} uri
      * @returns {String}
      */
-    encodeAsXmlAttr: function encodeAsXmlAttr(uri) {
+    encodeAsXmlAttr(uri) {
         return /[<>&']+/.test(uri) ? encodeURIComponent(uri) : uri;
     },
 
@@ -154,10 +154,8 @@ var urlUtil = {
      * @param {Object} [params] - params to add to the URL
      * @returns {String} the URL
      */
-    build: function build(path, params) {
-        var url,
-            queryString = '',
-            hasQueryString;
+    build(path, params) {
+        let url;
 
         if (path) {
             if (_.isString(path)) {
@@ -165,40 +163,36 @@ var urlUtil = {
             }
             if (_.isArray(path)) {
                 url = '';
-                _.forEach(path, function(chunk) {
+                _.forEach(path, function (chunk) {
                     if (/\/$/.test(url) && /^\//.test(chunk)) {
                         url += chunk.substr(1);
                     } else if (url !== '' && !/\/$/.test(url) && !/^\//.test(chunk)) {
-                        url += '/' + chunk;
+                        url += `/${chunk}`;
                     } else {
                         url += chunk;
                     }
                 });
             }
             if (_.isPlainObject(params)) {
-                hasQueryString = url.indexOf('?') > -1;
-                queryString = _.reduce(
+                const hasQueryString = url.indexOf('?') > -1;
+                const queryString = _.reduce(
                     params,
-                    function(acc, value, key) {
+                    function (acc, value, key) {
                         if (!_.isEmpty(acc) || hasQueryString) {
                             acc += '&';
                         }
                         if (typeof value === 'object' && !_.isArray(value)) {
-                            _.forOwn(value, function(parameterValue, parameterName) {
-                                acc +=
-                                    encodeURIComponent(key) +
-                                    '[' +
-                                    encodeURIComponent(parameterName) +
-                                    ']=' +
-                                    encodeURIComponent(parameterValue) +
-                                    '&';
+                            _.forOwn(value, function (parameterValue, parameterName) {
+                                acc += `${encodeURIComponent(key)}[${encodeURIComponent(
+                                    parameterName
+                                )}]=${encodeURIComponent(parameterValue)}&`;
                             });
                         } else {
-                            acc += encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                            acc += `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
                         }
                         return acc;
                     },
-                    queryString
+                    ''
                 );
                 if (!_.isEmpty(queryString)) {
                     if (!hasQueryString) {
@@ -217,17 +211,17 @@ var urlUtil = {
      * @param {String} action - The controller's action
      * @param {String} controller - The controller's name
      * @param {String} extension - The controller's extension
-     * @param {String} [rootUrl] - to change the root url, otherwise taken from context
      * @param {Object} [params] - params to add to the URL
+     * @param {String} [rootUrl] - to change the root url, otherwise taken from context
      * @returns {String} the url
      *
      * @throws {TypeError} if one of the required parameter is missing or empty
      */
-    route: function route(action, controller, extension, params, rootUrl) {
-        var routeParts = [extension, controller, action];
+    route(action, controller, extension, params, rootUrl) {
+        const routeParts = [extension, controller, action];
 
         if (
-            _.some(routeParts, function(value) {
+            _.some(routeParts, function (value) {
                 return _.isEmpty(value) || !_.isString(value);
             })
         ) {

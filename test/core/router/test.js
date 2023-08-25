@@ -44,11 +44,11 @@ define(['core/router', 'context'], function(router, context) {
             }
         ])
         .test('router has the method ', function(data, assert) {
-            assert.equal(typeof router[data.title], 'function', 'The router object expose the method ' + data.title);
+            assert.equal(typeof router[data.title], 'function', `The router object expose the method ${data.title}`);
         });
 
     QUnit.module('Parse URl', {
-        beforeEach: function setup(assert) {
+        beforeEach: function setup() {
             context.bundle = false;
         }
     });

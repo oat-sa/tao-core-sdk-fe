@@ -40,9 +40,9 @@ import moduleLoader from 'core/moduleLoader';
 /**
  * The default level
  */
-var defaultLevel = 'info';
+let defaultLevel = 'info';
 
-var levels = {
+const levels = {
     fatal: 60, // The service/app is going to stop or become unusable now. An operator should definitely look into this soon.
     error: 50, // Fatal for a particular request, but the service/app continues servicing other requests. An operator should look at this soon(ish).
     warn: 40, // A note on something that should probably be looked at by an operator eventually.
@@ -54,12 +54,12 @@ var levels = {
 /**
  * Major version of the node-bunyan package (for compat)
  */
-var bunyanVersion = 0;
+const bunyanVersion = 0;
 
 /**
  * Where messages dwells
  */
-var logQueue = [];
+let logQueue = [];
 
 /**
  * Get the actual level as a string,
@@ -67,19 +67,19 @@ var logQueue = [];
  * @param {String|Number} [level] - the level
  * @returns {String} the level
  */
-var getLevel = function getLevel(level) {
+function getLevel(level) {
     if (typeof level === 'undefined' || (_.isString(level) && !_.has(levels, level))) {
         return defaultLevel;
     }
     if (_.isNumber(level)) {
         return (
-            _.findKey(levels, function(l) {
+            _.findKey(levels, function (l) {
                 return l === level;
             }) || defaultLevel
         );
     }
     return level;
-};
+}
 
 /**
  * Get the actual level as a number,
@@ -87,7 +87,7 @@ var getLevel = function getLevel(level) {
  * @param {String|Number} [level] - the level
  * @returns {Number} the level
  */
-var getLevelNum = function getLevelNum(level) {
+function getLevelNum(level) {
     if (_.isString(level) && _.has(levels, level)) {
         return levels[level];
     }
@@ -95,17 +95,17 @@ var getLevelNum = function getLevelNum(level) {
         return level;
     }
     return levels[defaultLevel];
-};
+}
 
 /**
  * Check whether the given level is above the minimum level threshold
- * @param {String|Number} minlevel- the minimum level
+ * @param {String|Number} minLevel - the minimum level
  * @param {String|Number} [level] - the level to check
  * @returns {Boolean}
  */
-var checkMinLevel = function checkMinLevel(minLevel, level) {
+function checkMinLevel(minLevel, level) {
     return getLevelNum(level) >= getLevelNum(minLevel);
-};
+}
 
 /**
  * Creates a logger instance
@@ -116,10 +116,7 @@ var checkMinLevel = function checkMinLevel(minLevel, level) {
  *
  * @returns {logger} a new logger instance
  */
-var loggerFactory = function loggerFactory(name, minLevel, fields) {
-    var baseRecord;
-    var logger;
-
+function loggerFactory(name, minLevel, fields) {
     if (!_.isString(name) || _.isEmpty(name)) {
         throw new TypeError('A logger needs a name');
     }
@@ -129,7 +126,7 @@ var loggerFactory = function loggerFactory(name, minLevel, fields) {
         minLevel = defaultLevel;
     }
 
-    baseRecord = _.defaults(fields || {}, {
+    const baseRecord = _.defaults(fields || {}, {
         name: name,
         pid: 1, // only for compat
         hostname: navigator.userAgent
@@ -140,37 +137,34 @@ var loggerFactory = function loggerFactory(name, minLevel, fields) {
      *
      * @typedef logger
      */
-    logger = {
-
+    const logger = {
         /**
          * Log messages by delegating to the provider
          *
          * @param {String|Number} level - the log level
-         * @param {Object} [recordFields] - fields to add to the log record
+         * @param {Object|string} [recordFields] - fields to add to the log record
          * @param {String|Error} message - the message to log
          * @param {...String} [rest] - rest parameters if the message is formatted
          * @returns {logger} chains
          */
-        log: function log(level, recordFields, message) {
-            var record;
-            var err;
-            var rest = [];
-            var time = new Date().toISOString();
+        log(level, recordFields, message, ...rest) {
+            let err;
+            const time = new Date().toISOString();
 
             //without providers or not the level, we don't log.
             if (loggerFactory.providers === false || !checkMinLevel(minLevel || defaultLevel, level)) {
-                return;
+                return this;
             }
 
             if (_.isString(recordFields) || recordFields instanceof Error) {
+                if ('undefined' !== typeof message) {
+                    rest = [message, ...rest];
+                }
                 message = recordFields;
                 recordFields = {};
-                rest = [].slice.call(arguments, 2);
-            } else {
-                rest = [].slice.call(arguments, 3);
             }
 
-            record = {
+            const record = {
                 level: getLevel(level),
                 v: bunyanVersion,
                 time: time
@@ -187,7 +181,7 @@ var loggerFactory = function loggerFactory(name, minLevel, fields) {
                 record.msg = err.message;
                 record.err = err;
             } else {
-                record.msg = format.apply(null, [message].concat(rest));
+                record.msg = format(message, ...rest);
             }
 
             _.merge(record, baseRecord, recordFields);
@@ -201,10 +195,10 @@ var loggerFactory = function loggerFactory(name, minLevel, fields) {
 
         /**
          * Get/set the default level of the logger
-         * @param {String|Number} [level] - set the default level
+         * @param {String|Number} [value] - set the default level
          * @returns {String|logger} the default level as a getter or chains as a setter
          */
-        level: function(value) {
+        level(value) {
             if (typeof value !== 'undefined') {
                 //update the partial function
                 minLevel = getLevelNum(value);
@@ -218,9 +212,9 @@ var loggerFactory = function loggerFactory(name, minLevel, fields) {
          * same config + child fields
          *
          * @param {Object} [childFields] - specialized child fields
-         * @return {logger} the child logger
+         * @returns {logger} the child logger
          */
-        child: function child(childFields) {
+        child(childFields) {
             return loggerFactory(name, minLevel, _.defaults(childFields, baseRecord));
         }
     };
@@ -234,7 +228,7 @@ var loggerFactory = function loggerFactory(name, minLevel, fields) {
         },
         logger
     );
-};
+}
 
 /**
  * Exposes the levels
@@ -257,30 +251,37 @@ loggerFactory.load = function load(providerConfigs) {
     this.providers = [];
 
     //we can load the loggers dynamically
-    const modules = Object.keys(providerConfigs || {})
-        .map( module => ({
-            module,
-            category: 'logger'
-        }));
+    const modules = Object.keys(providerConfigs || {}).map(module => ({
+        module,
+        category: 'logger'
+    }));
 
-    return moduleLoader()
-        .addList(modules)
-        .load()
-        .then( loadedProviders => {
-            loadedProviders.forEach( (provider, moduleKey) => {
-                const providerConfig = modules[moduleKey] && modules[moduleKey].module && providerConfigs[modules[moduleKey].module];
-                this.register(provider, providerConfig);
-            });
-        })
-        //flush messages that arrived before the providers are there
-        .then( () => this.flush());
+    return (
+        moduleLoader()
+            .addList(modules)
+            .load()
+            .then(loadedProviders => {
+                loadedProviders.forEach((provider, moduleKey) => {
+                    const providerConfig =
+                        modules[moduleKey] && modules[moduleKey].module && providerConfigs[modules[moduleKey].module];
+                    this.register(provider, providerConfig);
+                });
+            })
+            //flush messages that arrived before the providers are there
+            .then(() => this.flush())
+    );
 };
 
 /**
  * A logger provider provides with a way to log
  * @typedef {Object} loggerProvider
  * @property {Function} log - called with the message in parameter
- * @param {Object} providerConfig - provider's config
+ */
+
+/**
+ * Registers a logger provider.
+ * @param {loggerProvider} provider
+ * @param {object} providerConfig - provider's config
  * @throws TypeError
  */
 loggerFactory.register = function register(provider, providerConfig) {
@@ -301,9 +302,9 @@ loggerFactory.register = function register(provider, providerConfig) {
  */
 loggerFactory.flush = function flush() {
     if (_.isArray(this.providers) && this.providers.length > 0) {
-        _.forEach(logQueue, function(message) {
+        _.forEach(logQueue, function (message) {
             //forward to the providers
-            _.forEach(loggerFactory.providers, function(provider) {
+            _.forEach(loggerFactory.providers, function (provider) {
                 provider.log(message);
             });
         });

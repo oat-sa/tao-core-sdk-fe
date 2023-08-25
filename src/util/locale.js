@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA;
  *
  */
 
@@ -23,7 +23,7 @@
 import module from 'module';
 import moment from 'moment';
 
-var configuration = module.config();
+let configuration = module.config();
 
 /**
  * Util object for manipulate locale dependent data
@@ -32,17 +32,17 @@ var configuration = module.config();
 export default {
     /**
      * Returns config of component
-     * @returns {*}
+     * @returns {object}
      */
-    getConfig: function getConfig() {
+    getConfig() {
         return configuration;
     },
 
     /**
      * Sets config of component
-     * @param config
+     * @param {object} config
      */
-    setConfig: function setConfig(config) {
+    setConfig(config) {
         configuration = config || {};
     },
 
@@ -50,7 +50,7 @@ export default {
      * Returns current system decimal separator
      * @returns {string}
      */
-    getDecimalSeparator: function getDecimalSeparator() {
+    getDecimalSeparator() {
         return this.getConfig() && this.getConfig().decimalSeparator ? this.getConfig().decimalSeparator : '.';
     },
 
@@ -58,15 +58,15 @@ export default {
      * Returns current system thousands separator
      * @returns {string}
      */
-    getThousandsSeparator: function getThousandsSeparator() {
+    getThousandsSeparator() {
         return this.getConfig() && this.getConfig().thousandsSeparator ? this.getConfig().thousandsSeparator : '';
     },
 
     /**
      * Returns datetime format
-     * @return {string}
+     * @returns {string}
      */
-    getDateTimeFormat: function getDateTimeFormat() {
+    getDateTimeFormat() {
         return this.getConfig() && this.getConfig().dateTimeFormat
             ? this.getConfig().dateTimeFormat
             : 'DD/MM/YYYY HH:mm:ss';
@@ -74,23 +74,21 @@ export default {
 
     /**
      * Parse float values with process locale features
-     * @param numStr
+     * @param {string} numStr
      * @returns {Number}
      */
-    parseFloat: function(numStr) {
-        var thousandsSeparator = this.getThousandsSeparator(),
-            decimalSeparator = this.getDecimalSeparator();
+    parseFloat(numStr) {
+        const thousandsSeparator = this.getThousandsSeparator();
+        const decimalSeparator = this.getDecimalSeparator();
 
         // discard all thousand separators:
         if (thousandsSeparator.length) {
-            numStr = numStr.replace(new RegExp('\\' + thousandsSeparator, 'g'), '');
+            numStr = numStr.replace(new RegExp(`\\${thousandsSeparator}`, 'g'), '');
         }
 
         // standardise the decimal separator as '.':
         if (decimalSeparator !== '.') {
-            numStr = numStr
-                .replace(new RegExp('\\' + '.', 'g'), '_')
-                .replace(new RegExp('\\' + decimalSeparator, 'g'), '.');
+            numStr = numStr.replace(new RegExp('\\.', 'g'), '_').replace(new RegExp(`\\${decimalSeparator}`, 'g'), '.');
         }
 
         // now the numeric string can be correctly parsed with the native parseFloat:
@@ -99,15 +97,15 @@ export default {
 
     /**
      * Parse integer values with process locale features
-     * @param number
-     * @param numericBase
+     * @param {string} number
+     * @param {number} numericBase
      * @returns {Number}
      */
-    parseInt: function(number, numericBase) {
-        var thousandsSeparator = this.getThousandsSeparator();
+    parseInt(number, numericBase) {
+        const thousandsSeparator = this.getThousandsSeparator();
 
         if (thousandsSeparator.length) {
-            number = number.replace(new RegExp('\\' + thousandsSeparator, 'g'), '');
+            number = number.replace(new RegExp(`\\${thousandsSeparator}`, 'g'), '');
         }
 
         return parseInt(number, numericBase);
@@ -115,11 +113,37 @@ export default {
 
     /**
      * Parse unix timestamp
-     * Note that user's (browser's) timezone will be used.
-     * @param {Number} timestamp
-     * @return string
+     * Note that user's (browser's) timezone will be used by default, unless the utc parameter is set to true.
+     * @param {Number} timestamp - The timestamp to format. It is considered as in the target timezone.
+     * @param {Boolean} [utc=false] - For the UTC timezone. By default the user's timezone will be used.
+     * @returns {string}
      */
-    formatDateTime: function(timestamp) {
-        return moment(timestamp, 'X').format(this.getDateTimeFormat());
+    formatDateTime(timestamp, utc = false) {
+        const datetime = utc ? moment.utc(timestamp, 'X') : moment(timestamp, 'X');
+        return datetime.format(this.getDateTimeFormat());
+    },
+
+    /**
+     * Determine direction for language
+     * @param {String} lang
+     * @returns {boolean}
+     */
+    isLanguageRTL(lang) {
+        if (!(this.getConfig() && this.getConfig().rtl) || !lang) {
+            return false;
+        }
+
+        return this.getConfig().rtl.some(function (lng) {
+            return String(lng).toLowerCase() === lang.toLowerCase();
+        });
+    },
+
+    /**
+     * Determine direction for language
+     * @param {String} lang
+     * @returns {String} rtl|ltr
+     */
+    getLanguageDirection(lang) {
+        return this.isLanguageRTL(lang) ? 'rtl' : 'ltr';
     }
 };

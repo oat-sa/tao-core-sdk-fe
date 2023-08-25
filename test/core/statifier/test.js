@@ -40,7 +40,7 @@ define(['core/statifier'], function(statifier) {
         assert.equal(
             typeof statifier()[data.title],
             'function',
-            'The statifier instance exposes a "' + data.title + '" function'
+            `The statifier instance exposes a "${data.title}" function`
         );
     });
 

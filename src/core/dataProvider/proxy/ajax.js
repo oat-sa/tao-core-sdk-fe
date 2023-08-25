@@ -22,7 +22,7 @@ import _ from 'lodash';
 import request from 'core/dataProvider/request';
 import Promise from 'core/promise';
 
-var _defaults = {
+const _defaults = {
     noCache: true,
     noToken: false,
     actions: {}
@@ -81,14 +81,20 @@ export default {
      * @param {Boolean} [config.noCache] - Prevent the request to be cached by the client (default: true)
      * @param {Boolean} [config.noToken] - Prevent the request to be use the security token when available (default: false)
      */
-    init: function init(config) {
-        // Will request the server for the wanted action.
-        // May reject the request if the action is not implemented.
+    init(config) {
+        /**
+         * Will request the server for the wanted action.
+         * May reject the request if the action is not implemented.
+         * @param {string} action
+         * @param {object} params
+         * @param {string} method
+         * @returns {Promise|*}
+         */
         this.processRequest = function processRequest(action, params, method) {
-            var descriptor = config.actions[action];
-            var headers = {};
-            var tokenHandler = this.getTokenHandler();
-            var token;
+            let descriptor = config.actions[action];
+            const headers = {};
+            const tokenHandler = this.getTokenHandler();
+            let token;
 
             if (_.isString(descriptor)) {
                 descriptor = {
@@ -118,14 +124,14 @@ export default {
             }
 
             return request(descriptor.url, params, descriptor.method || method, headers)
-                .then(function(data) {
+                .then(function (data) {
                     if (data && data.token) {
                         tokenHandler.setToken(data.token);
                     }
                     return data;
                 })
-                .catch(function(err) {
-                    var t = err.response && (err.response.token || (err.response.data && err.response.data.token));
+                .catch(function (err) {
+                    const t = err.response && (err.response.token || (err.response.data && err.response.data.token));
                     if (t) {
                         tokenHandler.setToken(t);
                     } else if (!config.noToken) {
@@ -142,39 +148,43 @@ export default {
     /**
      * Cleans up the instance when destroying
      */
-    destroy: function destroy() {
+    destroy() {
         this.processRequest = null;
     },
 
     /**
      * Requests the server for a create action
      * @param {Object} params
+     * @returns {Promise}
      */
-    create: function create(params) {
+    create(params) {
         return this.processRequest('create', params, 'POST');
     },
 
     /**
      * Requests the server for a read action
      * @param {Object} params
+     * @returns {Promise}
      */
-    read: function read(params) {
+    read(params) {
         return this.processRequest('read', params, 'GET');
     },
 
     /**
      * Requests the server for a write action
      * @param {Object} params
+     * @returns {Promise}
      */
-    write: function write(params) {
+    write(params) {
         return this.processRequest('write', params, 'POST');
     },
 
     /**
      * Requests the server for a remove action
      * @param {Object} params
+     * @returns {Promise}
      */
-    remove: function remove(params) {
+    remove(params) {
         return this.processRequest('remove', params, 'GET');
     },
 
@@ -182,8 +192,9 @@ export default {
      * Requests the server using a particular action
      * @param {String} actionName
      * @param {Object} params
+     * @returns {Promise}
      */
-    action: function action(actionName, params) {
+    action(actionName, params) {
         return this.processRequest(actionName, params, 'POST');
     }
 };

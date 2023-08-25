@@ -13,30 +13,46 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA ;
  */
 
 /**
  * Give and refresh JWT token
+ * !!! The module uses native fetch request to refresh token.
+ * !!! IE11 requires polyfill https://www.npmjs.com/package/whatwg-fetch
  * @module core/jwtTokenHandler
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
 import jwtTokenStoreFactory from 'core/jwt/jwtTokenStore';
-import coreRequest from 'core/request';
 import promiseQueue from 'core/promiseQueue';
+import TokenError from 'core/error/TokenError';
 
 /**
  * JWT token handler factory
  * @param {Object} options Options of JWT token handler
  * @param {String} options.serviceName Name of the service what JWT token belongs to
  * @param {String} options.refreshTokenUrl Url where handler could refresh JWT token
+ * @param {Number} [options.accessTokenTTL] Set accessToken TTL in ms for token store
+ * @param {Boolean} [options.usePerTokenTTL] if true, accessToken TTL should be extractable from JWT payload, and accessTokenTTL will be used as fallback
+ * @param {Boolean} [options.useCredentials] refreshToken stored in cookie instead of store
+ * @param {Object} [options.refreshTokenParameters] Parameters that should be send in refreshToken call
+ * @param {Boolean} [options.oauth2RequestFormat] use oauth2 request format
  * @returns {Object} JWT Token handler instance
  */
-const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 'tao', refreshTokenUrl} = {}) {
-
+const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
+    serviceName = 'tao',
+    refreshTokenUrl,
+    accessTokenTTL,
+    usePerTokenTTL = false,
+    refreshTokenParameters,
+    useCredentials = false,
+    oauth2RequestFormat = false
+} = {}) {
     const tokenStorage = jwtTokenStoreFactory({
-        namespace: serviceName
+        namespace: serviceName,
+        accessTokenTTL,
+        usePerTokenTTL
     });
 
     /**
@@ -50,21 +66,90 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
      * It will refresh the token from provided API and saves it for later use
      * @returns {Promise<String>} Promise of new token
      */
-    const unQueuedRefreshToken = () => tokenStorage.getRefreshToken().then(refreshToken => {
-        if (!refreshToken) {
-            throw new Error('Refresh token is not available');
-        } else {
-            return coreRequest({
-                url: refreshTokenUrl,
-                method: 'POST',
-                data: JSON.stringify({ refreshToken }),
-                dataType: 'json',
-                contentType: 'application/json',
-                noToken: true
-            }).then(({ accessToken }) => tokenStorage.setAccessToken(accessToken).then(() => accessToken));
+    const unQueuedRefreshToken = () => {
+        let parameters;
+        let credentials;
+        let flow;
 
+        if (refreshTokenParameters) {
+            parameters = Object.assign({}, refreshTokenParameters);
         }
-    });
+
+        if (useCredentials) {
+            credentials = 'include';
+            flow = Promise.resolve();
+        } else {
+            flow = tokenStorage.getRefreshToken().then(refreshToken => {
+                if (!refreshToken) {
+                    throw new Error('Refresh token is not available');
+                }
+                if (oauth2RequestFormat) {
+                    parameters = Object.assign({}, parameters, { refresh_token: refreshToken });
+                } else {
+                    parameters = Object.assign({}, parameters, { refreshToken });
+                }
+            });
+        }
+
+        return flow
+            .then(() => {
+                const headers = {};
+                let body;
+                if (oauth2RequestFormat) {
+                    body = new FormData();
+                    Object.keys(parameters).forEach(key => {
+                        body.append(key, parameters[key]);
+                    });
+                } else {
+                    if (parameters) {
+                        body = JSON.stringify(parameters);
+                    }
+
+                    headers['Content-Type'] = 'application/json';
+                }
+                return fetch(refreshTokenUrl, {
+                    method: 'POST',
+                    credentials,
+                    headers,
+                    body
+                });
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                if(response.status === 401){
+                    const error = new TokenError('Refresh-token expired', response);
+                    return Promise.reject(error);
+                }
+
+                let error = new Error('Unsuccessful token refresh');
+                error.response = response;
+                return Promise.reject(error);
+            })
+            .then(response => {
+                let accessToken, refreshToken, expiresIn;
+
+                if (oauth2RequestFormat) {
+                    accessToken = response.access_token;
+                    refreshToken = response.refresh_token;
+                    expiresIn = response.expires_in;
+                } else {
+                    accessToken = response.accessToken;
+                    refreshToken = response.refreshToken;
+                }
+
+                if (expiresIn) {
+                    tokenStorage.setAccessTokenTTL(expiresIn * 1000);
+                }
+
+                if (accessToken && refreshToken) {
+                    return tokenStorage.setTokens(accessToken, refreshToken).then(() => accessToken);
+                }
+
+                return tokenStorage.setAccessToken(accessToken).then(() => accessToken);
+            });
+    };
 
     return {
         /**
@@ -80,6 +165,10 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
             return actionQueue.serie(() => tokenStorage.getAccessToken().then(accessToken => {
                 if (accessToken) {
                     return accessToken;
+                }
+
+                if (useCredentials) {
+                    return unQueuedRefreshToken();
                 }
                 return tokenStorage.getRefreshToken().then(refreshToken => {
                     if (refreshToken) {
@@ -97,6 +186,9 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
          * @returns {Promise<Boolean>} Promise of token is stored
          */
         storeRefreshToken(refreshToken) {
+            if (useCredentials) {
+                return Promise.resolve(false);
+            }
             return actionQueue.serie(() => tokenStorage.setRefreshToken(refreshToken));
         },
 
@@ -123,6 +215,14 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({serviceName = 't
          */
         refreshToken() {
             return actionQueue.serie(() => unQueuedRefreshToken());
+        },
+
+        /**
+         * Set accessToken TTL
+         * @param {Number} newAccessTokenTTL - accessToken TTL in ms
+         */
+        setAccessTokenTTL(newAccessTokenTTL) {
+            tokenStorage.setAccessTokenTTL(newAccessTokenTTL);
         }
     };
 };

@@ -21,7 +21,7 @@
  */
 import _ from 'lodash';
 
-var pattern = /(%[sdj])/g;
+const pattern = /(%[sdj])/g;
 
 /**
  * Enables you to format strings/message, using the pattern:
@@ -35,13 +35,12 @@ var pattern = /(%[sdj])/g;
  * @param {...String|Number|Object} [replacements] -  the replacements arguments in the order defined in the message
  * @returns {String} the formatted message
  */
-export default function(message) {
-    var replacements = Array.prototype.slice.call(arguments, 1);
+export default function (message, ...replacements) {
     return _.reduce(
         message.match(pattern),
-        function(acc, match, index) {
-            var replacement = '';
-            if (undefined !== replacements[index]) {
+        function (acc, match, index) {
+            let replacement = '';
+            if ('undefined' !== typeof replacements[index]) {
                 switch (match) {
                     case '%d':
                         replacement = Number(replacements[index]);
@@ -49,7 +48,9 @@ export default function(message) {
                     case '%j':
                         try {
                             replacement = JSON.stringify(replacements[index]).replace(/"/g, '');
-                        } catch (e) {}
+                        } catch (e) {
+                            // no fallback
+                        }
                         break;
                     default:
                         replacement = replacements[index];
