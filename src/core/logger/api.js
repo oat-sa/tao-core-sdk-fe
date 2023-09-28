@@ -91,7 +91,7 @@ function getLevelNum(level) {
     if (_.isString(level) && _.has(levels, level)) {
         return levels[level];
     }
-    if (_.isNumber(level) && _.contains(levels, level)) {
+    if (_.isNumber(level) && _.includes(levels, level)) {
         return level;
     }
     return levels[defaultLevel];

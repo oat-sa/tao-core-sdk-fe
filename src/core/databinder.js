@@ -584,7 +584,7 @@ DataBinder.prototype._setNodeValue = function _setNodeValue($node, value) {
         }
 
         //assign value
-        if (_.contains(['INPUT', 'SELECT', 'TEXTAREA'], $node[0].nodeName)) {
+        if (_.includes(['INPUT', 'SELECT', 'TEXTAREA'], $node[0].nodeName)) {
             if ($node.is(":text, input[type='hidden'], textarea, select")) {
                 $node.val(value).trigger('change');
             } else if ($node.is(':radio, :checkbox')) {
@@ -621,7 +621,7 @@ DataBinder.prototype._setNodeValue = function _setNodeValue($node, value) {
 DataBinder.prototype._getNodeValue = function _getNodeValue($node) {
     const self = this;
     let value;
-    if (_.contains(['INPUT', 'SELECT', 'TEXTAREA'], $node[0].nodeName)) {
+    if (_.includes(['INPUT', 'SELECT', 'TEXTAREA'], $node[0].nodeName)) {
         if ($node.is(":text, input[type='hidden'], textarea, select")) {
             value = $node.val();
         } else if ($node.is(':radio, :checkbox')) {

@@ -24,9 +24,7 @@ export default {
     takeControl($container, options) {
         const control = {};
         let model = {};
-        const binderOpts = _.pick(options, function (value, key) {
-            return key === 'encoders' || key === 'filters' || key === 'templates';
-        });
+        const binderOpts = _.pick(options, ['encoders', 'filters', 'templates']);
 
         if (options.get) {
             control.get = function get(cb) {
