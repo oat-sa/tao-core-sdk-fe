@@ -125,7 +125,7 @@ memoryStorageBackend.removeAll = function removeAll(validate) {
     if (!_.isFunction(validate)) {
         validate = null;
     }
-    memoryStore = _.omit(memoryStore, function(store, storeName) {
+    memoryStore = _.omitBy(memoryStore, function(store, storeName) {
         return validate ? validate(storeName) : true;
     });
     return Promise.resolve(true);
