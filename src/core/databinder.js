@@ -194,7 +194,7 @@ const _unbind = function _unbind($node, $container, eventName) {
         if (
             bounds &&
             _(bounds[eventName])
-                .where({ namespace: 'internalbinder' })
+                .filter({ namespace: 'internalbinder' })
                 .size() > 0
         ) {
             toBind($node, $container).off(`${eventName}.internalbinder`);
@@ -216,7 +216,7 @@ const _bindOnce = function _bindOnce($node, $container, eventName, cb) {
         if (
             !bounds ||
             _(bounds[eventName])
-                .where({ namespace: 'internalbinder' })
+                .filter({ namespace: 'internalbinder' })
                 .size() < 1
         ) {
             toBind($node, $container).on(`${eventName}.internalbinder`, function (e, ...args) {
