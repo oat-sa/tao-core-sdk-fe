@@ -113,7 +113,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
                 modules[def.category].push(def.module);
             }
 
-            if (def.bundle && !_.contains(bundles, def.bundle)) {
+            if (def.bundle && !_.includes(bundles, def.bundle)) {
                 bundles.push(def.bundle);
             }
             return this;
@@ -193,7 +193,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
                 .then(loadedModules => {
                     _.forEach(dependencies, (dependency, index) => {
                         const module = loadedModules[index];
-                        const category = _.findKey(modules, val => _.contains(val, dependency));
+                        const category = _.findKey(modules, val => _.includes(val, dependency));
 
                         if (typeof validate === 'function' && !validate(module)) {
                             throw new TypeError(`The module '${dependency}' is not valid`);
@@ -243,7 +243,7 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
             throw new TypeError('A list of modules must be an array');
         }
 
-        if (!_.all(moduleList, validate)) {
+        if (!_.every(moduleList, validate)) {
             throw new TypeError('The list does not contain valid modules');
         }
 

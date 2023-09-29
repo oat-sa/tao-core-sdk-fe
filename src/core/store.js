@@ -184,7 +184,7 @@ var checkQuotas = function checkQuotas() {
  * @returns {Boolean} true if valid
  */
 var isBackendApiValid = function isBackendApiValid(backend) {
-    return _.all(backendApi, function methodExists(method) {
+    return _.every(backendApi, function methodExists(method) {
         return _.isFunction(backend[method]);
     });
 };
@@ -195,7 +195,7 @@ var isBackendApiValid = function isBackendApiValid(backend) {
  * @returns {Boolean} true if valid
  */
 var isStorageApiValid = function isStorageApiValid(storage) {
-    return _.all(storeApi, function methodExists(method) {
+    return _.every(storeApi, function methodExists(method) {
         return _.isFunction(storage[method]);
     });
 };

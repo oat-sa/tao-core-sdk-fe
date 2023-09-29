@@ -111,7 +111,7 @@ const mimetypeHelper = {
 
         const starType = checkType.replace(/\/.*$/, '/*');
 
-        return _.contains(validTypes, checkType) || _.contains(validTypes, starType);
+        return _.includes(validTypes, checkType) || _.includes(validTypes, starType);
     },
 
     /**

@@ -77,7 +77,7 @@ UrlParser.extractParams = function (search) {
  * @returns {String|Boolean} the requested url part or false
  */
 UrlParser.prototype.get = function (what) {
-    return _.contains(urlParts, what) ? this.data[what] : false;
+    return _.includes(urlParts, what) ? this.data[what] : false;
 };
 
 /**
@@ -134,7 +134,7 @@ UrlParser.prototype.getUrl = function (exclude) {
     let url = '';
     exclude = exclude || [];
     if (this.data) {
-        if (this.data.hostname && !_.contains(exclude, 'host')) {
+        if (this.data.hostname && !_.includes(exclude, 'host')) {
             url += `${this.data.protocol ? this.data.protocol : 'http:'}//${this.data.hostname.replace(/\/$/, '')}`;
 
             //the value of the port seems to be different regardign the browser, so we prevent adding port if not usual
@@ -147,7 +147,7 @@ UrlParser.prototype.getUrl = function (exclude) {
         }
         url += this.data.pathname; //there is always a path
 
-        if (this.params && !_.contains(exclude, 'params')) {
+        if (this.params && !_.includes(exclude, 'params')) {
             url += '?';
             _.forEach(this.params, function (value, key) {
                 url += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
@@ -155,7 +155,7 @@ UrlParser.prototype.getUrl = function (exclude) {
             url = url.substring(0, url.length - 1);
         }
 
-        if (this.data.hash && !_.contains(exclude, 'hash')) {
+        if (this.data.hash && !_.includes(exclude, 'hash')) {
             url += this.data.hash;
         }
     }
