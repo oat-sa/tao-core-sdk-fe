@@ -20,6 +20,63 @@ import ApiError from 'core/error/ApiError';
 import NetworkError from 'core/error/NetworkError';
 import TimeoutError from 'core/error/TimeoutError';
 
+const XHR_READY_STATE_OPENED = 1;
+const XHR_READY_STATE_HEADERS_RECEIVED = 2;
+const XHR_READY_STATE_HEADERS_DONE = 4;
+
+/**
+ * XHR implementation of Fetch API
+ * @param {string} url
+ * @param {Object} options - fetch request options that implements RequestInit (https://fetch.spec.whatwg.org/#requestinit)
+ * @param {Function} [options.onUploadProgress]
+ * @param {Function} [options.onDownloadProgress]
+ * @returns {Promise<Response>}
+ */
+function xhr(url, options) {
+    return new Promise(resolve => {
+        const request = new XMLHttpRequest();
+        const responseHeaders = new Headers();
+
+        if (typeof options.onUploadProgress === 'function') {
+            request.upload.addEventListener('progress', options.onUploadProgress);
+        }
+        if (typeof options.onDownloadProgress === 'function') {
+            request.addEventListener('progress', options.onDownloadProgress);
+        }
+        request.addEventListener('readystatechange', () => {
+            switch (request.readyState) {
+                case XHR_READY_STATE_OPENED:
+                    for (const header in options.headers) {
+                        request.setRequestHeader(header, options.headers[header]);
+                    }
+                    break;
+                case XHR_READY_STATE_HEADERS_RECEIVED:
+                    request.getAllResponseHeaders().trim().split(/[\r\n]+/).forEach((line) => {
+                        const parts = line.split(": ");
+                        const header = parts.shift();
+                        const value = parts.join(": ");
+                        responseHeaders.append(header, value);
+                    });
+                    break;
+                case XHR_READY_STATE_HEADERS_DONE:
+                    if (request.responseType === 'json') {
+                        request.response = JSON.stringify(xhr.response);
+                    }
+                    const response = new Response(request.response, {
+                        status: request.status,
+                        statusText: request.statusText,
+                        headers: responseHeaders
+                    });
+                    resolve(response);
+                    break;
+            }
+        });
+
+        request.open(options.method, url, true);
+        request.send(options.body);
+    });
+}
+
 /**
  * !!! IE11 requires polyfill https://www.npmjs.com/package/whatwg-fetch
  * Creates an HTTP request to the url based on the provided parameters
@@ -31,6 +88,9 @@ import TimeoutError from 'core/error/TimeoutError';
  * @param {integer} [options.timeout] - (default: 5000) if timeout reached, the request will be rejected
  * @param {object} [options.jwtTokenHandler] - core/jwt/jwtTokenHandler instance that should be used during request
  * @param {boolean} [options.returnOriginalResponse] - the full original response should be returned instead of parsing internally (useful for HEAD requests or other empty-response-body requests)
+ * @param {'xhr'|'fetch'} [options.httpRequestImplementation] - http request implementation to use
+ * @param {Function} [options.onUploadProgress]
+ * @param {Function} [options.onDownloadProgress]
  * @returns {Promise<Response>} resolves with http Response object
  */
 const requestFactory = (url, options) => {
@@ -54,9 +114,11 @@ const requestFactory = (url, options) => {
             });
     }
 
+    const httpRequestImplementation = options.httpRequestImplementation === 'xhr' ? xhr : fetch;
+
     flow = flow.then(() =>
         Promise.race([
-            fetch(url, options),
+            httpRequestImplementation(url, options),
             new Promise((resolve, reject) => {
                 setTimeout(() => {
                     reject(new TimeoutError('Timeout', options.timeout));
