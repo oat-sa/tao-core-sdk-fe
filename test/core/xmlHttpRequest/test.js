@@ -300,7 +300,7 @@ define([
                     .status(200)
                     .body(JSON.stringify(mockResponse));
             }
-        })
+        });
 
         fetchMock.mock('/refresh-token', function (uri, opts) {
             const data = JSON.parse(opts.body);

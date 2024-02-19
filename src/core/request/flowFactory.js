@@ -26,6 +26,7 @@ import TimeoutError from 'core/error/TimeoutError';
  * @param {integer} [options.timeout] - (default: 5000) if timeout reached, the request will be rejected
  * @param {object} [options.jwtTokenHandler] - core/jwt/jwtTokenHandler instance that should be used during request
  * @param {boolean} [options.returnOriginalResponse] - the full original response should be returned instead of parsing internally (useful for HEAD requests or other empty-response-body requests)
+ * @returns {Promise}
  */
 export default function httpRequestFlowFactory(httpRequest, url, options) {
     let flow = Promise.resolve();

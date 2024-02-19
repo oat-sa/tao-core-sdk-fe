@@ -44,6 +44,7 @@ function xhr(url, options) {
         request.addEventListener('readystatechange', () => {
             switch (request.readyState) {
                 case XHR_READY_STATE_OPENED:
+                    // eslint-disable-next-line no-case-declarations
                     for (const header in options.headers) {
                         request.setRequestHeader(header, options.headers[header]);
                     }
@@ -67,6 +68,7 @@ function xhr(url, options) {
                     if (request.responseType === 'json') {
                         responseBody = JSON.stringify(request.response);
                     }
+                    // eslint-disable-next-line no-case-declarations
                     const response = new Response(responseBody, {
                         status: request.status,
                         statusText: request.statusText,
