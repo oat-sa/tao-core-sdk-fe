@@ -32,6 +32,7 @@ const XHR_READY_STATE_HEADERS_DONE = 4;
 function xhr(url, options) {
     return new Promise(resolve => {
         const request = new XMLHttpRequest();
+        let responseBody = null;
         const responseHeaders = new Headers();
 
         if (typeof options.onUploadProgress === 'function') {
@@ -52,14 +53,21 @@ function xhr(url, options) {
                         const parts = line.split(": ");
                         const header = parts.shift();
                         const value = parts.join(": ");
-                        responseHeaders.append(header, value);
+                        if (header) {
+                            responseHeaders.append(header, value);
+                        }
                     });
                     break;
                 case XHR_READY_STATE_HEADERS_DONE:
-                    if (request.responseType === 'json') {
-                        request.response = JSON.stringify(xhr.response);
+                    responseBody = request.response;
+                    // Response with null body status cannot have body
+                    if ([101, 204, 205, 304].includes(request.status)) {
+                        responseBody = null;
                     }
-                    const response = new Response(request.response, {
+                    if (request.responseType === 'json') {
+                        responseBody = JSON.stringify(request.response);
+                    }
+                    const response = new Response(responseBody, {
                         status: request.status,
                         statusText: request.statusText,
                         headers: responseHeaders
@@ -69,7 +77,7 @@ function xhr(url, options) {
             }
         });
 
-        request.open(options.method, url, true);
+        request.open(options.method ?? 'GET', url, true);
         request.send(options.body);
     });
 }
@@ -96,7 +104,7 @@ const requestFactory = (url, options) => {
         options
     );
 
-    return httpRequestFlowFactory(xhr, options);
+    return httpRequestFlowFactory(xhr, url, options);
 };
 
 export default requestFactory;

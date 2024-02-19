@@ -60,7 +60,7 @@ export default function httpRequestFlowFactory(httpRequest, url, options) {
                     .then(options.jwtTokenHandler.getToken)
                     .then(token => {
                         options.headers.Authorization = `Bearer ${token}`;
-                        return fetch(url, options);
+                        return httpRequest(url, options);
                     });
             }
 
