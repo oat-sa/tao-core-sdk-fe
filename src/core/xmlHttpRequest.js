@@ -79,7 +79,7 @@ function xhr(url, options) {
             }
         });
 
-        request.open(options.method ?? 'GET', url, true);
+        request.open(options.method || 'GET', url, true);
         request.send(options.body);
     });
 }
