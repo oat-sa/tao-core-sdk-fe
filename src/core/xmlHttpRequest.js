@@ -53,7 +53,7 @@ function xhr(url, options) {
                     request.getAllResponseHeaders().trim().split(/[\r\n]+/).forEach((line) => {
                         const parts = line.split(': ');
                         const header = parts.shift();
-                        const value = parts.join(": ");
+                        const value = parts.join(': ');
                         if (header) {
                             responseHeaders.append(header, value);
                         }
