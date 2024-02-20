@@ -51,7 +51,7 @@ function xhr(url, options) {
                     break;
                 case XHR_READY_STATE_HEADERS_RECEIVED:
                     request.getAllResponseHeaders().trim().split(/[\r\n]+/).forEach((line) => {
-                        const parts = line.split(": ");
+                        const parts = line.split(': ');
                         const header = parts.shift();
                         const value = parts.join(": ");
                         if (header) {
