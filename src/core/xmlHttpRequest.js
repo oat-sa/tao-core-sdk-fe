@@ -86,7 +86,7 @@ function xhr(url, options) {
 
 /**
  * Creates an HTTP request to the url based on the provided parameters
- * Request is based on fetch, so behaviour and parameters are the same, except
+ * Request is based on fetch API, so behaviour and parameters are the same, except
  *   - every response where response code is not 2xx will be rejected and
  *   - every response will be parsed as json.
  * @param {string} url - url that should be requested
