@@ -19,7 +19,7 @@ import httpRequestFlowFactory from 'core/request/flowFactory';
 
 const XHR_READY_STATE_OPENED = 1;
 const XHR_READY_STATE_HEADERS_RECEIVED = 2;
-const XHR_READY_STATE_HEADERS_DONE = 4;
+const XHR_READY_STATE_DONE = 4;
 
 /**
  * XHR implementation of Fetch API
@@ -59,7 +59,7 @@ function xhr(url, options) {
                         }
                     });
                     break;
-                case XHR_READY_STATE_HEADERS_DONE:
+                case XHR_READY_STATE_DONE:
                     responseBody = request.response;
                     // Response with null body status cannot have body
                     if ([101, 204, 205, 304].includes(request.status)) {
