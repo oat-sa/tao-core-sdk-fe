@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2017-2023 (original work) Open Assessment Technologies SA;
  */
 
 define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogger'], function(
@@ -1711,5 +1711,110 @@ define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogge
             assert.ok(allErrors[0].err instanceof RangeError, 'the log entry contains the thrown error');
             ready();
         }, 20);
+    });
+
+    QUnit.module('priority of handlers', {
+        beforeEach: function setup() {
+            testLogger.reset();
+        }
+    });
+
+    QUnit.test('priority order of handlers added in .before()', function(assert) {
+        var ready = assert.async();
+        var emitter = eventifier();
+        var numHandlersCalled = 0;
+
+        assert.expect(4);
+
+        function lowPriorityHandler() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 4, 'The low priority handler is called fourth');
+            ready();
+        }
+        function highPriorityHandler() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 1, 'The high priority handler is called first');
+        }
+        lowPriorityHandler.priority = 3;
+        highPriorityHandler.priority = 7;
+
+        emitter.before('foo', function() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 2, 'The earlier default priority handler is called second');
+        });
+        emitter.before('foo', lowPriorityHandler);
+        emitter.before('foo', highPriorityHandler);
+        emitter.before('foo', function() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 3, 'The later default priority handler is called third');
+        });
+
+        emitter.trigger('foo');
+    });
+
+    QUnit.test('priority order of handlers added in .on()', function(assert) {
+        var ready = assert.async();
+        var emitter = eventifier();
+        var numHandlersCalled = 0;
+
+        assert.expect(4);
+
+        function lowPriorityHandler() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 4, 'The low priority handler is called fourth');
+            ready();
+        }
+        function highPriorityHandler() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 1, 'The high priority handler is called first');
+        }
+        lowPriorityHandler.priority = 3;
+        highPriorityHandler.priority = 7;
+
+        emitter.on('foo', function() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 2, 'The earlier default priority handler is called second');
+        });
+        emitter.on('foo', lowPriorityHandler);
+        emitter.on('foo', highPriorityHandler);
+        emitter.on('foo', function() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 3, 'The later default priority handler is called third');
+        });
+
+        emitter.trigger('foo');
+    });
+
+    QUnit.test('priority order of handlers added in .after()', function(assert) {
+        var ready = assert.async();
+        var emitter = eventifier();
+        var numHandlersCalled = 0;
+
+        assert.expect(4);
+
+        function lowPriorityHandler() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 4, 'The low priority handler is called fourth');
+            ready();
+        }
+        function highPriorityHandler() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 1, 'The high priority handler is called first');
+        }
+        lowPriorityHandler.priority = 3;
+        highPriorityHandler.priority = 7;
+
+        emitter.after('foo', function() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 2, 'The earlier default priority handler is called second');
+        });
+        emitter.after('foo', lowPriorityHandler);
+        emitter.after('foo', highPriorityHandler);
+        emitter.after('foo', function() {
+            numHandlersCalled++;
+            assert.equal(numHandlersCalled, 3, 'The later default priority handler is called third');
+        });
+
+        emitter.trigger('foo');
     });
 });

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2015-2023 (original work) Open Assessment Technologies SA;
  *
  */
 
@@ -83,6 +83,15 @@
  *      });
  * });
  *
+ * @example prioritised handlers
+ * function handler(e) { console.log(e); }
+ * function laterHandler(e) { console.log(e); }
+ * laterHandler.priority = 3;
+ *
+ * emitter.on('hello', laterHandler); // called 2nd
+ * emitter.on('hello', handler); // called 1st
+ * emitter.trigger('hello', 'world');
+ *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
@@ -99,6 +108,12 @@ const defaultNs = '@';
  * Namespace that targets all event
  */
 const globalNs = '*';
+
+/**
+ * Priority value applied by default to each event handler
+ * (Suggested value range is 0-10, but any number will work)
+ */
+const defaultPriority = 5;
 
 /**
  * Create a logger
@@ -183,6 +198,30 @@ function eventifier(target) {
     }
 
     /**
+     * Add a handler for one or more events of a given event type
+     * @param {String} eventNames - the name of the event, or multiple events separated by a space
+     * @param {String} type - the type of event in before, between and after
+     * @param {Function} handler - the callback to run once the event is triggered
+     * @param {Number} [handler.priority] - value which can be used to schedule the handler earlier or later in its sequence
+     */
+    function addHandler(eventNames, type, handler) {
+        if (_.isFunction(handler)) {
+            _.forEach(getEventNames(eventNames), eventName => {
+                if (typeof handler.priority !== 'number') {
+                    handler.priority = defaultPriority;
+                }
+                // insert to keep the handlers array sorted by decreasing priority (high -> low)
+                const handlers = getHandlers(eventName, type);
+                let insertionIndex = handlers.findIndex(h => h.priority < handler.priority);
+                if (insertionIndex === -1) {
+                    insertionIndex = handlers.length;
+                }
+                handlers.splice(insertionIndex, 0, handler);
+            });
+        }
+    }
+
+    /**
      * The API itself is just a placeholder, all methods will be delegated to a target.
      */
     const eventApi = {
@@ -196,14 +235,11 @@ function eventifier(target) {
          * @this the target
          * @param {String} eventNames - the name of the event, or multiple events separated by a space
          * @param {Function} handler - the callback to run once the event is triggered
+         * @param {Number} [handler.priority] - value which can be used to schedule the handler earlier or later in its sequence
          * @returns {Object} the target object
          */
         on(eventNames, handler) {
-            if (_.isFunction(handler)) {
-                _.forEach(getEventNames(eventNames), eventName => {
-                    getHandlers(eventName).push(handler);
-                });
-            }
+            addHandler(eventNames, 'between', handler);
             return this;
         },
 
@@ -400,14 +436,11 @@ function eventifier(target) {
          * @this the target
          * @param {String} eventNames - the name of the event, or multiple events separated by a space
          * @param {Function} handler - the callback to run once the event is triggered
+         * @param {Number} [handler.priority] - value which can be used to schedule the handler earlier or later in its sequence
          * @returns {Object} the target object
          */
         before(eventNames, handler) {
-            if (_.isFunction(handler)) {
-                _.forEach(getEventNames(eventNames), function (eventName) {
-                    getHandlers(eventName, 'before').push(handler);
-                });
-            }
+            addHandler(eventNames, 'before', handler);
             return this;
         },
 
@@ -418,14 +451,11 @@ function eventifier(target) {
          * @this the target
          * @param {String} eventNames - the name of the event, or multiple events separated by a space
          * @param {Function} handler - the callback to run once the event is triggered
+         * @param {Number} [handler.priority] - value which can be used to schedule the handler earlier or later in its sequence
          * @returns {Object} the target object
          */
         after(eventNames, handler) {
-            if (_.isFunction(handler)) {
-                _.forEach(getEventNames(eventNames), function (eventName) {
-                    getHandlers(eventName, 'after').push(handler);
-                });
-            }
+            addHandler(eventNames, 'after', handler);
             return this;
         },
 
