@@ -13,12 +13,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020-21 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020-2024 (original work) Open Assessment Technologies SA ;
  */
-
-import ApiError from 'core/error/ApiError';
-import NetworkError from 'core/error/NetworkError';
-import TimeoutError from 'core/error/TimeoutError';
+import httpRequestFlowFactory from 'core/request/flowFactory';
 
 /**
  * !!! IE11 requires polyfill https://www.npmjs.com/package/whatwg-fetch
@@ -41,101 +38,7 @@ const requestFactory = (url, options) => {
         options
     );
 
-    let flow = Promise.resolve();
-
-    if (options.jwtTokenHandler) {
-        flow = flow
-            .then(options.jwtTokenHandler.getToken)
-            .then(token => ({
-                Authorization: `Bearer ${token}`
-            }))
-            .then(headers => {
-                options.headers = Object.assign({}, options.headers, headers);
-            });
-    }
-
-    flow = flow.then(() =>
-        Promise.race([
-            fetch(url, options),
-            new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    reject(new TimeoutError('Timeout', options.timeout));
-                }, options.timeout);
-            })
-        ])
-    );
-
-    if (options.jwtTokenHandler) {
-        flow = flow.then(response => {
-            if (response.status === 401) {
-                return options.jwtTokenHandler
-                    .refreshToken()
-                    .then(options.jwtTokenHandler.getToken)
-                    .then(token => {
-                        options.headers.Authorization = `Bearer ${token}`;
-                        return fetch(url, options);
-                    });
-            }
-
-            return Promise.resolve(response);
-        });
-    }
-
-    /**
-     * Stores the original response
-     */
-    let originalResponse;
-    /**
-     * Stores the response code
-     */
-    let responseCode;
-
-    flow = flow
-        .then(response => {
-            originalResponse = response.clone();
-            responseCode = response.status;
-
-            if (options.returnOriginalResponse) {
-                return originalResponse;
-            }
-            return response.json().catch(() => ({}));
-        })
-        .then(response => {
-            if (responseCode === 204) {
-                return null;
-            }
-
-            // successful request
-            if ((responseCode >= 200 && responseCode < 300) || (response && response.success === true)) {
-                return response;
-            }
-
-            // create error
-            let err;
-            if (response.errorCode) {
-                err = new ApiError(
-                    `${response.errorCode} : ${response.errorMsg || response.errorMessage || response.error}`,
-                    response.errorCode,
-                    originalResponse
-                );
-            } else {
-                err = new NetworkError(
-                    `${responseCode} : Request error`,
-                    responseCode || 0,
-                    originalResponse
-                );
-            }
-            throw err;
-        })
-        .catch(err => {
-            if (!err.type) {
-                //offline, CORS, etc.
-                return Promise.reject(new NetworkError(err.message, 0));
-            }
-            return Promise.reject(err);
-        });
-
-    return flow;
+    return httpRequestFlowFactory(fetch, url, options);
 };
 
 export default requestFactory;
