@@ -1,6 +1,6 @@
 /**
  * COPIED from https://github.com/oat-sa/tao-core-libs-fe/blob/master/src/uuid.js to remove the dependency on tao-core-libs-fe
- * 
+ *
  * UUID generator
  *
  * This is a modified version of Robert Kieffer's Math.uuid
@@ -65,7 +65,7 @@ function uuid(len, radix) {
         for (let i = 0; i < len; i++) {
             id[i] = chars[0 | (Math.random() * radix)];
         }
-    // rfc4122 form
+        // rfc4122 form
     } else {
         // rfc4122 requires these characters
         // eslint-disable-next-line
