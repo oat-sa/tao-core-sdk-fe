@@ -41,7 +41,7 @@
 import _ from 'lodash';
 import Promise from 'core/promise';
 import eventifier from 'core/eventifier';
-import uuid from 'lib/uuid';
+import uuid from 'core/uuid.js';
 
 /**
  * Creates a new promise queue

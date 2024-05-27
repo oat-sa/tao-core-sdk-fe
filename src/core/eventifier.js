@@ -87,7 +87,7 @@
  */
 import _ from 'lodash';
 import Promise from 'core/promise';
-import uuid from 'lib/uuid';
+import uuid from 'core/uuid.js';
 import loggerFactory from 'core/logger';
 
 /**
