@@ -86,9 +86,7 @@
         "xhr-mock": "^2.5.1"
     },
     "dependencies": {
-        "fastestsmallesttextencoderdecoder": "1.0.14",
-        "idb-wrapper": "1.7.2",
-        "webcrypto-shim": "0.1.7"
+        "idb-wrapper": "1.7.2"
     },
     "browserslist": [
         "extends @oat-sa/browserslist-config-tao"

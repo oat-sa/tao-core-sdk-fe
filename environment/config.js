@@ -35,7 +35,6 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
                 util: '/dist/util',
 
                 'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
-                'webcrypto-shim': '/node_modules/webcrypto-shim/webcrypto-shim',
                 'idb-wrapper': '/node_modules/idb-wrapper/idbstore',
                 'fetch-mock': '/node_modules/fetch-mock/es5/client-bundle',
                 'xhr-mock': '/node_modules/xhr-mock/dist/xhr-mock'
