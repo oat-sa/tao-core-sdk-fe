@@ -239,4 +239,16 @@ define([
             })
             .then(ready);
     });
+
+    QUnit.test('parseFloat with thousands separator in decimal part', assert => {
+        locale.setConfig({
+            decimalSeparator: '.',
+            thousandsSeparator: ','
+        });
+
+        assert.equal(locale.parseFloat('3,14'), 3.0, 'float with thousands separator in decimal part should be parsed as integer 3');
+        assert.equal(locale.parseFloat('34,1'), 34.0, 'float with thousands separator in decimal part should be parsed as integer 34');
+        assert.equal(locale.parseFloat('3,123'), 3123.0, 'integer part with thousands separator should be parsed correctly as 3123');
+        assert.equal(locale.parseFloat('23,123'), 23123.0, 'integer part with thousands separator should be parsed correctly as 23123');
+    });
 });
