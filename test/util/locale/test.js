@@ -250,5 +250,18 @@ define([
         assert.equal(locale.parseFloat('34,1'), 34.0, 'float with thousands separator in decimal part should be parsed as integer 34');
         assert.equal(locale.parseFloat('3,123'), 3123.0, 'integer part with thousands separator should be parsed correctly as 3123');
         assert.equal(locale.parseFloat('23,123'), 23123.0, 'integer part with thousands separator should be parsed correctly as 23123');
+
+        assert.equal(locale.parseFloat('1,000'), 1000.0, 'integer with one thousands separator');
+        assert.equal(locale.parseFloat('1,000,000'), 1000000.0, 'integer with multiple valid thousands separators');
+        assert.equal(locale.parseFloat('1,00,000'), 1.0, 'integer with invalid thousands separators');
+        assert.equal(locale.parseFloat('1,000.123'), 1000.123, 'float with one thousands separator');
+        assert.equal(locale.parseFloat('1,000,000.123'), 1000000.123, 'float with multiple valid thousands separators');
+        assert.equal(locale.parseFloat('1,00,000.123'), 1.0, 'float with invalid thousands separators');
+        assert.equal(locale.parseFloat('1,000.1,23'), 1000.1, 'float with invalid thousands separator in the decimal part');
+
+        assert.equal(locale.parseFloat('1000,'), 1000.0, 'trailing thousands separator should be ignored');
+        assert.equal(locale.parseFloat('1,,000'), 1.0, 'double thousands separator should be invalid');
+        assert.equal(locale.parseFloat('1,000,000.0001'), 1000000.0001, 'float with multiple valid thousands separators and small decimal part');
+        assert.equal(locale.parseFloat('1,000,000,000.0001'), 1000000000.0001, 'float with many valid thousands separators and small decimal part');
     });
 });
