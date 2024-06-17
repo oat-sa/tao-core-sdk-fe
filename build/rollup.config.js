@@ -59,7 +59,6 @@ export default inputs.map(input => {
             'i18n',
             'jquery',
             'jquery.fileDownload',
-            'lib/uuid',
             'lodash',
             'module',
             'moment'
