@@ -83,7 +83,9 @@ export default {
 
         // discard all thousand separators:
         if (thousandsSeparator.length) {
-            numStr = numStr.replace(new RegExp(`\\${thousandsSeparator}`, 'g'), '');
+            // This regex finds thousands separators between groups of three digits
+            const thousandsRegex = new RegExp(`(?<=\\d)(?<!\\.\\d{0,2})\\${thousandsSeparator}(?=\\d{3}(\\D|$))`, 'g');
+            numStr = numStr.replace(thousandsRegex, '');
         }
 
         // standardise the decimal separator as '.':
