@@ -70,7 +70,7 @@ export default function digest(data, selectedAlgorithm = 'SHA-256') {
             reader.readAsArrayBuffer(data);
         });
     } else if (typeof data === 'string') {
-        dataPromise = Promise.resolve(new TextEncoder('utf-8').encode(data));
+        dataPromise = Promise.resolve(new TextEncoder().encode(data));
     } else {
         throw new TypeError(`Unsupported data type to digest with ${algorithm}`);
     }
