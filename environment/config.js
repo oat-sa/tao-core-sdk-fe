@@ -13,10 +13,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2024 (original work) Open Assessment Technologies SA ;
  */
 
-define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(libPathDefinition) {
+define(function() {
     requirejs.config({
         baseUrl: '/',
         paths: Object.assign(
@@ -35,12 +35,15 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
                 util: '/dist/util',
 
                 'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
-                'webcrypto-shim': '/node_modules/webcrypto-shim/webcrypto-shim',
                 'idb-wrapper': '/node_modules/idb-wrapper/idbstore',
                 'fetch-mock': '/node_modules/fetch-mock/es5/client-bundle',
-                'xhr-mock': '/node_modules/xhr-mock/dist/xhr-mock'
-            },
-            libPathDefinition
+                'xhr-mock': '/node_modules/xhr-mock/dist/xhr-mock',
+
+                jquery: '/node_modules/jquery/jquery',
+                lodash: '/node_modules/lodash/lodash',
+                moment: '/node_modules/moment/min/moment-with-locales',
+                handlebars: '/node_modules/handlebars/dist/handlebars.amd'
+            }
         ),
         shim: {
             'jquery.simulate': {

@@ -24,7 +24,7 @@
 
 import _ from 'lodash';
 import promiseQueue from 'core/promiseQueue';
-import uuid from 'lib/uuid';
+import uuid from 'core/uuid';
 
 /**
  * Prefix all databases

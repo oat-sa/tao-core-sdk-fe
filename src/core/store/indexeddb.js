@@ -24,7 +24,7 @@
 import _ from 'lodash';
 import Promise from 'core/promise';
 import IDBStore from 'idb-wrapper';
-import uuid from 'lib/uuid';
+import uuid from 'core/uuid';
 
 /**
  * Prefix all databases

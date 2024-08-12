@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018-2020 (original work) Open Assessment Technologies SA
+ * Copyright (c) 2018-2024 (original work) Open Assessment Technologies SA
  *
  */
 
@@ -24,11 +24,9 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import 'webcrypto-shim';
-import { TextEncoder } from 'fastestsmallesttextencoderdecoder';
 
 //get the native implementation of the CryptoSubtle
-const subtle = window.crypto.subtle || window.crypto.webkitSubtle;
+const subtle = window.crypto.subtle;
 const supportedAlgorithms = [
     'SHA-1', //considered as not safe anymore
     'SHA-256',
@@ -72,7 +70,7 @@ export default function digest(data, selectedAlgorithm = 'SHA-256') {
             reader.readAsArrayBuffer(data);
         });
     } else if (typeof data === 'string') {
-        dataPromise = Promise.resolve(new TextEncoder('utf-8').encode(data));
+        dataPromise = Promise.resolve(new TextEncoder().encode(data));
     } else {
         throw new TypeError(`Unsupported data type to digest with ${algorithm}`);
     }
