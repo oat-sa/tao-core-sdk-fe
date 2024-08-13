@@ -59,18 +59,13 @@ export default inputs.map(input => {
             'i18n',
             'jquery',
             'jquery.fileDownload',
-            'lib/uuid',
             'lodash',
             'module',
             'moment'
         ],
         plugins: [
             resolve({ mainFields: ['main'] }),
-            commonJS({
-                namedExports: {
-                    fastestsmallesttextencoderdecoder: ['TextEncoder']
-                }
-            }),
+            commonJS(),
             alias({
                 resolve: ['.js', '.json'],
                 core: path.resolve(srcDir, 'core'),
