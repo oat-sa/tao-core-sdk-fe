@@ -13,11 +13,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2024 (original work) Open Assessment Technologies SA ;
  */
 
 import $ from 'jquery';
-import capitalize from 'util/capitalize';
+import capitalize from './capitalize';
 
 /**
  * Adapts the size of several elements

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -27,18 +27,18 @@
  * @returns {timer}
  */
 function timerFactory(config) {
-    var initConfig = config || {};
-    var begin = now();
-    var last = begin;
-    var duration = initConfig.startDuration || 0;
-    var state = {};
-    var disableAutoStart = false === initConfig.autoStart;
+    const initConfig = config || {};
+    let begin = now();
+    let last = begin;
+    let duration = initConfig.startDuration || 0;
+    const state = {};
+    const disableAutoStart = false === initConfig.autoStart;
 
     /**
      * The timer instance
      * @type {timer}
      */
-    var timer = {
+    const timer = {
         /**
          * Starts the timer
          * @param {Number} [startDuration] - Initial duration (default: 0)

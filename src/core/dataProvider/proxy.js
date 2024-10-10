@@ -19,11 +19,11 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import _ from 'lodash';
-import delegator from 'core/delegator';
-import eventifier from 'core/eventifier';
-import Promise from 'core/promise';
-import providerRegistry from 'core/providerRegistry';
-import tokenHandlerFactory from 'core/tokenHandler';
+import delegator from '../delegator';
+import eventifier from '../eventifier';
+import Promise from '../promise';
+import providerRegistry from '../providerRegistry';
+import tokenHandlerFactory from '../tokenHandler';
 
 const _defaults = {};
 

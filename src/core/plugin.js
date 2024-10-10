@@ -13,13 +13,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Plugin modelisation :
  *  - helps you to create plugin's definition
  *  - helps you to bind plugin's behavior to the host
- *  - have it's own state and lifecycle convention (install -> init -> render -> finish -> destroy)
+ *  - have its own state and lifecycle convention (install -> init -> render -> finish -> destroy)
  *  - promise based
  *
  * @example
@@ -47,11 +47,11 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import delegator from 'core/delegator';
-import Promise from 'core/promise';
+import delegator from './delegator';
+import Promise from './promise';
 
 /**
- * Meta factory for plugins. Let's you create a plugin definition.
+ * Meta factory for plugins. Lets you create a plugin definition.
  *
  * @param {Object} provider - the plugin provider
  * @param {String} provider.name - the plugin name
@@ -164,7 +164,7 @@ function pluginFactory(provider, defaults) {
 
             /**
              * Triggers the events on the host using the pluginName as namespace
-             * and prefixed by plugin-
+             * and prefixed by plugin-.
              * For example trigger('foo') will trigger('plugin-foo.pluginA') on the host
              *
              * @param {String} name - the event name
@@ -178,7 +178,7 @@ function pluginFactory(provider, defaults) {
 
             /**
              * Get the plugin host
-             * @returns {host} the plugins's host
+             * @returns {host} the plugin's host
              */
             getHost() {
                 return host;

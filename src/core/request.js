@@ -13,12 +13,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2024 (original work) Open Assessment Technologies SA;
  */
 
 /**
  * Common HTTP request wrapper to get data from TAO.
- * This suppose the endpoint to match the following criteria :
+ * This supposes the endpoint to match the following criteria :
  *   - Restful endpoint
  *   - contentType : application/json; charset=UTF-8
  *   - headers : contains 'X-CSRF-Token' value when needed
@@ -36,9 +36,9 @@ import _ from 'lodash';
 import __ from 'i18n';
 import module from 'module';
 import context from 'context';
-import promiseQueue from 'core/promiseQueue';
-import tokenHandlerFactory from 'core/tokenHandler';
-import loggerFactory from 'core/logger';
+import promiseQueue from './promiseQueue';
+import tokenHandlerFactory from './tokenHandler';
+import loggerFactory from './logger';
 
 const tokenHeaderName = 'X-CSRF-Token';
 

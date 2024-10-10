@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2017-2024 (original work) Open Assessment Technologies SA;
  *
  */
 
@@ -28,7 +28,7 @@
  */
 import _ from 'lodash';
 import module from 'module';
-import loggerFactory from 'core/logger/api';
+import loggerFactory from './logger/api';
 
 /**
  * The default configuration if nothing
@@ -63,7 +63,7 @@ window.onerror = function onError(msg, url, line, col) {
 };
 
 /**
- * Expose explicitely an direct way to activate log levels
+ * Expose explicitely a direct way to activate log levels
  * @param {String|Number} level - the new log level
  * @returns {String} the defined level
  */

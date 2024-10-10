@@ -23,7 +23,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import pollProvider from 'core/communicator/poll';
+import pollProvider from './poll';
 
 /**
  * 'request' provider for {@link core/communicator}
@@ -61,7 +61,7 @@ const requestProvider = _.defaults({
     },
 
     /**
-     * Sends an messages through the communication implementation
+     * Sends a messages through the communication implementation
      * @param {String} channel - The name of the communication channel to use
      * @param {Object} message - The message to send
      * @returns {Promise}

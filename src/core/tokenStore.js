@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA
+ * Copyright (c) 2024 Open Assessment Technologies SA
  */
 
 /**
@@ -23,7 +23,7 @@
  * @author Martin Nicholson <martin@taotesting.com>
  */
 import _ from 'lodash';
-import store from 'core/store';
+import store from './store';
 
 /**
  * @typedef {Object} token - A token object

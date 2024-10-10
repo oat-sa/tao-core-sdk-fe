@@ -19,8 +19,8 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import _ from 'lodash';
-import request from 'core/dataProvider/request';
-import Promise from 'core/promise';
+import request from '../request';
+import Promise from '../../promise';
 
 const _defaults = {
     noCache: true,

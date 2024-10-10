@@ -15,9 +15,9 @@
  *
  * Copyright (c) 2024 (original work) Open Assessment Technologies SA ;
  */
-import ApiError from 'core/error/ApiError';
-import NetworkError from 'core/error/NetworkError';
-import TimeoutError from 'core/error/TimeoutError';
+import ApiError from '../error/ApiError';
+import NetworkError from '../error/NetworkError';
+import TimeoutError from '../error/TimeoutError';
 
 /**
  * @param {(url: string, options: object) => Promise<Response>} httpRequest

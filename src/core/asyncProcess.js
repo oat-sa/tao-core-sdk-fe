@@ -13,14 +13,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 import _ from 'lodash';
-import Promise from 'core/promise';
-import eventifier from 'core/eventifier';
+import Promise from './promise';
+import eventifier from './eventifier';
 
 /**
  * Defines a manager for async process with deferred steps.
@@ -34,8 +34,8 @@ import eventifier from 'core/eventifier';
  * @trigger reject - When the process has finished on error
  */
 function asyncProcessFactory() {
-    var running = false;
-    var steps = [];
+    let running = false;
+    let steps = [];
 
     return eventifier({
         /**
@@ -52,7 +52,7 @@ function asyncProcessFactory() {
          * @returns {boolean} - Returns true if the process can be started
          */
         start: function start(cb) {
-            var started = false;
+            let started = false;
             if (!running) {
                 steps = [];
                 running = true;
@@ -94,8 +94,8 @@ function asyncProcessFactory() {
          * @returns {Promise} - Returns the finish promise
          */
         done: function done(cb) {
-            var self = this;
-            var finish = Promise.all(steps);
+            const self = this;
+            const finish = Promise.all(steps);
 
             finish
                 .then(function(data) {

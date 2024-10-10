@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2015-2024 (original work) Open Assessment Technologies SA;
  *
  */
 
@@ -86,9 +86,9 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import Promise from 'core/promise';
-import uuid from 'core/uuid';
-import loggerFactory from 'core/logger';
+import Promise from './promise';
+import uuid from './uuid';
+import loggerFactory from './logger';
 
 /**
  * All events have a namespace, this one is the default
@@ -187,7 +187,7 @@ function eventifier(target) {
      */
     const eventApi = {
         /**
-         * Attach an handler to an event.
+         * Attach a handler to an event.
          * Calling `on` with the same eventName multiple times add callbacks: they
          * will all be executed.
          *

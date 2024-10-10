@@ -18,7 +18,7 @@
 
 /**
  * Common HTTP request wrapper to get data from TAO.
- * This suppose the endpoint to match the following criteria :
+ * This supposes the endpoint to match the following criteria :
  *   - Restful endpoint
  *   - contentType : application/json; charset=UTF-8
  *   - headers : contains 'X-CSRF-Token' value when needed
@@ -29,14 +29,14 @@
  *   - 204 for empty content
  *   - 403 if CSRF token validation fails
  *
- * CAUTION! By default this request does NOT have a token attached (for backwards compatibility reasons)
+ * CAUTION! By default, this request does NOT have a token attached (for backwards compatibility reasons)
  * If you need a token on a request, you must set noToken=false
  * OR directly use the 'core/request' module, which DOES attach a token by default
  *
  * @author Martin Nicholson <martin@taotesting.com>
  */
 import _ from 'lodash';
-import coreRequest from 'core/request';
+import coreRequest from '../request';
 
 /**
  * A wrapper for the core module which requests content from a TAO endpoint

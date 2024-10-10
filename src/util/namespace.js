@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -24,25 +24,25 @@ import _ from 'lodash';
  * RegExp that split strings separated by spaces
  * @type {RegExp}
  */
-var reSplit = /\s/g;
+const reSplit = /\s/g;
 
 /**
  * The namespace separator
  * @type {String}
  */
-var namespaceSep = '.';
+const namespaceSep = '.';
 
 /**
  * The default namespace
  */
-var defaultNamespace = '@';
+const defaultNamespace = '@';
 
 /**
  * The namespace helper
  * @typedef {namespaceHelper}
  * @type {namespaceHelper}
  */
-var namespaceHelper = {
+const namespaceHelper = {
     /**
      * Splits a string into single names
      * @param {String} names - the string containing the names separated by spaces
@@ -101,7 +101,7 @@ var namespaceHelper = {
      * @returns {String} - The list of namespaced names
      */
     namespaceAll: function namespaceAll(names, namespace, normalize) {
-        var suffix;
+        let suffix;
         if (!_.isArray(names)) {
             names = namespaceHelper.split(names, normalize);
         }
@@ -110,7 +110,7 @@ var namespaceHelper = {
         }
         suffix = namespace ? namespaceSep + namespace : '';
         return _(names)
-            .map(function(sh) {
+            .map(function (sh) {
                 if (sh.indexOf(namespaceSep) < 0) {
                     return sh + suffix;
                 }

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017-2024 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -22,18 +22,18 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import Promise from 'core/promise';
-import uuid from 'core/uuid';
+import Promise from '../promise';
+import uuid from '../uuid';
 
 /**
  * where data dwelves
  */
-var memoryStore = {};
+let memoryStore = {};
 
 /**
  * The storage identifier
  */
-var idStore;
+let idStore;
 
 /**
  * Open and access a store
@@ -41,7 +41,7 @@ var idStore;
  * @returns {Object} the store backend
  * @throws {TypeError} without a storeName
  */
-var memoryStorageBackend = function memoryStorageBackend(storeName) {
+const memoryStorageBackend = function memoryStorageBackend(storeName) {
     if (_.isEmpty(storeName) || !_.isString(storeName)) {
         throw new TypeError('The store name is required');
     }
@@ -137,7 +137,7 @@ memoryStorageBackend.removeAll = function removeAll(validate) {
  * @returns {Promise<String[]>} resolves with the list of stores
  */
 memoryStorageBackend.getAll = function getAll(validate) {
-    var storeNames = [];
+    let storeNames = [];
     if (!_.isFunction(validate)) {
         validate = null;
     }

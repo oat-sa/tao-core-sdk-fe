@@ -13,16 +13,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 import _ from 'lodash';
 import Promise from 'core/promise';
-import providerRegistry from 'core/providerRegistry';
-import delegator from 'core/delegator';
-import eventifier from 'core/eventifier';
+import providerRegistry from './providerRegistry';
+import delegator from './delegator';
+import eventifier from './eventifier';
 
 /**
  * Some default config values

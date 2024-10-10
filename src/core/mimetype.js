@@ -13,15 +13,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2014-2024 Open Assessment Technologies SA ;
  */
 /**
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import categories from 'core/mimetype/categories.json';
-import extensions from 'core/mimetype/extensions.json';
+import categories from './mimetype/categories.json';
+import extensions from './mimetype/extensions.json';
 
 /**
  * Helps you to retrieve file type and categories based on a file mime type
@@ -29,7 +29,7 @@ import extensions from 'core/mimetype/extensions.json';
  */
 const mimetypeHelper = {
     /**
-     * Gets the MIME type of a resource.
+     * Gets the MIME type of resource.
      *
      * @param {String} url - The URL of the resource to get type of
      * @param {Function} [callback] - An optional function called when the response is received.

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -36,16 +36,16 @@
 import _ from 'lodash';
 import moment from 'moment';
 import module from 'module';
-import loggerFactory from 'core/logger';
-import Promise from 'core/promise';
-import localStorageBackend from 'core/store/localstorage';
-import sessionStorageBackend from 'core/store/sessionstorage';
-import indexedDBBackend from 'core/store/indexeddb';
-import memoryBackend from 'core/store/memory';
+import loggerFactory from './logger';
+import Promise from './promise';
+import localStorageBackend from './store/localstorage';
+import sessionStorageBackend from './store/sessionstorage';
+import indexedDBBackend from './store/indexeddb';
+import memoryBackend from './store/memory';
 
-var supportsIndexedDB = false;
-var dectectionDone = false;
-var quotaChecked = false;
+let supportsIndexedDB = false;
+let dectectionDone = false;
+let quotaChecked = false;
 
 /**
  * The exported store module, can be used as a function to get one store
@@ -53,29 +53,29 @@ var quotaChecked = false;
  *
  * @type {Function|Object}
  */
-var store;
+let store;
 
 /**
  * The list of required methods exposed by a store backend
  * @type {String[]}
  */
-var backendApi = ['removeAll', 'getAll', 'getStoreIdentifier'];
+const backendApi = ['removeAll', 'getAll', 'getStoreIdentifier'];
 
 /**
  * The list of required methods exposed by a store implementation
  * @type {String[]}
  */
-var storeApi = ['getItem', 'setItem', 'removeItem', 'getItems', 'clear', 'removeStore'];
+const storeApi = ['getItem', 'setItem', 'removeItem', 'getItems', 'clear', 'removeStore'];
 
 /**
  * Dedicated logger
  */
-var logger = loggerFactory('core/store');
+const logger = loggerFactory('core/store');
 
 /**
  * Main config
  */
-var config = _.defaults(module.config() || {}, {
+const config = _.defaults(module.config() || {}, {
     /**
      * Percent of used space (ie. 80% used)
      * to consider the browser as having low space
@@ -102,13 +102,13 @@ var config = _.defaults(module.config() || {}, {
  * Due to a bug in Firefox private mode, we need to try to open a database to be sure it's available.
  * @returns {Promise} that resolve the result
  */
-var isIndexDBSupported = function isIndexDBSupported() {
+const isIndexDBSupported = function isIndexDBSupported() {
     if (dectectionDone) {
         return Promise.resolve(supportsIndexedDB);
     }
-    return new Promise(function(resolve) {
-        var test, indexedDB;
-        var done = function done(result) {
+    return new Promise(function (resolve) {
+        let test, indexedDB;
+        const done = function done(result) {
             supportsIndexedDB = !!result;
             dectectionDone = true;
             return resolve(supportsIndexedDB);
@@ -126,14 +126,14 @@ var isIndexDBSupported = function isIndexDBSupported() {
 
             //we need to try to open a db, for example FF in private browsing will fail.
             test = indexedDB.open('__feature_test', 1);
-            test.onsuccess = function() {
+            test.onsuccess = function () {
                 if (test.result) {
                     test.result.close();
                     return done(true);
                 }
             };
             //if we can't open a DB, we assume, we fallback
-            test.onerror = function(e) {
+            test.onerror = function (e) {
                 e.preventDefault();
                 done(false);
                 return false;
@@ -150,12 +150,12 @@ var isIndexDBSupported = function isIndexDBSupported() {
  * Estimates aren't widely supported,
  * but that worth to try it (progressive enhancement)
  */
-var checkQuotas = function checkQuotas() {
+const checkQuotas = function checkQuotas() {
     if (!quotaChecked && 'storage' in window.navigator && window.navigator.storage.estimate) {
         window.navigator.storage
             .estimate()
-            .then(function(estimate) {
-                var usedRatio = 0;
+            .then(function (estimate) {
+                let usedRatio = 0;
                 if (_.isNumber(estimate.usage) && _.isNumber(estimate.quota) && estimate.quota > 0) {
                     usedRatio = estimate.usage / estimate.quota;
                     if (usedRatio > config.lowSpaceRatio) {
@@ -171,7 +171,7 @@ var checkQuotas = function checkQuotas() {
                     }
                 }
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 logger.warn(`Unable to retrieve quotas : ${err.message}`);
             });
     }
@@ -183,7 +183,7 @@ var checkQuotas = function checkQuotas() {
  * @param {Object} backend - the backend object to check
  * @returns {Boolean} true if valid
  */
-var isBackendApiValid = function isBackendApiValid(backend) {
+const isBackendApiValid = function isBackendApiValid(backend) {
     return _.every(backendApi, function methodExists(method) {
         return _.isFunction(backend[method]);
     });
@@ -194,7 +194,7 @@ var isBackendApiValid = function isBackendApiValid(backend) {
  * @param {Storage} storage - the storage object to check
  * @returns {Boolean} true if valid
  */
-var isStorageApiValid = function isStorageApiValid(storage) {
+const isStorageApiValid = function isStorageApiValid(storage) {
     return _.every(storeApi, function methodExists(method) {
         return _.isFunction(storage[method]);
     });
@@ -205,9 +205,9 @@ var isStorageApiValid = function isStorageApiValid(storage) {
  * @param {Object} [preselectedBackend] - the backend to force the selection
  * @returns {Promise} that resolves with the backend
  */
-var loadBackend = function loadBackend(preselectedBackend) {
-    return isIndexDBSupported().then(function() {
-        var backend = preselectedBackend || (supportsIndexedDB ? indexedDBBackend : localStorageBackend);
+const loadBackend = function loadBackend(preselectedBackend) {
+    return isIndexDBSupported().then(function () {
+        const backend = preselectedBackend || (supportsIndexedDB ? indexedDBBackend : localStorageBackend);
         if (!_.isFunction(backend)) {
             return Promise.reject(new TypeError('No backend, no storage!'));
         }
@@ -233,7 +233,7 @@ var loadBackend = function loadBackend(preselectedBackend) {
  */
 store = function storeLoader(storeName, preselectedBackend) {
     return loadBackend(preselectedBackend).then(function(backend) {
-        var storeInstance = backend(storeName);
+        const storeInstance = backend(storeName);
 
         if (!isStorageApiValid(storeInstance)) {
             return Promise.reject(new TypeError("The store doesn't comply with the Storage interface"));
@@ -279,13 +279,13 @@ store.removeAll = function removeAll(validate, preselectedBackend) {
  * @returns {Promise<Boolean>}
  */
 store.cleanUpSpace = function cleanUpSpace(since, storeNamePattern, preselectedBackend) {
-    var tsThreshold;
+    let tsThreshold;
 
     /**
      * Create the invalidation callback
      * @type {validateStore}
      */
-    var invalidate = function invalidate(storeName, storeEntry) {
+    const invalidate = function invalidate(storeName, storeEntry) {
         if (!storeName || !storeEntry) {
             return false;
         }

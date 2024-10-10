@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2024 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -24,9 +24,9 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-import jwtTokenStoreFactory from 'core/jwt/jwtTokenStore';
-import promiseQueue from 'core/promiseQueue';
-import TokenError from 'core/error/TokenError';
+import jwtTokenStoreFactory from './jwtTokenStore';
+import promiseQueue from '../promiseQueue';
+import TokenError from '../error/TokenError';
 
 /**
  * JWT token handler factory

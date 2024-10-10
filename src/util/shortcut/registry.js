@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Helper allowing to register shortcuts on the whole page.
@@ -35,7 +35,7 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import namespaceHelper from 'util/namespace';
+import namespaceHelper from '../namespace';
 
 /**
  * All shortcuts have a namespace, this one is the default
@@ -649,7 +649,7 @@ export default function shortcutFactory(root, defaultOptions) {
     return {
         /**
          * Sets options for a particular shortcut.
-         * If the shortcut does not already exists, create it
+         * If the shortcut does not already exist, create it
          * @param {String} shortcut
          * @param {Object} [options]
          * @param {Boolean} [options.propagate] - Allow the event to be propagated after caught

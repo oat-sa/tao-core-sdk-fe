@@ -20,9 +20,9 @@
  */
 
 import _ from 'lodash';
-import pollingFactory from 'core/polling';
-import Promise from 'core/promise';
-import coreRequest from 'core/request';
+import pollingFactory from '../polling';
+import Promise from '../promise';
+import coreRequest from './request';
 
 /**
  * Some default config values
@@ -258,7 +258,7 @@ const pollProvider = {
         });
         this.messagesQueue.push(pending);
 
-        // force a send in the next throttle period
+        // force send in the next throttle period
         this.throttledSend();
 
         return promise;

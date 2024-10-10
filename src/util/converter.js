@@ -13,12 +13,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2022 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2024 (original work) Open Assessment Technologies SA ;
  */
 
 import module from 'module';
-import converterFactory from 'util/converter/factory';
-import ambiguousSymbolsConverter from 'util/converter/ambiguousSymbols';
+import converterFactory from './converter/factory';
+import ambiguousSymbolsConverter from './converter/ambiguousSymbols';
 
 /**
  * Exposes a default text converter, including all builtin processors.

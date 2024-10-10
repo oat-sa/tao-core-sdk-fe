@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2017-2024 (original work) Open Assessment Technologies SA;
  *
  */
 
@@ -34,8 +34,8 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import format from 'core/format';
-import moduleLoader from 'core/moduleLoader';
+import format from '../format';
+import moduleLoader from '../moduleLoader';
 
 /**
  * The default level
