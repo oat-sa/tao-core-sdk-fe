@@ -22,7 +22,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import Promise from '../promise';
 import uuid from '../uuid';
 
 /**

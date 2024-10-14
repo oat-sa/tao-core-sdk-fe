@@ -18,7 +18,6 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-import Promise from './promise';
 
 /**
  * Requires an optional module. It the module does not exist, an empty resource is provided (null).

@@ -191,7 +191,7 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/TokenErr
             this.handler
                 .refreshToken()
                 .catch(e => {
-                    assert.equal(e instanceof TokenError, true, 'rejects with error');
+                    assert.equal(e.name, 'TokenError', 'rejects with error');
                     assert.equal(e.response instanceof Response, true, 'passes response');
                     return e.response.json();
                 })
@@ -252,7 +252,7 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/TokenErr
             this.handler
                 .getToken()
                 .catch(e => {
-                    assert.equal(e instanceof TokenError, true, 'rejects with error');
+                    assert.equal(e.name, 'TokenError', 'rejects with error');
                     assert.equal(e.response instanceof Response, true, 'passes response');
                     return e.response.json();
                 })

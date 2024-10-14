@@ -16,6 +16,6 @@
  * Copyright (c) 2024 (original work) Open Assessment Technologies SA ;
  */
 
-import webstorageFactory from '../store/webstorage';
+import webstorageFactory from './webstorage';
 
 export default webstorageFactory(window.sessionStorage);

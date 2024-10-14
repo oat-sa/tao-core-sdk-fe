@@ -27,7 +27,6 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import _ from 'lodash';
-import Promise from './promise';
 
 /**
  * The data required by the modules loader

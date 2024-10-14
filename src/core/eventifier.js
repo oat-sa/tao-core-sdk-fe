@@ -86,7 +86,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import Promise from './promise';
 import uuid from './uuid';
 import loggerFactory from './logger';
 
@@ -159,9 +158,9 @@ function getHandlerObject() {
  * @returns {Object} the target for conveniance
  */
 function eventifier(target) {
-    var targetName;
-    var logger;
-    var stoppedEvents;
+    let targetName;
+    let logger;
+    let stoppedEvents;
 
     //it stores all the handlers under ns/name/[handlers]
     let eventHandlers = {};
@@ -430,7 +429,7 @@ function eventifier(target) {
         },
 
         /**
-         * If triggered into an sync handler, this immediately cancels the execution of all following handlers
+         * If triggered into a sync handler, this immediately cancels the execution of all following handlers
          * regardless of their category
          * If triggered asynchronously, this will only cancel the next category of handlers:
          * - .on() and .after() if triggered during a .before() handler
@@ -449,7 +448,7 @@ function eventifier(target) {
         /**
          * Spread events to another eventifier object.
          * So when an event is triggered on the current target,
-         * it get's triggered on the destination too.
+         * it gets triggered on the destination too.
          *
          * Be careful, the forward will be triggered only if the event reach the `on` steps
          * (it can be canceled by a before).
@@ -485,7 +484,7 @@ function eventifier(target) {
         .functions()
         .forEach(function (method) {
             if (_.isFunction(target[method])) {
-                eventifierLogger.warn(`The target object has already a method named ${method}`, target);
+                logger.warn(`The target object has already a method named ${method}`, target);
             }
             target[method] = function delegate(...args) {
                 return eventApi[method].apply(target, args);

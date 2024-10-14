@@ -131,7 +131,6 @@ export default function request(options) {
             }
             return tokenHandler.getToken().then(token => {
                 tempToken = token;
-
                 return { [tokenHeaderName]: token || 'none' };
             });
         };

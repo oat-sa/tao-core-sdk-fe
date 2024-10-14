@@ -21,7 +21,6 @@
 import _ from 'lodash';
 import delegator from '../delegator';
 import eventifier from '../eventifier';
-import Promise from '../promise';
 import providerRegistry from '../providerRegistry';
 import tokenHandlerFactory from '../tokenHandler';
 
@@ -55,7 +54,7 @@ function crudProxyFactory(proxyName, middlewares) {
     const proxy = eventifier({
         /**
          * Initializes the proxy
-         * @param {Object} [config] - Some optional config depending of implementation,
+         * @param {Object} [config] - Some optional config depending on implementation,
          *                            this object will be forwarded to the proxy adapter
          * @returns {Promise} - Returns a promise that provide the proxy.
          *                      The proxy will be fully initialized on resolve.

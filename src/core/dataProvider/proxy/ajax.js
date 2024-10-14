@@ -20,7 +20,6 @@
  */
 import _ from 'lodash';
 import request from '../request';
-import Promise from '../../promise';
 
 const _defaults = {
     noCache: true,
@@ -57,7 +56,7 @@ export default {
      * @param {Object} config
      * @param {Object} config.actions - The list of supported actions.
      * Each action is represented by a name and a descriptor. The descriptor can be either a string (URL), or an
-     * object. When the descriptor is an object, it must provide an URL, optionally a request method. It can also
+     * object. When the descriptor is an object, it must provide a URL, optionally a request method. It can also
      * provide a callback that will validate the parameters. A full descriptor looks like:
      * ```
      * {

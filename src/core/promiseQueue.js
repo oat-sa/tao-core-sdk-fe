@@ -39,7 +39,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import Promise from './promise';
 import eventifier from './eventifier';
 import uuid from './uuid';
 

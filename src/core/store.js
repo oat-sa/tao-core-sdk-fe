@@ -37,7 +37,6 @@ import _ from 'lodash';
 import moment from 'moment';
 import module from 'module';
 import loggerFactory from './logger';
-import Promise from './promise';
 import localStorageBackend from './store/localstorage';
 import sessionStorageBackend from './store/sessionstorage';
 import indexedDBBackend from './store/indexeddb';

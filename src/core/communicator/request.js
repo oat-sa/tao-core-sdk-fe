@@ -68,11 +68,11 @@ const requestProvider = _.defaults({
      */
     send: function send(channel, message) {
         // queue the message, it will be sent soon
-        var pending = {
+        const pending = {
             channel: channel,
             message: message
         };
-        var promise = new Promise(function(resolve, reject) {
+        const promise = new Promise(function (resolve, reject) {
             pending.promise = {
                 resolve: resolve,
                 reject: reject

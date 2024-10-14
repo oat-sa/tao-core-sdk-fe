@@ -21,8 +21,7 @@
 
 import _ from 'lodash';
 import pollingFactory from '../polling';
-import Promise from '../promise';
-import coreRequest from './request';
+import coreRequest from '../request';
 
 /**
  * Some default config values
@@ -68,7 +67,7 @@ const defaults = {
  *
  * Business logic errors can be implemented using the `error` *channel*.
  * Network errors are handled by the AJAX implementation, and are forwarded to the `error` *event*.
- * Additional network error handling can be achieve by the rejected send promises.
+ * Additional network error handling can be achieved by the rejected send promises.
  *
  * Malformed messages will be issued through the `malformed` channel
  *

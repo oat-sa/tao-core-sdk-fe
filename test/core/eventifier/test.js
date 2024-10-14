@@ -16,10 +16,9 @@
  * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
  */
 
-define(['lodash', 'core/eventifier', 'core/promise', 'test/core/logger/testLogger'], function(
+define(['lodash', 'core/eventifier', 'test/core/logger/testLogger'], function(
     _,
     eventifier,
-    Promise,
     testLogger
 ) {
     'use strict';

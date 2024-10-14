@@ -20,11 +20,10 @@
  */
 define([
     'lodash',
-    'core/promise',
     'core/dataProvider/request',
     'core/dataProvider/proxy',
     'core/dataProvider/proxy/ajax'
-], function(_, Promise, requestMock, proxyFactory, ajaxProvider) {
+], function(_, requestMock, proxyFactory, ajaxProvider) {
     'use strict';
 
     var ajaxProviderApi = [
@@ -170,7 +169,6 @@ define([
             assert.deepEqual(params, expectedParams, 'The expected parameters have been provided');
             requestMock.api.trigger('success', expectedResponse);
         });
-
         proxy
             .init(initConfig)
             .then(function() {
@@ -181,11 +179,13 @@ define([
                 return result;
             })
             .then(function(response) {
+                // console.log(response, 'resp')
                 assert.ok(true, 'The promise should be resolved');
                 assert.deepEqual(response, expectedResponse, 'The expected responses have been provided');
                 ready();
             })
             .catch(function(err) {
+                // console.log(err,'err')
                 assert.ok(false, 'The promise should not be rejected');
                 // eslint-disable-next-line
                 console.error(err);

@@ -46,7 +46,7 @@ import coreRequest from '../request';
  * @param {String} [method='GET'] - the HTTP method
  * @param {Object} [headers] - the HTTP header
  * @param {Boolean} [background] - tells if the request should be done in the background, which in practice does not trigger the global handlers like ajaxStart or ajaxStop
- * @param {Boolean} [noToken=true] - the default is a request with no token, set this to false to require a token
+ * @param {Boolean} [noToken=true] - the default is a request with no token, set this to false for require a token
  * @returns {Promise} that resolves with data or reject if something went wrong
  */
 export default function request(url, data, method, headers, background, noToken) {
@@ -56,7 +56,7 @@ export default function request(url, data, method, headers, background, noToken)
         method: method,
         headers: headers,
         background: background,
-        noToken: noToken === false ? false : true
+        noToken: noToken !== false
     }).then(function(response) {
         if (_.isUndefined(response)) { // in case 204 empty content
             return Promise.resolve();
