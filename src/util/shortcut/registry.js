@@ -35,7 +35,7 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import namespaceHelper from '../namespace';
+import namespaceHelper from '../namespace.js';
 
 /**
  * All shortcuts have a namespace, this one is the default

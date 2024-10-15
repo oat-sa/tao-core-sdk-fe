@@ -86,8 +86,8 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import uuid from './uuid';
-import loggerFactory from './logger';
+import uuid from './uuid.js';
+import loggerFactory from './logger.js';
 
 /**
  * All events have a namespace, this one is the default

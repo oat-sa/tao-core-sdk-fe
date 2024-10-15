@@ -28,7 +28,7 @@
  */
 import _ from 'lodash';
 import module from 'module';
-import loggerFactory from './logger/api';
+import loggerFactory from './logger/api.js';
 
 /**
  * The default configuration if nothing

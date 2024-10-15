@@ -47,8 +47,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import delegator from './delegator';
-import Promise from './promise';
+import delegator from './delegator.js';
 
 /**
  * Meta factory for plugins. Lets you create a plugin definition.

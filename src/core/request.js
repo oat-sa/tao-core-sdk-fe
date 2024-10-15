@@ -36,9 +36,9 @@ import _ from 'lodash';
 import __ from 'i18n';
 import module from 'module';
 import context from 'context';
-import promiseQueue from './promiseQueue';
-import tokenHandlerFactory from './tokenHandler';
-import loggerFactory from './logger';
+import promiseQueue from './promiseQueue.js';
+import tokenHandlerFactory from './tokenHandler.js';
+import loggerFactory from './logger.js';
 
 const tokenHeaderName = 'X-CSRF-Token';
 
@@ -53,7 +53,7 @@ const logger = loggerFactory('core/request');
  * @param {Object} response - the server body response as plain object
  * @param {String} fallbackMessage - the error message in case the response isn't correct
  * @param {Number} httpCode - the response HTTP code
- * @param {Boolean} httpSent - the sent status
+ * @param {Boolean} httpSent - the scent status
  * @returns {Error} the new error
  */
 const createError = (response, fallbackMessage, httpCode, httpSent) => {
@@ -217,7 +217,6 @@ export default function request(options) {
                     },
                     global: !options.background //TODO fix this with TT-260
                 };
-
                 const onDone = (response, status, xhr) => {
                     setTokenFromXhr(xhr)
                             .then(() => {

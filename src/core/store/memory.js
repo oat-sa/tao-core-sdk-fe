@@ -22,7 +22,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import uuid from '../uuid';
+import uuid from '../uuid.js';
 
 /**
  * where data dwelves

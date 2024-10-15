@@ -19,8 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 import _ from 'lodash';
-import Promise from './promise';
-import eventifier from './eventifier';
+import eventifier from './eventifier.js';
 
 /**
  * Defines a manager for async process with deferred steps.

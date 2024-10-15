@@ -179,13 +179,11 @@ define([
                 return result;
             })
             .then(function(response) {
-                // console.log(response, 'resp')
                 assert.ok(true, 'The promise should be resolved');
                 assert.deepEqual(response, expectedResponse, 'The expected responses have been provided');
                 ready();
             })
             .catch(function(err) {
-                // console.log(err,'err')
                 assert.ok(false, 'The promise should not be rejected');
                 // eslint-disable-next-line
                 console.error(err);

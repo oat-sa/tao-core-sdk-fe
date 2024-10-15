@@ -23,7 +23,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import pollProvider from './poll';
+import pollProvider from './poll.js';
 
 /**
  * 'request' provider for {@link core/communicator}

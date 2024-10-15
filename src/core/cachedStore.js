@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-import store from './store';
+import store from './store.js';
 
 /**
  * The default name of the key storage indexing the persisted data

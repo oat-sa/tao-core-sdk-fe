@@ -15,7 +15,7 @@
  *
  * Copyright (c) 2020-2024 (original work) Open Assessment Technologies SA ;
  */
-import httpRequestFlowFactory from './request/flowFactory';
+import httpRequestFlowFactory from './request/flowFactory.js';
 
 /**
  * !!! IE11 requires polyfill https://www.npmjs.com/package/whatwg-fetch

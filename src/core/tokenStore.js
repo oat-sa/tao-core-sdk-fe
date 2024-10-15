@@ -23,7 +23,7 @@
  * @author Martin Nicholson <martin@taotesting.com>
  */
 import _ from 'lodash';
-import store from './store';
+import store from './store.js';
 
 /**
  * @typedef {Object} token - A token object

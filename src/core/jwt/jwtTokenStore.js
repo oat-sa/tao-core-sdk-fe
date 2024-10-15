@@ -22,8 +22,8 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-import store from '../store';
-import { parseJwtPayload, getJwtTTL } from './jwtToken';
+import store from '../store.js';
+import { parseJwtPayload, getJwtTTL } from './jwtToken.js';
 
 /**
  * @param {Object} options - Factory options

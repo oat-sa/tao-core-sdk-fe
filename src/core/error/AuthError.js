@@ -16,7 +16,7 @@
  * Copyright (c) 2024 (original work) Open Assessment Technologies SA ;
  */
 
-import errorTypes from './types';
+import errorTypes from './types.js';
 
 /**
  * Error due to client side authentication mechanisms

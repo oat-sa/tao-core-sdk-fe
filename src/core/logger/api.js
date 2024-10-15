@@ -34,8 +34,8 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import format from '../format';
-import moduleLoader from '../moduleLoader';
+import format from '../format.js';
+import moduleLoader from '../moduleLoader.js';
 
 /**
  * The default level

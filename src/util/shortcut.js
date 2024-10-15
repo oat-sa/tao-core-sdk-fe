@@ -33,7 +33,7 @@
  *
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-import shortcutRegistry from './shortcut/registry';
+import shortcutRegistry from './shortcut/registry.js';
 
 /**
  * Default options applied to each shortcut

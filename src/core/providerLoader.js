@@ -23,7 +23,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import moduleLoaderFactory from './moduleLoader';
+import moduleLoaderFactory from './moduleLoader.js';
 
 /**
  * Checks a provider object

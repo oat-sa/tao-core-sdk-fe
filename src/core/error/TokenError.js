@@ -16,8 +16,8 @@
  * Copyright (c) 2024 (original work) Open Assessment Technologies SA ;
  */
 
-import errorTypes from './types';
-import NetworkError from './NetworkError';
+import errorTypes from './types.js';
+import NetworkError from './NetworkError.js';
 
 /**
  * Token expiration error

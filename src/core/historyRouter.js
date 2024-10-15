@@ -22,10 +22,9 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import router from './router';
-import eventifier from './eventifier';
-import statifier from './statifier';
-import Promise from './promise';
+import router from './router.js';
+import eventifier from './eventifier.js';
+import statifier from './statifier.js';
 
 let historyRouter;
 const location = `${window.history.location || window.location}`;

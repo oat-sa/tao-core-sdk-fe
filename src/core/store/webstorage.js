@@ -23,8 +23,8 @@
  */
 
 import _ from 'lodash';
-import promiseQueue from '../promiseQueue';
-import uuid from '../uuid';
+import promiseQueue from '../promiseQueue.js';
+import uuid from '../uuid.js';
 
 /**
  * Prefix all databases

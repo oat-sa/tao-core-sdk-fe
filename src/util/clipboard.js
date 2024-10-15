@@ -19,7 +19,7 @@
  */
 
 import $ from 'jquery';
-import eventifier from '../core/eventifier';
+import eventifier from '../core/eventifier.js';
 
 /**
  * System clipboard manager

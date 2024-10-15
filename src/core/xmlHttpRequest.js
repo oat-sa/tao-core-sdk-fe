@@ -15,7 +15,7 @@
  *
  * Copyright (c) 2020-2024 (original work) Open Assessment Technologies SA ;
  */
-import httpRequestFlowFactory from './request/flowFactory';
+import httpRequestFlowFactory from './request/flowFactory.js';
 
 const XHR_READY_STATE_OPENED = 1;
 const XHR_READY_STATE_HEADERS_RECEIVED = 2;

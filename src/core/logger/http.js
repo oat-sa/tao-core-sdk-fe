@@ -24,7 +24,7 @@
  */
 import _ from 'lodash';
 import $ from 'jquery';
-import urlHelper from '../../util/url';
+import urlHelper from '../../util/url.js';
 
 const defaultConfig = {
     url: urlHelper.route('log', 'Log', 'tao'),

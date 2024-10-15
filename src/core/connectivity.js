@@ -22,7 +22,7 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import eventifier from './eventifier';
+import eventifier from './eventifier.js';
 
 /**
  * @type {Boolean} the current status, true means online

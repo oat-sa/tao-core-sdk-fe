@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery';
-import capitalize from './capitalize';
+import capitalize from './capitalize.js';
 
 /**
  * Adapts the size of several elements

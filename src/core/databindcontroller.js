@@ -18,7 +18,7 @@
 
 import $ from 'jquery';
 import _ from 'lodash';
-import DataBinder from './databinder';
+import DataBinder from './databinder.js';
 
 export default {
     takeControl($container, options) {

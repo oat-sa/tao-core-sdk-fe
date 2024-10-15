@@ -36,11 +36,11 @@
 import _ from 'lodash';
 import moment from 'moment';
 import module from 'module';
-import loggerFactory from './logger';
-import localStorageBackend from './store/localstorage';
-import sessionStorageBackend from './store/sessionstorage';
-import indexedDBBackend from './store/indexeddb';
-import memoryBackend from './store/memory';
+import loggerFactory from './logger.js';
+import localStorageBackend from './store/localstorage.js';
+import sessionStorageBackend from './store/sessionstorage.js';
+import indexedDBBackend from './store/indexeddb.js';
+import memoryBackend from './store/memory.js';
 
 let supportsIndexedDB = false;
 let dectectionDone = false;

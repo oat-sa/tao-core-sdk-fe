@@ -31,9 +31,8 @@
  */
 import _ from 'lodash';
 import context from 'context';
-import UrlParser from '../util/urlParser';
-import loggerFactory from './logger';
-import Promise from 'core/promise';
+import UrlParser from '../util/urlParser.js';
+import loggerFactory from './logger.js';
 
 const logger = loggerFactory('router');
 

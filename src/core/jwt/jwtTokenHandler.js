@@ -24,9 +24,9 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-import jwtTokenStoreFactory from './jwtTokenStore';
-import promiseQueue from '../promiseQueue';
-import TokenError from '../error/TokenError';
+import jwtTokenStoreFactory from './jwtTokenStore.js';
+import promiseQueue from '../promiseQueue.js';
+import TokenError from '../error/TokenError.js';
 
 /**
  * JWT token handler factory

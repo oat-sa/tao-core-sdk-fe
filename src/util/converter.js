@@ -17,8 +17,8 @@
  */
 
 import module from 'module';
-import converterFactory from './converter/factory';
-import ambiguousSymbolsConverter from './converter/ambiguousSymbols';
+import converterFactory from './converter/factory.js';
+import ambiguousSymbolsConverter from './converter/ambiguousSymbols.js';
 
 /**
  * Exposes a default text converter, including all builtin processors.

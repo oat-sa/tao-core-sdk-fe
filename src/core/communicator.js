@@ -19,9 +19,9 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 import _ from 'lodash';
-import providerRegistry from './providerRegistry';
-import delegator from './delegator';
-import eventifier from './eventifier';
+import providerRegistry from './providerRegistry.js';
+import delegator from './delegator.js';
+import eventifier from './eventifier.js';
 
 /**
  * Some default config values

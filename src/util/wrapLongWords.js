@@ -21,7 +21,7 @@
  *
  * @author dieter <dieter@taotesting.com>
  */
-import regexEscape from './regexEscape';
+import regexEscape from './regexEscape.js';
 
 /**
  * Builds a chunked term from a too long one.

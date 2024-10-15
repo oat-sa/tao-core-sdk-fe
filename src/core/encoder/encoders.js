@@ -16,13 +16,13 @@
  * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
 import _ from 'lodash';
-import boolean from './boolean';
-import number from './number';
-import float from './float';
-import time from './time';
-import array2str from './array2str';
-import str2array from './str2array';
-import entity from './entity';
+import boolean from './boolean.js';
+import number from './number.js';
+import float from './float.js';
+import time from './time.js';
+import array2str from './array2str.js';
+import str2array from './str2array.js';
+import entity from './entity.js';
 
 /**
  * Extract the argument in parentheses from a function name:  "foo(a,b)" return [a,b]

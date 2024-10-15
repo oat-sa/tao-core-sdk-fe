@@ -25,8 +25,8 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import Handlebars from 'handlebars';
-import Encoders from './encoder/encoders';
-import Filters from './filter/filters';
+import Encoders from './encoder/encoders.js';
+import Filters from './filter/filters.js';
 
 /**
  * Get the value of a property defined by the path into the object

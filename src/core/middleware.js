@@ -19,8 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import _ from 'lodash';
-import eventifier from './eventifier';
-import Promise from './promise';
+import eventifier from './eventifier.js';
 
 /**
  * Defines a middlewares chain handler.

@@ -36,7 +36,7 @@
  * @author Martin Nicholson <martin@taotesting.com>
  */
 import _ from 'lodash';
-import coreRequest from '../request';
+import coreRequest from '../request.js';
 
 /**
  * A wrapper for the core module which requests content from a TAO endpoint
@@ -56,7 +56,7 @@ export default function request(url, data, method, headers, background, noToken)
         method: method,
         headers: headers,
         background: background,
-        noToken: noToken !== false
+        noToken: noToken !== false ? false : true
     }).then(function(response) {
         if (_.isUndefined(response)) { // in case 204 empty content
             return Promise.resolve();

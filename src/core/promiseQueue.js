@@ -39,8 +39,8 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import eventifier from './eventifier';
-import uuid from './uuid';
+import eventifier from './eventifier.js';
+import uuid from './uuid.js';
 
 /**
  * Creates a new promise queue

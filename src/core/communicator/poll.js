@@ -20,8 +20,8 @@
  */
 
 import _ from 'lodash';
-import pollingFactory from '../polling';
-import coreRequest from '../request';
+import pollingFactory from '../polling.js';
+import coreRequest from '../request.js';
 
 /**
  * Some default config values

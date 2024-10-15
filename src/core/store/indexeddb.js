@@ -22,9 +22,8 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import Promise from '../promise';
 import IDBStore from 'idb-wrapper';
-import uuid from '../uuid';
+import uuid from '../uuid.js';
 
 /**
  * Prefix all databases

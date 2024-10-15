@@ -19,7 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import _ from 'lodash';
-import request from '../request';
+import request from '../request.js';
 
 const _defaults = {
     noCache: true,
@@ -89,7 +89,7 @@ export default {
          * @param {string} method
          * @returns {Promise|*}
          */
-        this.processRequest = function processRequest(action, params, method) {
+        this.processRequest = async function processRequest(action, params, method) {
             let descriptor = config.actions[action];
             const headers = {};
             const tokenHandler = this.getTokenHandler();
@@ -114,7 +114,6 @@ export default {
             if (config.noCache) {
                 params = _.merge({ _: new Date().getTime() }, params);
             }
-
             if (!config.noToken) {
                 token = tokenHandler.getToken();
                 if (token) {
@@ -152,7 +151,7 @@ export default {
     },
 
     /**
-     * Requests the server for a create action
+     * Requests the server for a creation action
      * @param {Object} params
      * @returns {Promise}
      */

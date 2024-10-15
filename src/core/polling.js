@@ -115,8 +115,7 @@
  */
 
 import _ from 'lodash';
-import Promise from './promise';
-import eventifier from './eventifier';
+import eventifier from './eventifier.js';
 
 /**
  * The default value of the polling interval
