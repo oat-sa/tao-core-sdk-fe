@@ -25,7 +25,7 @@ export default {
      * @param {Boolean} defaultValue
      * @returns {Boolean} true if value === "true", defaultValue if set, false if defaultValue not set
      */
-    strToBool: function strToBool(value, defaultValue) {
+    strToBool(value, defaultValue) {
         if (_.isBoolean(value)) {
             return value;
         } else if (_.isString(value)) {

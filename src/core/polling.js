@@ -147,7 +147,7 @@ function pollingFactory(config, pollingInterval = _defaultInterval) {
         /**
          * Gets the current action into asynchronous mode.
          * The next iteration won't be executed until the resolve method has been called.
-         * However if the reject method is called, the polling is then stopped!
+         * However, if the reject method is called, the polling is then stopped!
          * @returns {Object} Returns a promise resolver that provides resolve() and reject() methods
          */
         async() {
@@ -223,7 +223,7 @@ function pollingFactory(config, pollingInterval = _defaultInterval) {
                 return this;
             }
 
-            // the next() method can be called either to force a next iteration or to start immediately the action
+            // the next() method can be called either to force a next iteration or to start immediately the action,
             // so we need to ensure the schedule is not blocked
             state.stopped = false;
 

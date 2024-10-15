@@ -23,6 +23,7 @@ import _ from 'lodash';
 import module from 'module';
 import tokenStoreFactory from './tokenStore.js';
 import promiseQueue from './promiseQueue.js';
+import store from "./store.js";
 
 let validateTokensOpt = true;
 let clientConfigFetched = false;
@@ -85,7 +86,7 @@ export default function tokenHandlerFactory(options) {
             // Some async checks before we go for the token:
             return tokenStore
                 .expireOldTokens()
-                .then(() => {
+                .then(async () => {
                     if (!clientConfigFetched) {
                         // Client Config allowed! (first and only time)
                         return this.getClientConfigTokens()

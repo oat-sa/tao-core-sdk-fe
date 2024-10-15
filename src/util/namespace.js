@@ -49,7 +49,7 @@ const namespaceHelper = {
      * @param {Boolean} [normalize] - lower case the string to normalize all the names
      * @returns {String[]} the list of names (no empty, no duplicate)
      */
-    split: function split(names, normalize) {
+    split(names, normalize) {
         if (!_.isString(names) || _.isEmpty(names)) {
             return [];
         }
@@ -67,7 +67,7 @@ const namespaceHelper = {
      * @param {String} namespaced - the namespaced name
      * @returns {String} the name part
      */
-    getName: function getName(namespaced) {
+    getName(namespaced) {
         if (!_.isString(namespaced) || _.isEmpty(namespaced)) {
             return '';
         }
@@ -83,7 +83,7 @@ const namespaceHelper = {
      * @param {String} [defaultNs] - the default namespace
      * @returns {String} the namespace, that defaults to defaultNs
      */
-    getNamespace: function getNamespace(namespaced, defaultNs) {
+    getNamespace(namespaced, defaultNs) {
         if (!_.isString(namespaced) || _.isEmpty(namespaced)) {
             return '';
         }
@@ -100,7 +100,7 @@ const namespaceHelper = {
      * @param {Boolean} [normalize] - lower case the string to normalize all the names
      * @returns {String} - The list of namespaced names
      */
-    namespaceAll: function namespaceAll(names, namespace, normalize) {
+    namespaceAll(names, namespace, normalize) {
         let suffix;
         if (!_.isArray(names)) {
             names = namespaceHelper.split(names, normalize);

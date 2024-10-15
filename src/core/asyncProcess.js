@@ -41,7 +41,7 @@ function asyncProcessFactory() {
          * Tells if a process is running
          * @returns {Boolean}
          */
-        isRunning: function isRunning() {
+        isRunning() {
             return running;
         },
 
@@ -50,7 +50,7 @@ function asyncProcessFactory() {
          * @param {Function} [cb] - The process to start
          * @returns {boolean} - Returns true if the process can be started
          */
-        start: function start(cb) {
+        start(cb) {
             let started = false;
             if (!running) {
                 steps = [];
@@ -74,7 +74,7 @@ function asyncProcessFactory() {
          * @param {Promise} step
          * @returns {asyncProcess}
          */
-        addStep: function addStep(step) {
+        addStep(step) {
             steps.push(step);
 
             /**
@@ -92,7 +92,7 @@ function asyncProcessFactory() {
          * @param {Function} [cb] - A nodeback like function which will be called when all the deferred steps have finished or an error occurs
          * @returns {Promise} - Returns the finish promise
          */
-        done: function done(cb) {
+        done(cb) {
             const self = this;
             const finish = Promise.all(steps);
 

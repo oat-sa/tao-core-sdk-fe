@@ -43,10 +43,10 @@ export default {
      * @param {String} errorThrown  - textual portion of the HTTP status, such as "Not Found" or "Internal Server Error."
      * @returns {Error} the new error
      */
-    parse: function parse(xhr, options, errorThrown) {
-        var msg;
-        var json;
-        var error;
+    parse(xhr, options, errorThrown) {
+        let msg;
+        let json;
+        let error;
         try {
             json = JSON.parse(xhr.responseText);
             msg = json.message ? json.message : errorThrown;

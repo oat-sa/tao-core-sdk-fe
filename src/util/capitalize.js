@@ -30,7 +30,7 @@ import _ from 'lodash';
  * @param {Boolean} allWords capitalize all words, similar to PHP's ucWords()
  * @returns {*}
  */
-const capitalize = function capitalize(input, allWords) {
+function capitalize(input, allWords) {
     const ucFirst = function ucFirst(str) {
         return str.charAt(0).toUpperCase() + str.substr(1);
     };

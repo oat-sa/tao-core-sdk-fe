@@ -27,20 +27,20 @@ import eventifier from './eventifier.js';
 /**
  * @type {Boolean} the current status, true means online
  */
-var status = navigator.onLine;
+let status = navigator.onLine;
 
 /**
  * The connectivity module
  * @typedef {connectivity}
  */
-var connectivity = eventifier({
+const connectivity = eventifier({
     /**
      * Set manually as online
      * @returns {connectivity} chains
      * @fires {connectivity#online}
      * @fires {connectivity#change}
      */
-    setOnline: function setOnline() {
+    setOnline() {
         if (this.isOffline()) {
             status = true;
 
@@ -55,7 +55,7 @@ var connectivity = eventifier({
      * @fires {connectivity#offline}
      * @fires {connectivity#change}
      */
-    setOffline: function setOffline() {
+    setOffline() {
         if (this.isOnline()) {
             status = false;
 
@@ -68,7 +68,7 @@ var connectivity = eventifier({
      * Are we online ?
      * @returns {Boolean}
      */
-    isOnline: function isOnline() {
+    isOnline() {
         return status;
     },
 
@@ -76,7 +76,7 @@ var connectivity = eventifier({
      * Are we offline
      * @returns {Boolean}
      */
-    isOffline: function isOffline() {
+    isOffline() {
         return !status;
     }
 });
