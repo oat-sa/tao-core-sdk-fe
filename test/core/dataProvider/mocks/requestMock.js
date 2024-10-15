@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define(['core/eventifier', 'core/promise'], function(eventifier, Promise) {
+define(['core/eventifier'], function(eventifier) {
     'use strict';
 
     /**

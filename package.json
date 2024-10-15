@@ -4,10 +4,15 @@
     "displayName": "TAO Core SDK",
     "description": "Core libraries of TAO",
     "homepage": "https://github.com/oat-sa/tao-core-sdk-fe#readme",
+    "type": "module",
     "files": [
         "dist/",
         "src/"
     ],
+    "exports": {
+        "./core/*": "./src/core/*.js",
+        "./util/*": "./src/util/*.js"
+    },
     "license": "GPL-2.0",
     "scripts": {
         "test": "npx qunit-testrunner",

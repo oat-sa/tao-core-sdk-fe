@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2015-2024 (original work) Open Assessment Technologies SA;
  */
 
 /**
@@ -22,10 +22,9 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import router from 'core/router';
-import eventifier from 'core/eventifier';
-import statifier from 'core/statifier';
-import Promise from 'core/promise';
+import router from './router.js';
+import eventifier from './eventifier.js';
+import statifier from './statifier.js';
 
 let historyRouter;
 const location = `${window.history.location || window.location}`;

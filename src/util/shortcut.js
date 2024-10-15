@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Helper allowing to register shortcuts on the whole page.
@@ -27,19 +27,19 @@
  *
  * **Known limitations:**
  * Due to browser implementation, some shortcuts may not work.
- * For instance on a french keyboard layout, the shortcut "Shift+;" wont work as the browser
+ * For instance on a French keyboard layout, the shortcut "Shift+;" won't work as the browser
  * will return the result of the uppercase key that is "Shift+." in this case.
  * For alphanumeric keys the issue is prevented (this is the more needed feature).
  *
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-import shortcutRegistry from 'util/shortcut/registry';
+import shortcutRegistry from './shortcut/registry.js';
 
 /**
  * Default options applied to each shortcut
  * @type {Object}
  */
-var defaultOptions = {
+const defaultOptions = {
     propagate: false,
     prevent: true
 };

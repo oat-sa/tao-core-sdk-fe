@@ -20,11 +20,10 @@
  */
 define([
     'lodash',
-    'core/promise',
     'core/dataProvider/request',
     'core/dataProvider/proxy',
     'core/dataProvider/proxy/ajax'
-], function(_, Promise, requestMock, proxyFactory, ajaxProvider) {
+], function(_, requestMock, proxyFactory, ajaxProvider) {
     'use strict';
 
     var ajaxProviderApi = [
@@ -170,7 +169,6 @@ define([
             assert.deepEqual(params, expectedParams, 'The expected parameters have been provided');
             requestMock.api.trigger('success', expectedResponse);
         });
-
         proxy
             .init(initConfig)
             .then(function() {

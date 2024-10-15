@@ -23,7 +23,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import pollProvider from 'core/communicator/poll';
+import pollProvider from './poll.js';
 
 /**
  * 'request' provider for {@link core/communicator}
@@ -61,18 +61,18 @@ const requestProvider = _.defaults({
     },
 
     /**
-     * Sends an messages through the communication implementation
+     * Sends a messages through the communication implementation
      * @param {String} channel - The name of the communication channel to use
      * @param {Object} message - The message to send
      * @returns {Promise}
      */
     send: function send(channel, message) {
         // queue the message, it will be sent soon
-        var pending = {
+        const pending = {
             channel: channel,
             message: message
         };
-        var promise = new Promise(function(resolve, reject) {
+        const promise = new Promise(function (resolve, reject) {
             pending.promise = {
                 resolve: resolve,
                 reject: reject

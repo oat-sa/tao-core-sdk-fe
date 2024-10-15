@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA;
  */
 import _ from 'lodash';
 
@@ -25,7 +25,7 @@ export default {
      * @param {Boolean} defaultValue
      * @returns {Boolean} true if value === "true", defaultValue if set, false if defaultValue not set
      */
-    strToBool: function strToBool(value, defaultValue) {
+    strToBool(value, defaultValue) {
         if (_.isBoolean(value)) {
             return value;
         } else if (_.isString(value)) {

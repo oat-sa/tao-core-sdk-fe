@@ -240,8 +240,8 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
             }
         ])
         .test('tokenised request with ', function(caseData, assert) {
-            var ready = assert.async();
-            var tokenHandler = tokenHandlerFactory();
+            const ready = assert.async();
+            const tokenHandler = tokenHandlerFactory();
 
             // mock the endpoints:
             $.mockjax([
@@ -264,7 +264,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                     return tokenHandler.setToken('token1');
                 })
                 .then(function() {
-                    var result = request(caseData);
+                    const result = request(caseData);
 
                     assert.expect(3);
 

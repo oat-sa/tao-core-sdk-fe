@@ -26,7 +26,7 @@ define([
 ], (request, jwtTokenHandlerFactory, fetchMock, ApiError, NetworkError, TimeoutError) => {
     'use strict';
 
-    // can mocked url redefined
+    // can mock url redefined
     fetchMock.config.overwriteRoutes = true;
 
     QUnit.module('Request', {

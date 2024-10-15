@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -83,7 +83,6 @@ function delegator(api, provider, config) {
         } else {
             throw new Error(`There is no ${name} provider!`);
         }
-
         return response;
     }
 
