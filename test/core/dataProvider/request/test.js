@@ -21,7 +21,7 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define(['jquery', 'lodash', 'core/dataProvider/request', 'core/promise'], function($, _, request, Promise) {
+define(['jquery', 'lodash', 'core/dataProvider/request'], function($, _, request) {
     'use strict';
 
     var requestCases;

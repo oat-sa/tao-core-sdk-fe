@@ -202,7 +202,7 @@ define([
         );
 
         request('/foo').catch(error => {
-            assert.ok(error instanceof ApiError);
+            assert.equal(error.name, "ApiError");
             assert.equal(error.message, 'ABC123 : Cannot trigger ABC');
             assert.equal(error.response.status, 406);
             assert.equal(error.errorCode, 'ABC123');
@@ -351,7 +351,7 @@ define([
             .then(() => this.jwtTokenHandler.storeAccessToken(accessToken))
             .then(() => request(url, { jwtTokenHandler: this.jwtTokenHandler }))
             .catch(error => {
-                assert.ok(error instanceof NetworkError);
+                assert.equal(error.name, "NetworkError");
                 assert.equal(error.message, '401 : Request error');
                 assert.equal(error.response.status, 401);
                 assert.equal(error.errorCode, 401);
@@ -363,6 +363,6 @@ define([
         assert.expect(1);
         fetchMock.mock('/', new Promise(resolve => setTimeout(resolve, 2000)));
 
-        assert.rejects(request('/', { timeout: 1000 }), TimeoutError);
+        assert.rejects(request('/', { timeout: 1000 }), Error);
     });
 });

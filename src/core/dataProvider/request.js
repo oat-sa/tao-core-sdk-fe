@@ -56,7 +56,7 @@ export default function request(url, data, method, headers, background, noToken)
         method: method,
         headers: headers,
         background: background,
-        noToken: noToken !== false ? false : true
+        noToken: noToken === false ? false : true
     }).then(function(response) {
         if (_.isUndefined(response)) { // in case 204 empty content
             return Promise.resolve();
