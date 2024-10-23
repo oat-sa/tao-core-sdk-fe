@@ -22,7 +22,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define(['lodash', 'core/moduleLoader', 'core/promise'], function(_, moduleLoader, Promise) {
+define(['lodash', 'core/moduleLoader'], function(_, moduleLoader) {
     'use strict';
 
     QUnit.module('API');
