@@ -494,14 +494,7 @@ define(['lodash', 'core/eventifier', 'test/core/logger/testLogger'], function(
 
         itemEditor.trigger('save');
 
-        // window.console.trace = ctrace;
-
         setTimeout(function() {
-
-            const allTraces = testLogger.getMessages().trace,
-                stopTraces = allTraces.filter(function(trace) {
-                    return trace.stoppedIn;
-                });
             ready();
         }, 10);
     });

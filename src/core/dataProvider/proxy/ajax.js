@@ -89,7 +89,7 @@ export default {
          * @param {string} method
          * @returns {Promise|*}
          */
-        this.processRequest = async function processRequest(action, params, method) {
+        this.processRequest = function processRequest(action, params, method) {
             let descriptor = config.actions[action];
             const headers = {};
             const tokenHandler = this.getTokenHandler();
