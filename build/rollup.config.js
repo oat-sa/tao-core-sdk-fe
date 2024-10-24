@@ -25,7 +25,7 @@ import commonJS from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import istanbul from 'rollup-plugin-istanbul';
 
-import { srcDir, outputDir } from "./path.js";
+import { srcDir, outputDir } from './path.js';
 
 const isDev = process.env.NODE_ENV === 'development';
 

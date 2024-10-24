@@ -19,7 +19,7 @@
 /**
  * This file contains path definitions for build scripts.
  */
-import path from "path";
+import path from 'path';
 const rootPath = path.resolve(__dirname, '..');
 
 export const srcDir = path.resolve(rootPath, 'src');

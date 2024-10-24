@@ -23,7 +23,6 @@ import _ from 'lodash';
 import module from 'module';
 import tokenStoreFactory from './tokenStore.js';
 import promiseQueue from './promiseQueue.js';
-import store from "./store.js";
 
 let validateTokensOpt = true;
 let clientConfigFetched = false;
