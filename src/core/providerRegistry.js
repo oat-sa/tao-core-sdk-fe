@@ -24,7 +24,7 @@
 import _ from 'lodash';
 
 /**
- * Transfers the target into a a provider registry
+ * Transfers the target into a provider registry
  * It adds two methods registerProvider() and getProvider();
  *
  * @param {Object} target

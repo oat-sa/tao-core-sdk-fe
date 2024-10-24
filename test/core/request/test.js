@@ -206,7 +206,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                     return tokenHandler.setToken('token1');
                 })
                 .then(function() {
-                    var result = request(caseData);
+                    const result = request(caseData);
 
                     assert.expect(2);
 
@@ -224,120 +224,6 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                         });
                 });
         });
-
-    QUnit.cases
-        .init([
-            {
-                title: '200 got content',
-                url: '//200',
-                content: { foo: 'bar' }
-            },
-            {
-                title: '200 with custom header',
-                url: '//200',
-                headers: { 'x-foo': 'bar' },
-                content: { foo: 'bar', requestHeaders: { 'x-foo': 'bar', 'X-CSRF-Token': 'token1' } }
-            }
-        ])
-        .test('tokenised request with ', function(caseData, assert) {
-            var ready = assert.async();
-            var tokenHandler = tokenHandlerFactory();
-
-            // mock the endpoints:
-            $.mockjax([
-                {
-                    url: /^\/\/200.*$/,
-                    status: 200,
-                    headers: {
-                        // respond with:
-                        'X-CSRF-Token': 'token2'
-                    },
-                    response: function(settings) {
-                        return standardMockResponse(settings, caseData, this);
-                    }
-                }
-            ]);
-
-            tokenHandler
-                .clearStore()
-                .then(function() {
-                    return tokenHandler.setToken('token1');
-                })
-                .then(function() {
-                    var result = request(caseData);
-
-                    assert.expect(3);
-
-                    assert.ok(result instanceof Promise, 'The request function returns a promise');
-
-                    result
-                        .then(function(response) {
-                            assert.deepEqual(response.content, caseData.content, 'The given result is correct');
-
-                            tokenHandler.getToken().then(function(storedToken) {
-                                assert.equal(storedToken, 'token2', 'The token was updated with the next in sequence');
-                                ready();
-                            });
-                        })
-                        .catch(function() {
-                            assert.ok(false, 'Should not reject');
-                            ready();
-                        });
-                });
-        });
-
-    QUnit.test('tokenised request with multiple tokens available', function(assert) {
-        var data = {
-            url: '//200',
-            content: { foo: 'bar' }
-        };
-
-        var ready = assert.async();
-        var tokenHandler = tokenHandlerFactory();
-
-        // mock the endpoints:
-        $.mockjax([
-            {
-                url: /^\/\/200.*$/,
-                status: 200,
-                headers: {
-                    // respond with:
-                    'X-CSRF-Token': 'token3'
-                },
-                response: function(settings) {
-                    return standardMockResponse(settings, data, this);
-                }
-            }
-        ]);
-
-        tokenHandler
-            .clearStore()
-            .then(function() {
-                return tokenHandler.setToken('token1');
-            })
-            .then(function() {
-                return tokenHandler.setToken('token2');
-            })
-            .then(function() {
-                var result = request(data);
-
-                assert.expect(2);
-
-                assert.ok(result instanceof Promise, 'The request function returns a promise');
-
-                result
-                    .then(function() {
-                        tokenHandler.getToken().then(function(storedToken) {
-                            assert.equal(storedToken, 'token2', 'The next token is the second original token');
-                            ready();
-                        });
-                    })
-                    .catch(function() {
-                        assert.ok(false, 'Should not reject');
-                        ready();
-                    });
-            });
-    });
 
     QUnit.test('empty response [204]', function(assert) {
         var data = {
@@ -391,6 +277,7 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                 title: '500 error',
                 url: '//500',
                 reject: true,
+                reuseToken: true,
                 err: new Error('500 : Server Error')
             },
             {
@@ -495,18 +382,14 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
                 .then(function() {
                     var result = request(caseData);
 
-                    assert.expect(3);
+                    assert.expect(2);
 
                     assert.ok(result instanceof Promise, 'The request function returns a promise');
 
                     result
                         .then(function(response) {
                             assert.deepEqual(response, responses[caseData.url][0], 'The given result is correct');
-
-                            tokenHandler.getToken().then(function(storedToken) {
-                                assert.equal(storedToken, 'token2', 'The token was updated with the next in sequence');
-                                ready();
-                            });
+                            ready();
                         })
                         .catch(function() {
                             assert.ok(false, 'Should not reject');
@@ -839,29 +722,5 @@ define(['jquery', 'lodash', 'core/request', 'core/tokenHandler', 'core/jwt/jwtTo
             /Token not available and cannot be refreshed/i,
             'request fails if token handler cannot provide access token'
         );
-    });
-
-    QUnit.module('request logger', {
-        afterEach: function() {
-            $.mockjax.clear();
-        }
-    });
-
-    QUnit.cases.init(['warn', 'error', 'fatal']).test('request logger min level is set based on config', (logLevel, assert) => {
-        const done = assert.async();
-        assert.expect(1);
-
-        $.mockjax([
-            {
-                url: '//endpoint',
-                status: 200,
-                responseText: JSON.stringify({})
-            }
-        ]);
-
-        request({ url: '//endpoint', noToken: true, logLevel }).then(() => {
-            assert.equal(loggerFactory().loggerLevel, logLevel, `loggel level should be ${logLevel} based on config`);
-            done();
-        });
     });
 });

@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define(['lodash', 'core/promise', 'core/dataProvider/proxy'], function(_, Promise, proxyFactory) {
+define(['lodash', 'core/dataProvider/proxy'], function(_, proxyFactory) {
     'use strict';
 
     var defaultProxy = {

@@ -19,7 +19,7 @@
 /**
  * Test the module {@link core/store}
  */
-define(['core/store', 'core/promise'], function(store, Promise) {
+define(['core/store'], function(store) {
     'use strict';
 
     var mockedData = {};

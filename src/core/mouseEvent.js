@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Creates and triggers a mouseEvent
@@ -31,9 +31,8 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  * @author Christophe Noël <christophe@taotesting.com>
  */
-
-var dispatchEvent;
-var allowedEvents = [
+let dispatchEvent;
+const allowedEvents = [
     'click',
     'contextmenu',
     'dblclick',
@@ -53,8 +52,8 @@ var allowedEvents = [
  * @param {*} eventOptions
  * @returns {Event}
  */
-var createEvent = function createEvent(eventName, eventOptions) {
-    var event;
+const createEvent = function createEvent(eventName, eventOptions) {
+    let event;
     try {
         event = new MouseEvent(eventName, eventOptions);
     } catch (e) {
@@ -117,7 +116,7 @@ if (document.dispatchEvent) {
  * @returns {Boolean} Returns true if the event has been successfully triggered
  */
 export default function triggerMouseEvent(element, eventName, eventOptions) {
-    var event;
+    let event;
 
     if (allowedEvents.indexOf(eventName) === -1) {
         return false;

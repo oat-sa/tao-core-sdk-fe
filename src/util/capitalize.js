@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2015-2024 (original work) Open Assessment Technologies SA;
  *
  */
 
@@ -30,8 +30,8 @@ import _ from 'lodash';
  * @param {Boolean} allWords capitalize all words, similar to PHP's ucWords()
  * @returns {*}
  */
-var capitalize = function capitalize(input, allWords) {
-    var ucFirst = function ucFirst(str) {
+function capitalize(input, allWords) {
+    const ucFirst = function ucFirst(str) {
         return str.charAt(0).toUpperCase() + str.substr(1);
     };
 

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019-2021 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2024 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -22,8 +22,8 @@
  * @author Tamas Besenyei <tamas@taotesting.com>
  */
 
-import store from 'core/store';
-import { parseJwtPayload, getJwtTTL } from 'core/jwt/jwtToken';
+import store from '../store.js';
+import { parseJwtPayload, getJwtTTL } from './jwtToken.js';
 
 /**
  * @param {Object} options - Factory options

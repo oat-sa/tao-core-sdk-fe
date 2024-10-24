@@ -13,12 +13,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-import Promise from 'core/promise';
 
 /**
  * Requires an optional module. It the module does not exist, an empty resource is provided (null).
@@ -28,7 +27,7 @@ import Promise from 'core/promise';
 function requireIfExists(uri) {
     // the promise will always be resolved
     return new Promise(function(resolve) {
-        // if a require issue occurs, fallback to an empty resource
+        // if a requirement issue occurs, fallback to an empty resource
         function failed(err) {
             // only catch error related to the required module
             var failedId = err.requireModules && err.requireModules[0];

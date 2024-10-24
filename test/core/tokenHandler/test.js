@@ -19,7 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  * @author Martin Nicholson <martin@taotesting.com>
  */
-define(['core/promise', 'core/tokenHandler', 'jquery.mockjax'], function(Promise, tokenHandlerFactory) {
+define(['core/tokenHandler', 'jquery.mockjax'], function(tokenHandlerFactory) {
     'use strict';
 
     QUnit.module('tokenHandler');

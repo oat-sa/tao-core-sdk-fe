@@ -13,14 +13,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 import _ from 'lodash';
-import Promise from 'core/promise';
-import eventifier from 'core/eventifier';
+import eventifier from './eventifier.js';
 
 /**
  * Defines a manager for async process with deferred steps.
@@ -34,15 +33,15 @@ import eventifier from 'core/eventifier';
  * @trigger reject - When the process has finished on error
  */
 function asyncProcessFactory() {
-    var running = false;
-    var steps = [];
+    let running = false;
+    let steps = [];
 
     return eventifier({
         /**
          * Tells if a process is running
          * @returns {Boolean}
          */
-        isRunning: function isRunning() {
+        isRunning() {
             return running;
         },
 
@@ -51,8 +50,8 @@ function asyncProcessFactory() {
          * @param {Function} [cb] - The process to start
          * @returns {boolean} - Returns true if the process can be started
          */
-        start: function start(cb) {
-            var started = false;
+        start(cb) {
+            let started = false;
             if (!running) {
                 steps = [];
                 running = true;
@@ -75,7 +74,7 @@ function asyncProcessFactory() {
          * @param {Promise} step
          * @returns {asyncProcess}
          */
-        addStep: function addStep(step) {
+        addStep(step) {
             steps.push(step);
 
             /**
@@ -93,9 +92,9 @@ function asyncProcessFactory() {
          * @param {Function} [cb] - A nodeback like function which will be called when all the deferred steps have finished or an error occurs
          * @returns {Promise} - Returns the finish promise
          */
-        done: function done(cb) {
-            var self = this;
-            var finish = Promise.all(steps);
+        done(cb) {
+            const self = this;
+            const finish = Promise.all(steps);
 
             finish
                 .then(function(data) {

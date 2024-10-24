@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define(['lodash', 'core/promise', 'core/communicator'], function(_, Promise, communicator) {
+define(['lodash', 'core/communicator'], function(_, communicator) {
     'use strict';
 
     QUnit.module('communicator factory', {

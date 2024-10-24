@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define(['core/promise'], function(Promise) {
+define([], function() {
     'use strict';
 
     var _stores = {};

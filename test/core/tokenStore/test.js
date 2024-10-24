@@ -20,7 +20,7 @@
  *
  * @author Martin Nicholson <martin@taotesting.com>
  */
-define(['lodash', 'core/promise', 'core/tokenStore'], function(_, Promise, tokenStoreFactory) {
+define(['lodash', 'core/tokenStore'], function(_, tokenStoreFactory) {
     'use strict';
 
     // Define some dummy tokens with unique values & dates:

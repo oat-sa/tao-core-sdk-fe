@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2013-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2013-2024 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -32,8 +32,8 @@ export default {
      * @param {ImageSizeCallback} cb - called with the image size
      */
     getSize: function(src, timeout, cb) {
-        var timeoutId;
-        var img = document.createElement('img');
+        let timeoutId;
+        const img = document.createElement('img');
 
         //params interchange
         if (typeof timeout === 'function') {

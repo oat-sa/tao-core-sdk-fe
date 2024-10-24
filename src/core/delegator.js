@@ -83,7 +83,6 @@ function delegator(api, provider, config) {
         } else {
             throw new Error(`There is no ${name} provider!`);
         }
-
         return response;
     }
 

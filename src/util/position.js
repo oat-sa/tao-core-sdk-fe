@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA;
  *
  */
 
@@ -33,9 +33,9 @@ export default {
      * @param {HTMLElement} element - the element to check against the container
      * @returns {Boolean|undefined} or undefined if the parameters are incorrect, so check your return value type.
      */
-    isInside: function isInside(container, element) {
-        var containerCoords;
-        var elementCoords;
+    isInside(container, element) {
+        let containerCoords;
+        let elementCoords;
         if (container instanceof HTMLElement && element instanceof HTMLElement) {
             containerCoords = container.getBoundingClientRect();
             elementCoords = element.getBoundingClientRect();
@@ -66,9 +66,9 @@ export default {
      * @param {HTMLElement} element - the element to check against the container
      * @returns {Boolean|undefined} or undefined if the parameters are incorrect, so check your return value type.
      */
-    isOver: function isInside(container, element) {
-        var containerCoords;
-        var elementCoords;
+    isOver(container, element) {
+        let containerCoords;
+        let elementCoords;
         if (container instanceof HTMLElement && element instanceof HTMLElement) {
             containerCoords = container.getBoundingClientRect();
             elementCoords = element.getBoundingClientRect();
