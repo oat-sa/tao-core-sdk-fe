@@ -19,7 +19,7 @@
 import _ from 'lodash';
 
 const Filters = {
-    register: function (name, filter) {
+    register(name, filter) {
         if (!_.isString(name)) {
             throw new Error('An filter must have a valid name');
         }
@@ -29,7 +29,7 @@ const Filters = {
         this[name] = filter;
     },
 
-    filter: function (name, value) {
+    filter(name, value) {
         if (this[name] && _.isArray(value)) {
             return _.filter(value, this[name]);
         }
