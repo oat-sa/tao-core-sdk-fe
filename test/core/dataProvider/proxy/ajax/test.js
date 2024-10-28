@@ -174,11 +174,10 @@ define([
             .then(function() {
                 const result = proxy.create(expectedParams);
                 assert.ok(result instanceof Promise, 'The proxyFactory.create() method has returned a promise');
+                ready();
                 return result;
             })
-            .catch(function () {
-                ready();
-            });
+            .catch(function () { return null; });
     });
 
     QUnit.test('ajax.read()', function(assert) {
@@ -235,11 +234,10 @@ define([
             .then(function() {
                 const result = proxy.read(expectedParams);
                 assert.ok(result instanceof Promise, 'The proxyFactory.read() method has returned a promise');
+                ready();
                 return result;
             })
-            .catch(function () {
-                ready();
-            });
+            .catch(function () { return null; });
     });
 
     QUnit.test('ajax.write()', function(assert) {
