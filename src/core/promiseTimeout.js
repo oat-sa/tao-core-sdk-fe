@@ -25,7 +25,7 @@
  * If a timeout occurs, the promise is rejected with an Error containing the optional provided message,
  * and a `timeout property set to `true`.
  *
- * By default, the timeout is set to 30 seconds.
+ * By default the timeout is set to 30 seconds.
  *
  * @example
  *  promiseTimeout(new Promise((resolve, reject) => {
