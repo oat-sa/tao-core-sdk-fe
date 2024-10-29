@@ -10,8 +10,8 @@
         "src/"
     ],
     "exports": {
-        "./core/*": "./src/core/*.js",
-        "./util/*": "./src/util/*.js"
+        "./dist/*": "./dist/*.js",
+        "./src/*": "./src/*.js"
     },
     "license": "GPL-2.0",
     "scripts": {
