@@ -177,7 +177,14 @@ export default function moduleLoaderFactory(requiredModules, validate, specs) {
                         });
                     } else {
                         return Promise.all(
-                            amdModules.map(module => import(/* webpackIgnore: true */ `${module}`))
+                            amdModules.map(module => {
+                                switch (module) {
+                                    case 'core/logger/console':
+                                        return import('./logger/console');
+                                    default:
+                                        return import(`${module}`);
+                                }
+                            })
                         ).then(loadedModules => loadedModules.map(module => module.default));
                     }
                 }
