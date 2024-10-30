@@ -42,12 +42,20 @@ export default inputs.map(input => {
 
     return {
         input,
-        output: {
-            dir: path.join(outputDir, dir),
-            format: 'amd',
-            sourcemap: isDev,
-            name
-        },
+        output: [
+            {
+                dir: path.join(outputDir, 'amd', dir),
+                format: 'amd',
+                sourcemap: isDev,
+                name
+            },
+            {
+                dir: path.join(outputDir, 'esm', dir),
+                format: 'es',
+                sourcemap: isDev,
+                name
+            }
+        ],
         watch: {
             clearScreen: false
         },

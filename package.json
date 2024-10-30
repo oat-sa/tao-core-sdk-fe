@@ -11,12 +11,12 @@
     ],
     "exports": {
         "./core/*": {
-            "require": "./src/core/*.js",
-            "import": "./dist/core/*.js"
+            "require": "./dist/amd/core/*.js",
+            "import": "./dist/esm/core/*.js"
         },
         "./util/*": {
-            "require": "./src/util/*.js",
-            "import": "./dist/util/*.js"
+            "require": "./dist/amd/util/*.js",
+            "import": "./dist/esm/util/*.js"
         }
     },
     "license": "GPL-2.0",
