@@ -193,6 +193,13 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
         },
 
         /**
+         * Returns the refresh token from the token storage
+         * @returns {Promise<String|null>} Promise that returns the token
+         */
+        getRefreshToken() {
+            return tokenStorage.getRefreshToken();
+        },
+        /**
          * Saves initial access token
          * @param {String} accessToken
          * @returns {Promise<Boolean>} Promise of token is stored

@@ -78,6 +78,23 @@ define(['jquery', 'core/jwt/jwtTokenHandler', 'fetch-mock', 'core/error/TokenErr
         });
     });
 
+    QUnit.test('get refresh token', function (assert) {
+        assert.expect(2);
+
+        const done = assert.async();
+
+        const token = 'some token';
+
+        this.handler.storeRefreshToken(token).then(setResult => {
+            assert.equal(setResult, true, 'token is set');
+
+            this.handler.getRefreshToken().then(storedToken => {
+                assert.equal(storedToken, token, 'get back stored refresh token');
+                done();
+            });
+        });
+    });
+
     QUnit.test('clear', function (assert) {
         assert.expect(4);
 
