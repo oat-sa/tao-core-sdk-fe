@@ -194,7 +194,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
 
         /**
          * Returns the refresh token from the token storage
-         * @returns {Promise<Boolean>} Promise that returns the token
+         * @returns {Promise<String|null>} Promise that returns the token
          */
         getRefreshToken() {
             return tokenStorage.getRefreshToken();
