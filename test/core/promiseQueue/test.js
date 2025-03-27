@@ -16,7 +16,7 @@
  * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
  */
 
-define(['core/promise', 'core/promiseQueue'], function(Promise, promiseQueue) {
+define(['core/promiseQueue'], function(promiseQueue) {
     'use strict';
 
     QUnit.module('API');

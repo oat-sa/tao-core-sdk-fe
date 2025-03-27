@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2013-2022 Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2013-2024 Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
 /**
  * @author Bertrand Chevrier <bertrand@taotesting.com>
@@ -25,8 +25,8 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import Handlebars from 'handlebars';
-import Encoders from 'core/encoder/encoders';
-import Filters from 'core/filter/filters';
+import Encoders from './encoder/encoders.js';
+import Filters from './filter/filters.js';
 
 /**
  * Get the value of a property defined by the path into the object
@@ -34,7 +34,7 @@ import Filters from 'core/filter/filters';
  * @param {string} path - the property path
  * @returns {*}
  */
-const locate = function locate(obj, path) {
+function locate(obj, path) {
     const nodes = path.split('.');
     const size = nodes.length;
     let i = 1;
@@ -60,7 +60,7 @@ const locate = function locate(obj, path) {
  * @param {string} path - the property path
  * @param {string|boolean|number} value - the value to assign
  */
-const update = function update(obj, path, value) {
+function update(obj, path, value) {
     const nodes = path.split('.');
     const size = nodes.length;
     let i;
@@ -86,7 +86,7 @@ const update = function update(obj, path, value) {
  * @param {Object} obj - the object to locate property into
  * @param {string} path - the property path
  */
-const remove = function remove(obj, path) {
+function remove(obj, path) {
     const nodes = path.split('.');
     const size = nodes.length;
     let i;
@@ -112,7 +112,7 @@ const remove = function remove(obj, path) {
  * @param {jQueryElement} $node - the element that contains the items
  * @param {Boolean} [retry=false] - if we are in fault tolerancy context, to prevent deep recursivity
  */
-const order = function order(obj, path, $node, retry) {
+function order(obj, path, $node, retry) {
     const values = locate(obj, path);
     let changed = false;
     if (_.isArray(values)) {
@@ -148,7 +148,7 @@ const order = function order(obj, path, $node, retry) {
  * @param {string} path - the property path
  * @param {jQueryElement} $node - the element that contains the items
  */
-const resyncIndexes = function resyncIndexes(obj, path, $node) {
+function resyncIndexes(obj, path, $node) {
     const values = locate(obj, path);
     if (_.isArray(values)) {
         _.forEach(values, function (value, position) {
@@ -172,7 +172,7 @@ const resyncIndexes = function resyncIndexes(obj, path, $node) {
  * @param {jQueryElement} $container
  * @returns {jQueryElement}
  */
-const toBind = function toBind($node, $container) {
+function toBind($node, $container) {
     if ($node[0].type && $node[0].name) {
         if ($node[0].type === 'radio' || $node[0].type === 'checkbox') {
             return $(`[name='${$node[0].name}']`, $container);
@@ -188,7 +188,7 @@ const toBind = function toBind($node, $container) {
  * @param {String} eventName - the name of the event to bind
  * @private
  */
-const _unbind = function _unbind($node, $container, eventName) {
+function _unbind($node, $container, eventName) {
     if ($node.length > 0) {
         const bounds = $._data($node[0], 'events');
         if (
@@ -209,7 +209,7 @@ const _unbind = function _unbind($node, $container, eventName) {
  * @param {String} eventName - the name of the event to bind
  * @param {Function} cb - a jQuery event handler
  */
-const _bindOnce = function _bindOnce($node, $container, eventName, cb) {
+function _bindOnce($node, $container, eventName, cb) {
     _unbind($node, $container, eventName);
     if ($node.length > 0) {
         const bounds = $._data($node[0], 'events');
@@ -236,7 +236,7 @@ const _bindOnce = function _bindOnce($node, $container, eventName, cb) {
  * @param {Object} model
  * @param {Object} options - to be documented
  */
-const DataBinder = function DataBinder($container, model, options) {
+function DataBinder($container, model, options) {
     const self = this;
     this.$container = $container;
     this.model = model || {};
@@ -470,9 +470,9 @@ DataBinder.prototype._listenRemoves = function _listenRemoves($node, path, model
             remove(model, path);
 
             /**
-             * An property of the model is removed
+             * A property of the model is removed
              * @event DataBinder#delete.binder
-             * @param {Object} model - the up to date model
+             * @param {Object} model - the up-to-date model
              */
             self.$container.trigger('delete.binder', [self.model]).trigger('change.binder', [self.model]);
         }
@@ -507,7 +507,7 @@ DataBinder.prototype._listenAdds = function _listenAdds($node, path) {
                     update(self.model, realPath, data);
                 }
 
-                //bind the node and it's content using the domFirst approach (to create the related model)
+                //bind the node, and it's content using the domFirst approach (to create the related model)
                 self.bind($newNode, self.model, `${realPath}.`, true);
                 self._listenRemoves($newNode, realPath, self.model);
             });
@@ -515,7 +515,7 @@ DataBinder.prototype._listenAdds = function _listenAdds($node, path) {
         /**
          * The model contains a new property
          * @event DataBinder#add.binder
-         * @param {Object} model - the up to date model
+         * @param {Object} model - the up-to-date model
          */
         self.$container.trigger('add.binder', [self.model]).trigger('change.binder', [self.model]);
 
@@ -525,7 +525,7 @@ DataBinder.prototype._listenAdds = function _listenAdds($node, path) {
 };
 
 /**
- * Used to resynchronized the items of a `each` binding once one of them was removed
+ * Used to resynchronize the items of a `each` binding once one of them was removed
  * @memberOf DataBinder
  * @private
  * @param {jQueryElement} $node - the elements to bind

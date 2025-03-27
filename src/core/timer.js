@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -27,24 +27,24 @@
  * @returns {timer}
  */
 function timerFactory(config) {
-    var initConfig = config || {};
-    var begin = now();
-    var last = begin;
-    var duration = initConfig.startDuration || 0;
-    var state = {};
-    var disableAutoStart = false === initConfig.autoStart;
+    const initConfig = config || {};
+    let begin = now();
+    let last = begin;
+    let duration = initConfig.startDuration || 0;
+    const state = {};
+    const disableAutoStart = false === initConfig.autoStart;
 
     /**
      * The timer instance
      * @type {timer}
      */
-    var timer = {
+    const timer = {
         /**
          * Starts the timer
          * @param {Number} [startDuration] - Initial duration (default: 0)
          * @returns {timer}
          */
-        start: function start(startDuration) {
+        start(startDuration) {
             begin = now();
             last = begin;
             duration = startDuration || 0;
@@ -58,7 +58,7 @@ function timerFactory(config) {
          * Gets the time elapsed since the last tick
          * @returns {number}
          */
-        tick: function tick() {
+        tick() {
             var timestamp = now();
             var elapsed;
             if (state.running) {
@@ -72,7 +72,7 @@ function timerFactory(config) {
          * Pause the timer
          * @returns {timer}
          */
-        pause: function pause() {
+        pause() {
             if (state.running) {
                 duration += now() - begin;
                 state.running = false;
@@ -85,7 +85,7 @@ function timerFactory(config) {
          * Resume the timer
          * @returns {timer}
          */
-        resume: function resume() {
+        resume() {
             if (!state.running) {
                 begin = now();
                 last = begin;
@@ -100,7 +100,7 @@ function timerFactory(config) {
          * Stops the timer
          * @returns {timer}
          */
-        stop: function stop() {
+        stop() {
             if (state.running) {
                 duration += now() - begin;
             }
@@ -116,7 +116,7 @@ function timerFactory(config) {
          * If the timer is stopped, gets the total duration between start and stop.
          * @returns {number}
          */
-        getDuration: function getDuration() {
+        getDuration() {
             if (state.running) {
                 return duration + (now() - begin);
             }
@@ -128,7 +128,7 @@ function timerFactory(config) {
          * @param {String} stateName
          * @returns {Boolean}
          */
-        is: function is(stateName) {
+        is(stateName) {
             return !!state[stateName];
         },
 
@@ -137,7 +137,7 @@ function timerFactory(config) {
          * @param {Number} time
          * @returns {timer}
          */
-        add: function add(time) {
+        add(time) {
             time = parseFloat(time);
             duration += time;
             last -= time;
@@ -149,7 +149,7 @@ function timerFactory(config) {
          * @param {Number} time
          * @returns {timer}
          */
-        sub: function sub(time) {
+        sub(time) {
             time = parseFloat(time);
             duration -= time;
             last += time;

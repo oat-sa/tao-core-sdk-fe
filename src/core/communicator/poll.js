@@ -20,9 +20,8 @@
  */
 
 import _ from 'lodash';
-import pollingFactory from 'core/polling';
-import Promise from 'core/promise';
-import coreRequest from 'core/request';
+import pollingFactory from '../polling.js';
+import coreRequest from '../request.js';
 
 /**
  * Some default config values
@@ -68,7 +67,7 @@ const defaults = {
  *
  * Business logic errors can be implemented using the `error` *channel*.
  * Network errors are handled by the AJAX implementation, and are forwarded to the `error` *event*.
- * Additional network error handling can be achieve by the rejected send promises.
+ * Additional network error handling can be achieved by the rejected send promises.
  *
  * Malformed messages will be issued through the `malformed` channel
  *
@@ -258,7 +257,7 @@ const pollProvider = {
         });
         this.messagesQueue.push(pending);
 
-        // force a send in the next throttle period
+        // force send in the next throttle period
         this.throttledSend();
 
         return promise;

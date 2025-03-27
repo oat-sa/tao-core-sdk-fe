@@ -25,7 +25,7 @@ import commonJS from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import istanbul from 'rollup-plugin-istanbul';
 
-const { srcDir, outputDir } = require('./path');
+import { srcDir, outputDir } from './path.js';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -42,12 +42,20 @@ export default inputs.map(input => {
 
     return {
         input,
-        output: {
-            dir: path.join(outputDir, dir),
-            format: 'amd',
-            sourcemap: isDev,
-            name
-        },
+        output: [
+            {
+                dir: path.join(outputDir, 'amd', dir),
+                format: 'amd',
+                sourcemap: isDev,
+                name
+            },
+            {
+                dir: path.join(outputDir, 'esm', dir),
+                format: 'es',
+                sourcemap: isDev,
+                name
+            }
+        ],
         watch: {
             clearScreen: false
         },

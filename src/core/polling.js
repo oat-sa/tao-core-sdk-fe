@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2024 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -115,8 +115,7 @@
  */
 
 import _ from 'lodash';
-import Promise from 'core/promise';
-import eventifier from 'core/eventifier';
+import eventifier from './eventifier.js';
 
 /**
  * The default value of the polling interval
@@ -148,7 +147,7 @@ function pollingFactory(config, pollingInterval = _defaultInterval) {
         /**
          * Gets the current action into asynchronous mode.
          * The next iteration won't be executed until the resolve method has been called.
-         * However if the reject method is called, the polling is then stopped!
+         * However, if the reject method is called, the polling is then stopped!
          * @returns {Object} Returns a promise resolver that provides resolve() and reject() methods
          */
         async() {
@@ -224,7 +223,7 @@ function pollingFactory(config, pollingInterval = _defaultInterval) {
                 return this;
             }
 
-            // the next() method can be called either to force a next iteration or to start immediately the action
+            // the next() method can be called either to force a next iteration or to start immediately the action,
             // so we need to ensure the schedule is not blocked
             state.stopped = false;
 

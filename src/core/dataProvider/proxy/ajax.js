@@ -19,8 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import _ from 'lodash';
-import request from 'core/dataProvider/request';
-import Promise from 'core/promise';
+import request from '../request.js';
 
 const _defaults = {
     noCache: true,
@@ -57,7 +56,7 @@ export default {
      * @param {Object} config
      * @param {Object} config.actions - The list of supported actions.
      * Each action is represented by a name and a descriptor. The descriptor can be either a string (URL), or an
-     * object. When the descriptor is an object, it must provide an URL, optionally a request method. It can also
+     * object. When the descriptor is an object, it must provide a URL, optionally a request method. It can also
      * provide a callback that will validate the parameters. A full descriptor looks like:
      * ```
      * {
@@ -115,7 +114,6 @@ export default {
             if (config.noCache) {
                 params = _.merge({ _: new Date().getTime() }, params);
             }
-
             if (!config.noToken) {
                 token = tokenHandler.getToken();
                 if (token) {
@@ -153,7 +151,7 @@ export default {
     },
 
     /**
-     * Requests the server for a create action
+     * Requests the server for a creation action
      * @param {Object} params
      * @returns {Promise}
      */

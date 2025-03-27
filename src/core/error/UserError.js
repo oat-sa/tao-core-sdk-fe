@@ -13,10 +13,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020-2024 (original work) Open Assessment Technologies SA ;
  */
 
-import errorTypes from 'core/error/types';
+import errorTypes from './types.js';
 
 /**
  * Error due to wrong user input

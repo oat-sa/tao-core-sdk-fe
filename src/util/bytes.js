@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2013-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2013-2024 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -24,16 +24,16 @@
  * Util object to manipulate bytes
  * @exports util/bytes
  */
-var bytesUtil = {
+const bytesUtil = {
     /**
      * Get Human Readable Size
      * @param {Number} bytes - the number of bytes
      * @returns {String} the size converted
      */
     hrSize: function hrSize(bytes) {
-        var units = ['B', 'kB', 'MB', 'GB', 'TB'];
-        var unit = 0;
-        var thresh = 1024;
+        const units = ['B', 'kB', 'MB', 'GB', 'TB'];
+        let unit = 0;
+        const thresh = 1024;
         bytes = bytes || 0;
         while (bytes >= thresh) {
             bytes /= thresh;

@@ -18,9 +18,8 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define(['jquery', 'core/promise', 'util/shortcut/registry', 'jquery.simulate'], function (
+define(['jquery', 'util/shortcut/registry', 'jquery.simulate'], function (
     $,
-    Promise,
     shortcutRegistry
 ) {
     'use strict';

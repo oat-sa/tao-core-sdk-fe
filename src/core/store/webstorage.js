@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -23,26 +23,26 @@
  */
 
 import _ from 'lodash';
-import promiseQueue from 'core/promiseQueue';
-import uuid from 'core/uuid';
+import promiseQueue from '../promiseQueue.js';
+import uuid from '../uuid.js';
 
 /**
  * Prefix all databases
  * @type {String}
  */
-var prefix = 'tao-store-';
+const prefix = 'tao-store-';
 
 /**
  * The name of the store that contains the index of known stores.
  * @type {String}
  */
-var knownStoresName = 'index';
+const knownStoresName = 'index';
 
 /**
  * The name of the store that contains the store id
  * @type {String}
  */
-var idStoreName = 'id';
+const idStoreName = 'id';
 
 /**
  * WebStorage is an implementation of browser's Web Storage API
@@ -63,8 +63,8 @@ const webStorageFactory = function(storage) {
      * @param {*} value - the value to set
      * @returns {Promise<Boolean>}
      */
-    var setEntry = function setEntry(storeName, key, value) {
-        return new Promise(function(resolve, reject) {
+    const setEntry = function setEntry(storeName, key, value) {
+        return new Promise(function (resolve, reject) {
             try {
                 storage.setItem(`${prefix + storeName}.${key}`, JSON.stringify(value));
                 resolve(true);
@@ -80,9 +80,9 @@ const webStorageFactory = function(storage) {
      * @param {String} key - entry key
      * @returns {Promise<*>} resolves with the value
      */
-    var getEntry = function getEntry(storeName, key) {
-        return new Promise(function(resolve, reject) {
-            var value;
+    const getEntry = function getEntry(storeName, key) {
+        return new Promise(function (resolve, reject) {
+            let value;
             try {
                 value = storage.getItem(`${prefix + storeName}.${key}`);
                 if (value === null) {
@@ -100,7 +100,7 @@ const webStorageFactory = function(storage) {
      * Gets access to the store that contains the index of known stores.
      * @returns {Promise}
      */
-    var getKnownStores = function getKnownStores() {
+    const getKnownStores = function getKnownStores() {
         return getEntry(knownStoresName, 'stores');
     };
 
@@ -109,8 +109,8 @@ const webStorageFactory = function(storage) {
      * @param {String} storeName
      * @returns {Promise<Boolean>}
      */
-    var registerStore = function registerStore(storeName) {
-        return getKnownStores().then(function(stores) {
+    const registerStore = function registerStore(storeName) {
+        return getKnownStores().then(function (stores) {
             stores = stores || {};
             stores[storeName] = {
                 name: storeName,
@@ -125,8 +125,8 @@ const webStorageFactory = function(storage) {
      * @param {String} storeName
      * @returns {Promise<Boolean>}
      */
-    var unregisterStore = function unregisterStore(storeName) {
-        return getKnownStores().then(function(stores) {
+    const unregisterStore = function unregisterStore(storeName) {
+        return getKnownStores().then(function (stores) {
             stores = stores || {};
             delete stores[storeName];
             return setEntry(knownStoresName, 'stores', stores);
@@ -139,15 +139,15 @@ const webStorageFactory = function(storage) {
      * @returns {Object} the store backend
      * @throws {TypeError} without a storeName
      */
-    var webStorageBackend = function webStorageBackend(storeName) {
-        var name;
-        var registered = false;
+    const webStorageBackend = function webStorageBackend(storeName) {
+        let name;
+        let registered = false;
 
-        var openStore = function openStore() {
+        const openStore = function openStore() {
             if (registered) {
                 return Promise.resolve();
             }
-            return registerStore(storeName).then(function() {
+            return registerStore(storeName).then(function () {
                 registered = true;
             });
         };
@@ -168,8 +168,8 @@ const webStorageFactory = function(storage) {
              * @returns {Promise} with the result in resolve, undefined if nothing
              */
             getItem: function getItem(key) {
-                return writingQueue.serie(function() {
-                    return openStore().then(function() {
+                return writingQueue.serie(function () {
+                    return openStore().then(function () {
                         return getEntry(storeName, key);
                     });
                 });
@@ -182,8 +182,8 @@ const webStorageFactory = function(storage) {
              * @returns {Promise} with true in resolve if added/updated
              */
             setItem: function setItem(key, value) {
-                return writingQueue.serie(function() {
-                    return openStore().then(function() {
+                return writingQueue.serie(function () {
+                    return openStore().then(function () {
                         return setEntry(storeName, key, value);
                     });
                 });
@@ -195,8 +195,8 @@ const webStorageFactory = function(storage) {
              * @returns {Promise} with true in resolve if removed
              */
             removeItem: function removeItem(key) {
-                return writingQueue.serie(function() {
-                    return openStore().then(function() {
+                return writingQueue.serie(function () {
+                    return openStore().then(function () {
                         storage.removeItem(name + key);
                         return true;
                     });
@@ -208,19 +208,19 @@ const webStorageFactory = function(storage) {
              * @returns {Promise<Object>} with a collection of items
              */
             getItems: function getItems() {
-                var keyPattern = new RegExp(`^${name}`);
-                return writingQueue.serie(function() {
-                    return openStore().then(function() {
+                const keyPattern = new RegExp(`^${name}`);
+                return writingQueue.serie(function () {
+                    return openStore().then(function () {
                         return _(storage)
-                            .map(function(entry, index) {
+                            .map(function (entry, index) {
                                 return storage.key(index);
                             })
-                            .filter(function(key) {
+                            .filter(function (key) {
                                 return keyPattern.test(key);
                             })
-                            .reduce(function(acc, key) {
-                                var value;
-                                var exposedKey = key.replace(name, '');
+                            .reduce(function (acc, key) {
+                                let value;
+                                const exposedKey = key.replace(name, '');
                                 try {
                                     value = storage.getItem(key);
                                     if (value !== null) {
@@ -240,17 +240,17 @@ const webStorageFactory = function(storage) {
              * @returns {Promise} with true in resolve once cleared
              */
             clear: function clear() {
-                var keyPattern = new RegExp(`^${name}`);
-                return writingQueue.serie(function() {
-                    return openStore().then(function() {
+                const keyPattern = new RegExp(`^${name}`);
+                return writingQueue.serie(function () {
+                    return openStore().then(function () {
                         _(storage)
-                            .map(function(entry, index) {
+                            .map(function (entry, index) {
                                 return storage.key(index);
                             })
-                            .filter(function(key) {
+                            .filter(function (key) {
                                 return keyPattern.test(key);
                             })
-                            .forEach(function(key) {
+                            .forEach(function (key) {
                                 storage.removeItem(key);
                             });
                         return true;
@@ -263,7 +263,7 @@ const webStorageFactory = function(storage) {
              * @returns {Promise} with true in resolve once cleared
              */
             removeStore: function removeStore() {
-                return this.clear().then(function() {
+                return this.clear().then(function () {
                     return unregisterStore(storeName);
                 });
             }
@@ -280,11 +280,11 @@ const webStorageFactory = function(storage) {
             validate = null;
         }
         return getKnownStores().then(function(stores) {
-            var removing = _(stores)
-                .filter(function(store, storeName) {
+            const removing = _(stores)
+                .filter(function (store, storeName) {
                     return validate ? validate(storeName, store) : true;
                 })
-                .map(function(store) {
+                .map(function (store) {
                     if (store && store.name) {
                         return webStorageBackend(store.name).removeStore();
                     }
@@ -319,7 +319,7 @@ const webStorageFactory = function(storage) {
      * @returns {Promise} that resolves with the store identifier
      */
     webStorageBackend.getStoreIdentifier = function getStoreIdentifier() {
-        var idStore = webStorageBackend(idStoreName);
+        const idStore = webStorageBackend(idStoreName);
 
         //we use the storeName also as the id
         return idStore.getItem(idStoreName).then(function(id) {

@@ -19,11 +19,10 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 import _ from 'lodash';
-import delegator from 'core/delegator';
-import eventifier from 'core/eventifier';
-import Promise from 'core/promise';
-import providerRegistry from 'core/providerRegistry';
-import tokenHandlerFactory from 'core/tokenHandler';
+import delegator from '../delegator.js';
+import eventifier from '../eventifier.js';
+import providerRegistry from '../providerRegistry.js';
+import tokenHandlerFactory from '../tokenHandler.js';
 
 const _defaults = {};
 
@@ -55,7 +54,7 @@ function crudProxyFactory(proxyName, middlewares) {
     const proxy = eventifier({
         /**
          * Initializes the proxy
-         * @param {Object} [config] - Some optional config depending of implementation,
+         * @param {Object} [config] - Some optional config depending on implementation,
          *                            this object will be forwarded to the proxy adapter
          * @returns {Promise} - Returns a promise that provide the proxy.
          *                      The proxy will be fully initialized on resolve.

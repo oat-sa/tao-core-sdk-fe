@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2024 (original work) Open Assessment Technologies SA ;
  *
  */
 
@@ -21,14 +21,14 @@
  *
  * @author dieter <dieter@taotesting.com>
  */
-import regexEscape from 'util/regexEscape';
+import regexEscape from './regexEscape.js';
 
 /**
  * Builds a chunked term from a too long one.
  *
  * Internet Explorer will not insert a line-break before a period or a colon (and possibly other characters),
  * even when they're preceded by a space. To address this chunks starting with one of the problematic characters
- * will have this removed and it will be appended to the previous chunk.
+ * will have this removed, and it will be appended to the previous chunk.
  *
  * @param {string} longWord
  * @param {RegExp} chunkExp

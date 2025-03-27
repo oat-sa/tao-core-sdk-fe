@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2018-2024 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -43,10 +43,10 @@ export default {
      * @param {String} errorThrown  - textual portion of the HTTP status, such as "Not Found" or "Internal Server Error."
      * @returns {Error} the new error
      */
-    parse: function parse(xhr, options, errorThrown) {
-        var msg;
-        var json;
-        var error;
+    parse(xhr, options, errorThrown) {
+        let msg;
+        let json;
+        let error;
         try {
             json = JSON.parse(xhr.responseText);
             msg = json.message ? json.message : errorThrown;

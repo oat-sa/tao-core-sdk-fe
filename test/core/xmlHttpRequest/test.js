@@ -211,9 +211,8 @@ define([
         xhrMock.get('/foo', (req, res) => res
             .status(406)
             .body(JSON.stringify({ success: false, errorCode: 'ABC123', errorMessage: 'Cannot trigger ABC' })));
-
         request('/foo').catch(error => {
-            assert.ok(error instanceof ApiError);
+            assert.equal(error.name, 'ApiError');
             assert.equal(error.message, 'ABC123 : Cannot trigger ABC');
             assert.equal(error.response.status, 406);
             assert.equal(error.errorCode, 'ABC123');
@@ -366,7 +365,7 @@ define([
             .then(() => this.jwtTokenHandler.storeAccessToken(accessToken))
             .then(() => request(url, { jwtTokenHandler: this.jwtTokenHandler }))
             .catch(error => {
-                assert.ok(error instanceof NetworkError);
+                assert.equal(error.name, 'NetworkError');
                 assert.equal(error.message, '401 : Request error');
                 assert.equal(error.response.status, 401);
                 assert.equal(error.errorCode, 401);
@@ -381,6 +380,6 @@ define([
             return res.status(200);
         });
 
-        assert.rejects(request('/', { timeout: 1000 }), TimeoutError);
+        assert.rejects(request('/', { timeout: 1000 }), new TimeoutError().message);
     });
 });

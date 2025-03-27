@@ -13,16 +13,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2024 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 import _ from 'lodash';
-import Promise from 'core/promise';
-import providerRegistry from 'core/providerRegistry';
-import delegator from 'core/delegator';
-import eventifier from 'core/eventifier';
+import providerRegistry from './providerRegistry.js';
+import delegator from './delegator.js';
+import eventifier from './eventifier.js';
 
 /**
  * Some default config values
@@ -156,7 +155,7 @@ function communicatorFactory(providerName, config) {
         },
 
         /**
-         * Sends an messages through the communication implementation.
+         * Sends a messages through the communication implementation.
          * @param {String} channel - The name of the communication channel to use
          * @param {Object} message - The message to send
          * @returns {Promise} The delegated provider's method must return a promise
@@ -227,7 +226,7 @@ function communicatorFactory(providerName, config) {
         }
     });
 
-    // all messages comes through a message event, then each is dispatched to the right channel
+    // all messages come through a message event, then each is dispatched to the right channel
     communicator.on('message', function (channel, message) {
         this.trigger(`channel-${channel}`, message);
     });

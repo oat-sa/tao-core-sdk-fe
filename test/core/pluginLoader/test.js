@@ -21,7 +21,7 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define(['lodash', 'core/pluginLoader', 'core/promise'], function(_, pluginLoader, Promise) {
+define(['lodash', 'core/pluginLoader'], function(_, pluginLoader) {
     'use strict';
 
     QUnit.module('API');

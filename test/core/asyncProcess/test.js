@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
-define(['lodash', 'core/promise', 'core/asyncProcess'], function (_, Promise, asyncProcessFactory) {
+define(['lodash', 'core/asyncProcess'], function (_, asyncProcessFactory) {
     'use strict';
 
     QUnit.module('asyncProcess');

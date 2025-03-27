@@ -1,13 +1,24 @@
 {
     "name": "@oat-sa/tao-core-sdk",
-    "version": "3.2.1",
+    "version": "4.0.0-alpha.5",
     "displayName": "TAO Core SDK",
     "description": "Core libraries of TAO",
     "homepage": "https://github.com/oat-sa/tao-core-sdk-fe#readme",
+    "type": "module",
     "files": [
         "dist/",
         "src/"
     ],
+    "exports": {
+        "./core/*": {
+            "require": "./dist/amd/core/*.js",
+            "import": "./dist/esm/core/*.js"
+        },
+        "./util/*": {
+            "require": "./dist/amd/util/*.js",
+            "import": "./dist/esm/util/*.js"
+        }
+    },
     "license": "GPL-2.0",
     "scripts": {
         "test": "npx qunit-testrunner",

@@ -20,7 +20,7 @@
  * Test the memory store backend
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define(['core/store/memory', 'core/promise'], function(memoryStorageBackend, Promise) {
+define(['core/store/memory'], function(memoryStorageBackend) {
     'use strict';
 
     QUnit.module('API');
