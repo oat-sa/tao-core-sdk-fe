@@ -183,7 +183,7 @@ export default {
             },
             {
                 mime: 'text/x-c',
-                label: __('C++ file (.cpp)'),
+                label: __('C++ file'),
                 equivalent: ['.cpp'],
                 extensionsLabels: ['.cpp']
             },
@@ -195,7 +195,7 @@ export default {
             },
             {
                 mime: 'text/pascal',
-                label: __('Pascal file (.pas)'),
+                label: __('Pascal file'),
                 equivalent: ['.pas'],
                 extensionsLabels: ['.pas']
             },
