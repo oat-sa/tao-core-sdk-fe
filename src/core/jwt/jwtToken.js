@@ -50,7 +50,7 @@ export function parseJwtPayload(token) {
         base64Payload = base64Payload.replace(/-/g, '+'); // replace - with +
         base64Payload = base64Payload.replace(/_/g, '/'); // replace _ with /
 
-        return JSON.parse(atob(base64Payload));
+        return JSON.parse(base64ToUtf8(base64Payload));
     } catch (e) {
         return null;
     }
