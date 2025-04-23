@@ -39,7 +39,7 @@ define(['core/jwt/jwtToken'], jwtToken => {
         assert.ok(typeof result === 'object', 'parsed payload is an object');
         assert.equal(result.iat, 1620653548, 'iat correctly parsed');
         assert.equal(result.exp, 1620654762, 'exp correctly parsed');
-        assert.equal(result.aud, 'www.example.com', 'aud correctly parsed');
+        assert.equal(result.aud, 'www.ęxample.com', 'aud correctly parsed');
     });
 
     QUnit.test('parses payload object from full token', assert => {
