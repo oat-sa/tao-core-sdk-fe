@@ -24,6 +24,22 @@
  */
 
 /**
+ * Parse a base64 encoded string to utf8
+ * It can help decode non-ASCII characters
+ * @see https://oat-sa.atlassian.net/browse/SOLAR-1440?focusedCommentId=304145
+ * If a jwt token contains non-ASCII characters, the function atob() will not work. This can
+ * happen if the user is allowed to enter a custom name for any of it's fields like working profiles names, or ORG ids.
+ * @param {String} base64 - base64 encoded string
+ * @returns {String} utf8 decoded string
+ */
+function base64ToUtf8(base64) {
+    const binaryStr = atob(base64);
+    const bytes = Uint8Array.from(binaryStr, char => char.charCodeAt(0));
+    const decoder = new TextDecoder();
+    return decoder.decode(bytes);
+}
+
+/**
  * Decodes the payload (middle section) of a JWT token
  * @param {String} token - JWT token, 'xxxxx.yyyyy.zzzzz' format
  * @returns {Object} JWT payload
@@ -34,7 +50,7 @@ export function parseJwtPayload(token) {
         base64Payload = base64Payload.replace(/-/g, '+'); // replace - with +
         base64Payload = base64Payload.replace(/_/g, '/'); // replace _ with /
 
-        return JSON.parse(atob(base64Payload));
+        return JSON.parse(base64ToUtf8(base64Payload));
     } catch (e) {
         return null;
     }
