@@ -45,10 +45,10 @@ define(['core/jwt/jwtToken'], jwtToken => {
     QUnit.test('parses payload object from full token with non-ASCII characters ñ å ę', assert => {
         assert.expect(5);
         const token =
-            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIg4p2k77iP8J-UpSIsImlhdCI6MTYyMDY1MzU0OCwiZXhwIjoxNjIwNjU0NzYyLCJhdWQiOiJ3d3cuxJl4w6VtcGxlLmNvbSIsInN1YiI6IiJ9.R2EkocTPJIkhghdJhO5Chv-1ZSFaSzQp3AbKW9tS8MM';
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpw7FlIEpXVCBCdWlsZGVyIOKdpO-4j_CflKUiLCJpYXQiOjE2MjA2NTM1NDgsImV4cCI6MTYyMDY1NDc2MiwiYXVkIjoid3d3LsSZeMOlbXBsZS5jb20iLCJzdWIiOiIifQ.g9h9kvy39vauIwM4S2i8jSuG0uRIVq0XpH9glMPoxN8';
         const result = parseJwtPayload(token);
         assert.ok(typeof result === 'object', 'parsed payload is an object');
-        assert.equal(result.iss, 'Online JWT Builder ❤️🔥', 'iat correctly parsed');
+        assert.equal(result.iss, 'Onliñe JWT Builder ❤️🔥', 'iat correctly parsed');
         assert.equal(result.iat, 1620653548, 'iat correctly parsed');
         assert.equal(result.exp, 1620654762, 'exp correctly parsed');
         assert.equal(result.aud, 'www.ęxåmple.com', 'aud correctly parsed');
