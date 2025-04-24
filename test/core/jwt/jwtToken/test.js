@@ -43,7 +43,7 @@ define(['core/jwt/jwtToken'], jwtToken => {
     });
 
     QUnit.test('parses payload object from full token with non-ASCII characters ñ å ę', assert => {
-        assert.expect(4);
+        assert.expect(5);
         const token =
             'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIg4p2k77iP8J-UpSIsImlhdCI6MTYyMDY1MzU0OCwiZXhwIjoxNjIwNjU0NzYyLCJhdWQiOiJ3d3cuxJl4w6VtcGxlLmNvbSIsInN1YiI6IiJ9.R2EkocTPJIkhghdJhO5Chv-1ZSFaSzQp3AbKW9tS8MM';
         const result = parseJwtPayload(token);
