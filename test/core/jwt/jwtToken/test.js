@@ -33,12 +33,25 @@ define(['core/jwt/jwtToken'], jwtToken => {
 
     QUnit.test('parses payload object from full token', assert => {
         assert.expect(4);
-        const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2MjA2NTM1NDgsImV4cCI6MTYyMDY1NDc2MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiIn0.3j-2RN4OVgDYUVxP9VIaOnpkno8I4LDDzouSzgAdUsw';
+        const token =
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2MjA2NTM1NDgsImV4cCI6MTYyMDY1NDc2MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiIn0.3j-2RN4OVgDYUVxP9VIaOnpkno8I4LDDzouSzgAdUsw';
         const result = parseJwtPayload(token);
         assert.ok(typeof result === 'object', 'parsed payload is an object');
         assert.equal(result.iat, 1620653548, 'iat correctly parsed');
         assert.equal(result.exp, 1620654762, 'exp correctly parsed');
         assert.equal(result.aud, 'www.example.com', 'aud correctly parsed');
+    });
+
+    QUnit.test('parses payload object from full token with non-ASCII characters ñ å ę ❤️ 🔥', assert => {
+        assert.expect(5);
+        const token =
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpw7FlIEpXVCBCdWlsZGVyIOKdpO-4j_CflKUiLCJpYXQiOjE2MjA2NTM1NDgsImV4cCI6MTYyMDY1NDc2MiwiYXVkIjoid3d3LsSZeMOlbXBsZS5jb20iLCJzdWIiOiIifQ.g9h9kvy39vauIwM4S2i8jSuG0uRIVq0XpH9glMPoxN8';
+        const result = parseJwtPayload(token);
+        assert.ok(typeof result === 'object', 'parsed payload is an object');
+        assert.equal(result.iss, 'Onliñe JWT Builder ❤️🔥', 'iat correctly parsed');
+        assert.equal(result.iat, 1620653548, 'iat correctly parsed');
+        assert.equal(result.exp, 1620654762, 'exp correctly parsed');
+        assert.equal(result.aud, 'www.ęxåmple.com', 'aud correctly parsed');
     });
 
     QUnit.test('returns null for bad or missing token', assert => {
@@ -64,13 +77,15 @@ define(['core/jwt/jwtToken'], jwtToken => {
     const jwtPayload2 = { iat: time1 };
     const jwtPayload3 = { exp: time2 };
 
-    QUnit.cases.init([
-        { payload: jwtPayload1, expectedTTL: 750000 },
-        { payload: jwtPayload2, expectedTTL: null },
-        { payload: jwtPayload3, expectedTTL: null },
-        { payload: void 0, expectedTTL: null },
-    ]).test('returns correct TTL', function(data, assert) {
-        assert.expect(1);
-        assert.equal(getJwtTTL(data.payload, data.defaultTTL), data.expectedTTL, JSON.stringify(data));
-    });
+    QUnit.cases
+        .init([
+            { payload: jwtPayload1, expectedTTL: 750000 },
+            { payload: jwtPayload2, expectedTTL: null },
+            { payload: jwtPayload3, expectedTTL: null },
+            { payload: void 0, expectedTTL: null }
+        ])
+        .test('returns correct TTL', function (data, assert) {
+            assert.expect(1);
+            assert.equal(getJwtTTL(data.payload, data.defaultTTL), data.expectedTTL, JSON.stringify(data));
+        });
 });
