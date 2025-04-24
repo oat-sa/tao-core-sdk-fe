@@ -27,8 +27,8 @@
  * Parse a base64 encoded string to utf8
  * It can help decode non-ASCII characters
  * @see https://oat-sa.atlassian.net/browse/SOLAR-1440?focusedCommentId=304145
- * If a jwt token contains non-ASCII characters, the function atob() will not work. This can
- * happen if the user is allowed to enter a custom name for any of it's fields like working profiles names, or ORG ids.
+ * If a jwt token contains non-ASCII characters, the function atob() will not be enough on its own. This can
+ * happen if the user is allowed to enter a custom name for any of the token fields like working profile names, or ORG ids.
  * @param {String} base64 - base64 encoded string
  * @returns {String} utf8 decoded string
  */
