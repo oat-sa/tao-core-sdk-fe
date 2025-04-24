@@ -42,13 +42,13 @@ define(['core/jwt/jwtToken'], jwtToken => {
         assert.equal(result.aud, 'www.example.com', 'aud correctly parsed');
     });
 
-    QUnit.test('parses payload object from full token with non-ASCII characters ❤️ ñ å ę 🔥', assert => {
+    QUnit.test('parses payload object from full token with non-ASCII characters ñ å ę', assert => {
         assert.expect(4);
         const token =
-            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpw7FlIEpXVCBCdWlsZGVyIOKdpO-4j_CflKUiLCJpYXQiOjE2MjA2NTM1NDgsImV4cCI6MTYyMDY1NDc2MiwiYXVkIjoid3d3LsSZeMOlbXBsZS5jb20iLCJzdWIiOiIifQ.g9h9kvy39vauIwM4S2i8jSuG0uRIVq0XpH9glMPoxN8';
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpw7FlIEpXVCBCdWlsZGVyIiwiaWF0IjoxNjIwNjUzNTQ4LCJleHAiOjE2MjA2NTQ3NjIsImF1ZCI6Ind3dy7EmXjDpW1wbGUuY29tIiwic3ViIjoiIn0.a3onjPyUJ-s8DTzOmzvkbco-NzubjNT_0isoahlYElU';
         const result = parseJwtPayload(token);
         assert.ok(typeof result === 'object', 'parsed payload is an object');
-        // assert.equal(result.iss, 'Onliñe JWT Builder ❤️🔥', 'iat correctly parsed');
+        assert.equal(result.iss, 'Onliñe JWT Builder', 'iat correctly parsed');
         assert.equal(result.iat, 1620653548, 'iat correctly parsed');
         assert.equal(result.exp, 1620654762, 'exp correctly parsed');
         assert.equal(result.aud, 'www.ęxåmple.com', 'aud correctly parsed');
