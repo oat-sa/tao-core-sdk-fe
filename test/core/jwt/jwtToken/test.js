@@ -49,6 +49,8 @@ define(['core/jwt/jwtToken'], jwtToken => {
         const result = parseJwtPayload(token);
         assert.ok(typeof result === 'object', 'parsed payload is an object');
         assert.equal(result.iss, 'Onliñe JWT Builder ❤️🔥', 'iat correctly parsed');
+        assert.equal(result.iat, 1620653548, 'iat correctly parsed');
+        assert.equal(result.exp, 1620654762, 'exp correctly parsed');
         assert.equal(result.aud, 'www.ęxåmple.com', 'aud correctly parsed');
     });
 
