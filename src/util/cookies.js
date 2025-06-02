@@ -19,7 +19,7 @@
  * Supports JSON-serializable values and persistent cookies.
  */
 
-export const cookieStorage = {
+export default {
     /**
      * Retrieves a cookie value by key.
      * Parses the value from JSON if present.

@@ -16,10 +16,8 @@
  * Copyright (c) 2025 Open Assessment Technologies SA;
  */
 
-define(['util/cookies'], function (cookiesModule) {
+define(['util/cookies'], function (cookieStorage) {
     'use strict';
-
-    const cookieStorage = cookiesModule.cookieStorage;
 
     QUnit.module('cookieStorage', {
         beforeEach: function () {
