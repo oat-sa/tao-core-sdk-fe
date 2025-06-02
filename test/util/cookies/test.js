@@ -54,8 +54,8 @@ define(['util/cookies'], function (cookieStorage) {
         try {
             cookieStorage.setItem(key, value, { path, domain, expires });
             assert.ok(true, 'Cookie was set without errors using custom options');
-        } catch (e) {
-            assert.ok(false, `Error occurred while setting cookie: ${e.message}`);
+        } catch (ex) {
+            assert.ok(false, `Error occurred while setting cookie: ${ex.message}`);
         }
     });
 
