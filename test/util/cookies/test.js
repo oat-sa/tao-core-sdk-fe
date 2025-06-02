@@ -16,7 +16,7 @@
  * Copyright (c) 2025 Open Assessment Technologies SA;
  */
 
-define(['core/store/cookies'], function (cookiesModule) {
+define(['util/cookies'], function (cookiesModule) {
     'use strict';
 
     const cookieStorage = cookiesModule.cookieStorage;
