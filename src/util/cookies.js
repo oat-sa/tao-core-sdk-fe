@@ -17,64 +17,108 @@
  *
  * Cookie-based storage utility.
  * Supports JSON-serializable values and persistent cookies.
+ *
+ * @param {Object} [opt] - Optional overrides
+ * @param {string} [opt.path="/"] - Cookie path
+ * @param {number|string|Date} [opt.expires] - Expiration (Date, ISO string, or timestamp). Defaults to +10 years.
+ * @param {number} [opt.domainLevel] - How many hostname segments to include in `; domain=`
+ *                               (e.g. level=2 on "foo.bar.example.com" → "bar.example.com")
+ * @returns {Object} - Cookie storage interface with methods: getItem, setItem, removeItem, keys, clearAll
  */
 
-export default {
-    /**
-     * Retrieves a cookie value by key.
-     * Parses the value from JSON if present.
-     *
-     * @param {string} key - The cookie key.
-     * @returns {any|null} - The parsed cookie value, or null if not found.
-     */
-    getItem(key) {
-        const cookie = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
-
-        return cookie ? decodeURIComponent(cookie.split('=')[1]) : null;
-    },
-
-    /**
-     * Sets a persistent cookie with a JSON-serializable value.
-     *
-     * @param {string} key - The cookie key.
-     * @param {any} value - The value to store (will be JSON-stringified).
-     * @param {Object} [options={}] - Optional cookie attributes.
-     * @param {string} [options.path='/'] - Cookie path scope (default is '/').
-     * @param {string} [options.domain] - Domain scope for the cookie.
-     * @param {Date} [options.expires] - Expiration date (default is 10 years from now).
-     */
-    setItem(key, value, options = {}) {
-        const {
-            path = '/',
-            domain,
-            expires = (() => {
-                const date = new Date();
-                date.setFullYear(date.getFullYear() + 10);
-                return date;
-            })()
-        } = options;
-
-        const domainPart = domain ? `; domain=${domain}` : '';
-        const encodedValue = encodeURIComponent(JSON.stringify(value));
-
-        document.cookie = `${key}=${encodedValue}; expires=${expires.toUTCString()}; path=${path}${domainPart}`;
-    },
-
-    /**
-     * Deletes a cookie by key.
-     *
-     * Note: The cookie will only be removed if the `path` and `domain`
-     * match those used when it was originally set.
-     *
-     * @param {string} key - The cookie key to delete.
-     * @param {Object} [options={}] - Optional cookie attributes.
-     * @param {string} [options.path='/'] - Path scope used when the cookie was set.
-     * @param {string} [options.domain] - Domain scope used when the cookie was set.
-     */
-    removeItem(key, options = {}) {
-        const { path = '/', domain } = options;
-
-        const domainPart = domain ? `; domain=${domain}` : '';
-        document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}${domainPart}`;
+export default function initCookieStorage(opt = {}) {
+    // Helper: take last `level` segments of window.location.hostname
+    function getDomainByHostname(level) {
+        const parts = window.location.hostname.split('.');
+        if (parts.length < level) return null;
+        return parts.slice(-level).join('.');
     }
-};
+
+    // Determine expiration Date object
+    let expiresDate;
+    if (opt.expires instanceof Date) {
+        expiresDate = opt.expires;
+    } else if (opt.expires) {
+        expiresDate = new Date(opt.expires);
+    } else {
+        const d = new Date();
+        d.setFullYear(d.getFullYear() + 10);
+        expiresDate = d;
+    }
+
+    const options = {
+        path: opt.path || '/',
+        domain: opt.domainLevel ? getDomainByHostname(opt.domainLevel) : null,
+        expires: expiresDate
+    };
+
+    // Serialize the path/domain/expiry into a string fragment
+    function serializeOptions() {
+        const domainPart = options.domain ? `; domain=${options.domain}` : '';
+        const pathPart = `; path=${options.path}`;
+        const expiresPart = `; expires=${options.expires.toUTCString()}`;
+        return `${expiresPart}${pathPart}${domainPart}`;
+    }
+
+    return {
+        /**
+         * Retrieve a cookie value by key.
+         * If the stored value is valid JSON, returns the parsed object;
+         * otherwise returns the raw string.
+         *
+         * @param {string} key - The cookie key.
+         * @returns {any|null} - The parsed value, or null if not found.
+         */
+        getItem(key) {
+            const match = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
+            if (!match) return null;
+
+            const rawValue = decodeURIComponent(match.split('=')[1]);
+            try {
+                return JSON.parse(rawValue);
+            } catch (_err) {
+                return rawValue;
+            }
+        },
+
+        /**
+         * Set a persistent cookie with a JSON-serialized value.
+         *
+         * @param {string} key - The cookie key.
+         * @param {any} value - The value to store (will be JSON-stringified).
+         */
+        setItem(key, value) {
+            const encodedValue = encodeURIComponent(JSON.stringify(value));
+            document.cookie = `${key}=${encodedValue}${serializeOptions()}`;
+        },
+
+        /**
+         * Remove a cookie by setting its expiry in the past.
+         * Must match the same `path` and `domain`.
+         *
+         * @param {string} key - The cookie key to delete.
+         */
+        removeItem(key) {
+            const domainPart = options.domain ? `; domain=${options.domain}` : '';
+            const pathPart = `; path=${options.path}`;
+            document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 GMT${pathPart}${domainPart}`;
+        },
+
+        /**
+         * List all cookie keys currently set (for debugging or clearAll).
+         *
+         * @returns {string[]} - Array of cookie keys.
+         */
+        keys() {
+            return document.cookie.length ? document.cookie.split('; ').map(pair => pair.split('=')[0]) : [];
+        },
+
+        /**
+         * Remove all cookies (respecting path and domain).
+         * Uses `removeItem` for each key.
+         */
+        clearAll() {
+            this.keys().forEach(k => this.removeItem(k));
+        }
+    };
+}
