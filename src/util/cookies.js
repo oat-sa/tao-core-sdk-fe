@@ -33,7 +33,6 @@
  */
 export function createCookieStorage(defaultOpts = {}) {
     /**
-     * @private
      * Take the last `n` segments of window.location.hostname,
      * or return null if there aren’t enough segments.
      * E.g. hostname="foo.bar.example.com", level=2 → "example.com"
@@ -47,7 +46,6 @@ export function createCookieStorage(defaultOpts = {}) {
     }
 
     /**
-     * @private
      * Normalize an `expires` option that may be:
      *   • a Date instance
      *   • a parsable string/number
@@ -70,7 +68,6 @@ export function createCookieStorage(defaultOpts = {}) {
     }
 
     /**
-     * @private
      * Build the cookie‐option string (expires, path, domain) from:
      *   1) the factory’s default options
      *   2) any per‐call overrides provided in `opts`

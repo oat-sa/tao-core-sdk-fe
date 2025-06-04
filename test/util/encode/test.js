@@ -62,7 +62,7 @@ define(['util/encode', 'lodash', 'jquery'], function (encode) {
         }
     ];
 
-        var sha256DataProvider = [
+    var sha256DataProvider = [
         {
             title: 'Simple ASCII text',
             string: 'hello',
