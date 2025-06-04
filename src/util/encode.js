@@ -83,9 +83,21 @@ function decodeBase64(str) {
     );
 }
 
+/**
+ * Generate hash from text using SHA-256
+ * @param {String} text
+ * @returns {Promise<String>}
+ */
+async function stringToSha256(text) {
+    const data = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export default {
     html: encodeHTML,
     attribute: encodeAttribute,
     encodeBase64: encodeBase64,
-    decodeBase64: decodeBase64
+    decodeBase64: decodeBase64,
+    stringToSha256: stringToSha256
 };
