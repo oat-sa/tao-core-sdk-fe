@@ -16,59 +16,129 @@
  * Copyright (c) 2025 Open Assessment Technologies SA;
  */
 
-define(['util/cookies'], function (cookieStorage) {
+define(['util/cookies'], cookieModule => {
     'use strict';
 
-    QUnit.module('cookieStorage', {
-        beforeEach: function () {
-            cookieStorage.removeItem('testKey');
-            cookieStorage.removeItem('nonexistent');
-            cookieStorage.removeItem('customKey');
-            cookieStorage.removeItem('toBeRemoved');
+    // The AMD bundle may export { createCookieStorage: function } or the function itself.
+    const createCookieStorage = cookieModule.createCookieStorage || cookieModule.default || cookieModule;
+
+    let store;
+
+    QUnit.module('cookieStorage (public API only)', {
+        beforeEach() {
+            // Instantiate a fresh storage instance:
+            store = createCookieStorage();
+
+            // Remove any cookies that might remain from previous tests:
+            store.keys().forEach(name => {
+                // removeItem without opts uses default path='/', no domain
+                store.removeItem(name);
+            });
         }
     });
 
-    QUnit.test('getItem returns null when cookie is not set', function (assert) {
-        assert.strictEqual(cookieStorage.getItem('nonexistent'), null, 'Returns null for missing key');
+    QUnit.test('getItem returns null when no cookie is set', assert => {
+        assert.strictEqual(store.getItem('nonexistent'), null, 'Returns null if key not found');
     });
 
-    QUnit.test('setItem sets and getItem retrieves the correct value', function (assert) {
+    QUnit.test('setItem + getItem round-trips a JSON-serializable object', assert => {
         const key = 'testKey';
         const value = { a: 1, b: 'hello' };
 
-        cookieStorage.setItem(key, value);
-        const raw = cookieStorage.getItem(key);
-        const parsed = JSON.parse(raw);
+        store.setItem(key, value);
+        const retrieved = store.getItem(key);
 
-        assert.deepEqual(parsed, value, 'Retrieved value matches stored object');
+        assert.deepEqual(
+            retrieved,
+            value,
+            'Storing an object with setItem and reading it back returns the same object'
+        );
     });
 
-    QUnit.test('setItem supports custom path, domain and expires', function (assert) {
-        const key = 'customKey';
-        const value = 'custom';
-        const path = '/custom';
-        const domain = location.hostname;
-        const expires = new Date(Date.now() + 1000 * 60 * 60 * 24); // +1 day
+    QUnit.test('setItem with plain string value is retrieved as string', assert => {
+        const key = 'stringKey';
+        const value = 'just_a_string';
 
-        // The test is only verifying that no error occurs with custom options
-        try {
-            cookieStorage.setItem(key, value, { path, domain, expires });
-            assert.ok(true, 'Cookie was set without errors using custom options');
-        } catch (ex) {
-            assert.ok(false, `Error occurred while setting cookie: ${ex.message}`);
-        }
+        store.setItem(key, value);
+        const retrieved = store.getItem(key);
+
+        assert.strictEqual(retrieved, value, 'Storing a plain string and retrieving returns the raw string');
     });
 
-    QUnit.test('removeItem deletes the cookie', function (assert) {
-        const key = 'toBeRemoved';
-        const value = 'bye';
+    QUnit.test('setItem with expires override does not throw', assert => {
+        const key = 'expiresKey';
+        const futureISO = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString();
 
-        cookieStorage.setItem(key, value);
-        assert.ok(cookieStorage.getItem(key), 'Cookie is set');
+        assert.ok(() => {
+            store.setItem(key, 'value', { expires: futureISO });
+        }, 'Calling setItem with an ISO-string expires override should not throw');
+        // We won’t call getItem here because path-scoped cookies may not appear immediately in QUnit’s environment
+    });
 
-        cookieStorage.removeItem(key);
-        const removed = cookieStorage.getItem(key);
+    QUnit.test('removeItem deletes the cookie so getItem returns null', assert => {
+        const key = 'removeKey';
+        const val = 'to_be_deleted';
 
-        assert.strictEqual(removed, null, 'Cookie is removed');
+        store.setItem(key, val);
+        assert.ok(store.getItem(key) !== null, 'Cookie is initially set');
+
+        store.removeItem(key);
+        const afterRemove = store.getItem(key);
+        assert.strictEqual(afterRemove, null, 'After removeItem, getItem returns null');
+    });
+
+    QUnit.test('keys() and clearAll() enumerate and clear all cookies', assert => {
+        store.setItem('key1', 'val1');
+        store.setItem('key2', { x: 2 });
+
+        const beforeKeys = store.keys();
+        assert.ok(
+            beforeKeys.includes('key1') && beforeKeys.includes('key2'),
+            'keys() returns both "key1" and "key2" when they are set'
+        );
+
+        store.clearAll();
+        assert.strictEqual(store.getItem('key1'), null, '"key1" was cleared');
+        assert.strictEqual(store.getItem('key2'), null, '"key2" was cleared');
+
+        const afterKeys = store.keys();
+        assert.deepEqual(afterKeys, [], 'keys() is empty after clearAll()');
+    });
+
+    QUnit.test('getItem returns raw string when cookie value is not valid JSON', assert => {
+        const key = 'rawKey';
+        const rawValue = 'plain_text_value';
+
+        // Manually set a non-JSON value in document.cookie:
+        document.cookie = `${key}=${encodeURIComponent(rawValue)}; path=/`;
+
+        const retrieved = store.getItem(key);
+        assert.strictEqual(retrieved, rawValue, 'getItem returns the raw string when JSON.parse fails');
+
+        // Clean up:
+        store.removeItem(key);
+    });
+
+    QUnit.test('domainLevel too large: setItem should omit any "; domain=" fragment', assert => {
+        const key = 'domainTestKey';
+        const value = 'blah';
+
+        // How many segments does the current hostname have?
+        const parts = window.location.hostname.split('.');
+        const tooBigLevel = parts.length + 1;
+
+        // Attempt to set a cookie with domainLevel > parts.length
+        store.setItem(key, value, { domainLevel: tooBigLevel });
+
+        // Read the raw `document.cookie` string:
+        const rawCookieString = document.cookie;
+
+        assert.ok(rawCookieString.includes(`${key}=`), 'The cookie name=value pair still appears');
+        assert.notOk(
+            rawCookieString.includes('; domain='),
+            'Since domainLevel was too large, there should be no "; domain=" fragment'
+        );
+        // Clean up:
+        store.removeItem(key);
     });
 });

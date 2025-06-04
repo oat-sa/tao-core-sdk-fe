@@ -62,6 +62,14 @@ define(['util/encode', 'lodash', 'jquery'], function (encode) {
         }
     ];
 
+    var sha256DataProvider = [
+        {
+            title: 'Simple ASCII text',
+            string: 'hello',
+            sha256: '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824'
+        }
+    ];
+
     QUnit.module('API');
 
     QUnit.cases.init(htmlDataProvider).test('encode HTML ', function (data, assert) {
@@ -86,5 +94,14 @@ define(['util/encode', 'lodash', 'jquery'], function (encode) {
         var result = encode.decodeBase64(data.base64);
         assert.ok(typeof result === 'string', 'The result is a string');
         assert.equal(result, data.string, 'The result is equal to the expected value');
+    });
+
+    QUnit.cases.init(sha256DataProvider).test('stringToSha256 ', function (data, assert) {
+        const done = assert.async();
+        encode.stringToSha256(data.string).then(function (hash) {
+            assert.ok(typeof hash === 'string', 'The result is a string');
+            assert.equal(hash, data.sha256, 'Hash matches expected SHA-256');
+            done();
+        });
     });
 });
