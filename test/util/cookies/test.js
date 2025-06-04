@@ -75,6 +75,7 @@ define(['util/cookies'], cookieStorageModule => {
         // Immediately before calling:
         const before = new Date();
         // If we pass nothing, it should default to now + 10 years
+        // eslint-disable-next-line no-undefined
         const result = normalizeExpires(undefined);
         const after = new Date();
 
