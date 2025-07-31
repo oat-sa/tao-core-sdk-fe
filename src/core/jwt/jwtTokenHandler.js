@@ -77,14 +77,14 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
 
         if (refreshTokenParameters) {
             parameters = Object.assign({}, refreshTokenParameters);
-            refreshTokenId = parameters.refreshTokenId;
+            refreshTokenId = parameters.refreshTokenId && decodeURIComponent(parameters.refreshTokenId);
         }
 
         if (useCredentials) {
             credentials = 'include';
             flow =
                 (refreshTokenId &&
-                    tokenStorage.getRefreshToken(decodeURIComponent(refreshTokenId)).then(refreshToken => {
+                    tokenStorage.getRefreshToken(refreshTokenId).then(refreshToken => {
                         if (refreshToken) {
                             headers[refreshTokenHeaderName] = refreshToken;
                         }
@@ -139,7 +139,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 return Promise.reject(error);
             })
             .then(response => {
-                let accessToken, refreshToken, expiresIn;
+                let accessToken, refreshToken, refreshTokenReference, expiresIn;
 
                 if (oauth2RequestFormat) {
                     accessToken = response.access_token;
@@ -148,6 +148,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 } else {
                     accessToken = response.accessToken;
                     refreshToken = response.refreshToken;
+                    refreshTokenReference = response.refreshTokenId;
                 }
 
                 if (expiresIn) {
@@ -158,7 +159,14 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                     return tokenStorage.setTokens(accessToken, refreshToken).then(() => accessToken);
                 }
 
-                return tokenStorage.setAccessToken(accessToken).then(() => accessToken);
+                return tokenStorage.setAccessToken(accessToken)
+                    .then(() => {
+                        if (refreshTokenReference) {
+                            return tokenStorage.setRefreshToken(refreshTokenReference, refreshTokenId);
+                        }
+                    })
+                    .then(() => accessToken)
+                    .catch(() => accessToken);
             });
     };
 

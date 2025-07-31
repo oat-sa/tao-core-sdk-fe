@@ -89,10 +89,11 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({
         /**
          * Set refresh token
          * @param {string} token
+         * @param {string} id
          * @returns {Promise<Boolean>} token successfully set
          */
-        setRefreshToken(token) {
-            return getRefreshTokenStore().then(storage => storage.setItem(refreshTokenName, token));
+        setRefreshToken(token, id = refreshTokenName) {
+            return getRefreshTokenStore().then(storage => storage.setItem(id, token));
         },
 
         /**
