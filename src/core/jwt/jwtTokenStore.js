@@ -97,10 +97,11 @@ const jwtTokenStoreFactory = function jwtTokenStoreFactory({
 
         /**
          * Get stored refresh token
+         * @param {string} id
          * @returns {Promise<string|null>} stored refresh token
          */
-        getRefreshToken() {
-            return getRefreshTokenStore().then(storage => storage.getItem(refreshTokenName));
+        getRefreshToken(id = refreshTokenName) {
+            return getRefreshTokenStore().then(storage => storage.getItem(id));
         },
 
         /**
