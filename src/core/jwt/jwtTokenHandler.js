@@ -36,6 +36,7 @@ import TokenError from 'core/error/TokenError';
  * @param {Number} [options.accessTokenTTL] Set accessToken TTL in ms for token store
  * @param {Boolean} [options.usePerTokenTTL] if true, accessToken TTL should be extractable from JWT payload, and accessTokenTTL will be used as fallback
  * @param {Boolean} [options.useCredentials] refreshToken stored in cookie instead of store
+ * @param {String} [options.refreshTokenHeaderName] the name of the header to send the refresh token value in
  * @param {Object} [options.refreshTokenParameters] Parameters that should be send in refreshToken call
  * @param {Boolean} [options.oauth2RequestFormat] use oauth2 request format
  * @returns {Object} JWT Token handler instance
@@ -46,6 +47,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
     accessTokenTTL,
     usePerTokenTTL = false,
     refreshTokenParameters,
+    refreshTokenHeaderName = 'refresh-token',
     useCredentials = false,
     oauth2RequestFormat = false
 } = {}) {
@@ -67,17 +69,27 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
      * @returns {Promise<String>} Promise of new token
      */
     const unQueuedRefreshToken = () => {
+        const headers = {};
+        let refreshTokenId;
         let parameters;
         let credentials;
         let flow;
 
         if (refreshTokenParameters) {
             parameters = Object.assign({}, refreshTokenParameters);
+            refreshTokenId = parameters.refreshTokenId && decodeURIComponent(parameters.refreshTokenId);
         }
 
         if (useCredentials) {
             credentials = 'include';
-            flow = Promise.resolve();
+            flow =
+                (refreshTokenId &&
+                    tokenStorage.getRefreshToken(refreshTokenId).then(refreshToken => {
+                        if (refreshToken) {
+                            headers[refreshTokenHeaderName] = refreshToken;
+                        }
+                    })) ||
+                Promise.resolve();
         } else {
             flow = tokenStorage.getRefreshToken().then(refreshToken => {
                 if (!refreshToken) {
@@ -93,7 +105,6 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
 
         return flow
             .then(() => {
-                const headers = {};
                 let body;
                 if (oauth2RequestFormat) {
                     body = new FormData();
@@ -128,7 +139,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 return Promise.reject(error);
             })
             .then(response => {
-                let accessToken, refreshToken, expiresIn;
+                let accessToken, refreshToken, refreshTokenReference, expiresIn;
 
                 if (oauth2RequestFormat) {
                     accessToken = response.access_token;
@@ -137,6 +148,7 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                 } else {
                     accessToken = response.accessToken;
                     refreshToken = response.refreshToken;
+                    refreshTokenReference = response.refreshTokenId;
                 }
 
                 if (expiresIn) {
@@ -147,7 +159,14 @@ const jwtTokenHandlerFactory = function jwtTokenHandlerFactory({
                     return tokenStorage.setTokens(accessToken, refreshToken).then(() => accessToken);
                 }
 
-                return tokenStorage.setAccessToken(accessToken).then(() => accessToken);
+                return tokenStorage.setAccessToken(accessToken)
+                    .then(() => {
+                        if (refreshTokenReference) {
+                            return tokenStorage.setRefreshToken(refreshTokenReference, refreshTokenId);
+                        }
+                    })
+                    .then(() => accessToken)
+                    .catch(() => accessToken);
             });
     };
 
