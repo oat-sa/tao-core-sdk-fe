@@ -41,7 +41,7 @@
         "access": "public"
     },
     "engines": {
-        "node": ">=14.0.0",
+        "node": ">=14.15.0",
         "npm": ">=8.3.0"
     },
     "devDependencies": {
