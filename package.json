@@ -40,9 +40,13 @@
     "publishConfig": {
         "access": "public"
     },
+    "engines": {
+        "node": ">=14.0.0",
+        "npm": ">=8.3.0"
+    },
     "devDependencies": {
-        "@babel/core": "^7.24.7",
-        "@babel/preset-env": "^7.24.7",
+        "@babel/core": "^7.28.5",
+        "@babel/preset-env": "^7.28.5",
         "@oat-sa/browserslist-config-tao": "^1.0.1",
         "@oat-sa/eslint-config-tao": "^2.0.0",
         "@oat-sa/prettier-config": "^0.1.1",
@@ -76,6 +80,11 @@
         "jquery": "1.9.1",
         "lodash": "^4.17.21",
         "moment": "^2.29.4"
+    },
+    "overrides": {
+        "shell-quote": "1.10.0",
+        "@babel/traverse": "^7.28.5",
+        "istanbul-lib-instrument": "^6.0.3"
     },
     "browserslist": [
         "extends @oat-sa/browserslist-config-tao"
