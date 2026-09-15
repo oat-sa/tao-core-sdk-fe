@@ -66,7 +66,7 @@ function isConnectionClosingError(err) {
     return (
         err &&
         (err.name === 'InvalidStateError' || err.name === 'UnknownError') &&
-        /connection is closing/i.test(message)
+        /\bclosed|\bclosing/i.test(message)
     );
 }
 
@@ -292,16 +292,25 @@ function indexDbBackend(storeName) {
      */
     function getStore() {
         if (!innerStore) {
-            innerStore = openStore(storeName, invalidateStore).then(function (store) {
+            // Capture this open attempt so stale onclose/onversionchange handlers
+            // from an earlier connection cannot clear a newer cached promise.
+            const openAttempt = openStore(storeName, function () {
+                if (innerStore === openAttempt) {
+                    innerStore = null;
+                }
+            }).then(function (store) {
                 return registerStore(storeName).then(function () {
                     return store;
                 });
             })
             .catch(function (err) {
                 // if open fails, don't keep a rejected promise forever
-                invalidateStore();
+                if (innerStore === openAttempt) {
+                    innerStore = null;
+                }
                 throw err;
             });
+            innerStore = openAttempt;
         }
         return innerStore;
     }
