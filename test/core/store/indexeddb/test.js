@@ -23,11 +23,52 @@
 define(['core/store/indexeddb', 'core/promise'], function(indexedDbBackend, Promise) {
     'use strict';
 
-    var testDbs = ['foo', 'foo1', 'foo2', 'foo3', 'test-store-1', 'test-store-2', 'bar3'];
+    var idb = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    var testDbs = [
+        'foo',
+        'foo1',
+        'foo2',
+        'foo3',
+        'test-store-1',
+        'test-store-2',
+        'bar3',
+        'reconnect-force',
+        'reconnect-onclose',
+        'reconnect-versionchange'
+    ];
+    var storePrefix = 'tao-store-';
+
+    /**
+     * Track opened IDBDatabase instances for a store
+     * @param {String} storeName
+     * @returns {{dbs: Array, restore: Function}}
+     */
+    function trackStoreDatabases(storeName) {
+        var dbName = storePrefix + storeName;
+        var dbs = [];
+        var originalOpen = idb.open.bind(idb);
+
+        idb.open = function(name, version) {
+            var req = originalOpen(name, version);
+            if (name === dbName) {
+                req.addEventListener('success', function() {
+                    dbs.push(req.result);
+                });
+            }
+            return req;
+        };
+
+        return {
+            dbs: dbs,
+            dbName: dbName,
+            restore: function() {
+                idb.open = originalOpen;
+            }
+        };
+    }
 
     QUnit.moduleDone(function() {
         var req;
-        var idb = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
         if (idb && typeof idb.deleteDatabase === 'function') {
             testDbs.forEach(function(dbName) {
                 req = idb.deleteDatabase(dbName);
@@ -625,6 +666,128 @@ define(['core/store/indexeddb', 'core/promise'], function(indexedDbBackend, Prom
             })
             .catch(function(err) {
                 assert.ok(false, err);
+                ready();
+            });
+    });
+
+    QUnit.module('Connection recovery');
+
+    QUnit.test('reopens store after force-closed db connection', function(assert) {
+        var ready = assert.async();
+        var storeName = 'reconnect-force';
+        var key = 'key';
+        var tracker = trackStoreDatabases(storeName);
+        var store = indexedDbBackend(storeName);
+
+        assert.expect(4);
+
+        store
+            .setItem(key, 'before-close')
+            .then(function(added) {
+                var db;
+
+                assert.ok(tracker.dbs.length > 0, 'The underlying IDBDatabase was opened');
+                assert.ok(added, 'The item is added before the connection is closed');
+
+                db = tracker.dbs[tracker.dbs.length - 1];
+                // Explicit close does not always fire onclose; withStore must recover from the sync error
+                db.close();
+
+                return store.setItem(key, 'after-close');
+            })
+            .then(function(added) {
+                assert.ok(added, 'setItem succeeds after the connection was force-closed');
+                return store.getItem(key);
+            })
+            .then(function(value) {
+                assert.equal(value, 'after-close', 'getItem reads the value written after reconnect');
+            })
+            .catch(function(err) {
+                assert.ok(false, err && err.message ? err.message : err);
+            })
+            .finally(() => {
+                tracker.restore();
+                ready();
+            });
+    });
+
+    QUnit.test('reopens store after browser onclose invalidates the connection', function(assert) {
+        var ready = assert.async();
+        var storeName = 'reconnect-onclose';
+        var key = 'key';
+        var tracker = trackStoreDatabases(storeName);
+        var store = indexedDbBackend(storeName);
+
+        assert.expect(3);
+
+        store
+            .setItem(key, 'before-onclose')
+            .then(function(added) {
+                var db = tracker.dbs[tracker.dbs.length - 1];
+
+                assert.ok(added, 'The item is added before onclose');
+
+                // Simulate a browser-forced close (Safari backgrounding, storage process death, etc.)
+                if (typeof db.onclose === 'function') {
+                    db.onclose();
+                }
+                db.close();
+
+                return store.getItem(key);
+            })
+            .then(function(value) {
+                assert.equal(value, 'before-onclose', 'getItem works after onclose invalidated the cache');
+                return store.setItem(key, 'after-onclose');
+            })
+            .then(function(added) {
+                assert.ok(added, 'setItem works after onclose invalidated the cache');
+            })
+            .catch(function(err) {
+                assert.ok(false, err && err.message ? err.message : err);
+            })
+            .finally(() => {
+                tracker.restore();
+                ready();
+            });
+    });
+
+    QUnit.test('reopens store after auto-close from versionchange / deleteDatabase', function(assert) {
+        var ready = assert.async();
+        var storeName = 'reconnect-versionchange';
+        var key = 'key';
+        var store = indexedDbBackend(storeName);
+
+        assert.expect(3);
+
+        store
+            .setItem(key, 'before-delete')
+            .then(function(added) {
+                assert.ok(added, 'The item is added before the database is deleted');
+
+                return new Promise(function(resolve, reject) {
+                    var req = idb.deleteDatabase(storePrefix + storeName);
+                    req.onsuccess = function() {
+                        resolve();
+                    };
+                    req.onerror = function(event) {
+                        reject(event && event.target && event.target.error);
+                    };
+                });
+            })
+            .then(function() {
+                return store.setItem(key, 'after-delete');
+            })
+            .then(function(added) {
+                assert.ok(added, 'setItem succeeds after auto-close from deleteDatabase');
+                return store.getItem(key);
+            })
+            .then(function(value) {
+                assert.equal(value, 'after-delete', 'getItem reads the value written after reconnect');
+            })
+            .catch(function(err) {
+                assert.ok(false, err && err.message ? err.message : err);
+            })
+            .finally(() => {
                 ready();
             });
     });
