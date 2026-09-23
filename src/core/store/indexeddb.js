@@ -58,11 +58,25 @@ const idStoreName = 'id';
 const isIndexedDB2 = typeof IDBObjectStore !== 'undefined' && 'getAll' in IDBObjectStore.prototype;
 
 /**
+ * @param {Error} err
+ * @returns {Boolean}
+ */
+function isConnectionClosingError(err) {
+    const message = (err && err.message) || '';
+    return (
+        err &&
+        (err.name === 'InvalidStateError' || err.name === 'UnknownError') &&
+        /\bclosed|\bclosing/i.test(message)
+    );
+}
+
+/**
  * Opens a store
  * @param {string} storeName
+ * @param {Function} [onConnectionLost] - called when the browser closes this connection
  * @returns {Promise} with store instance in resolve
  */
-function openStore(storeName) {
+function openStore(storeName, onConnectionLost) {
     return new Promise(function (resolve, reject) {
         const store = new IDBStore({
             dbVersion: 1,
@@ -75,6 +89,15 @@ function openStore(storeName) {
                 store.db.onversionchange = function onversionchange(e) {
                     if (!e || !e.newVersion) {
                         store.db.close();
+                        if (typeof onConnectionLost === 'function') {
+                            onConnectionLost();
+                        }
+                    }
+                };
+                // browser-forced close (Safari backgrounding, storage process death, etc.)
+                store.db.onclose = function onclose() {
+                    if (typeof onConnectionLost === 'function') {
+                        onConnectionLost();
                     }
                 };
                 resolve(store);
@@ -100,7 +123,11 @@ function setEntry(store, key, value) {
         function success(returnKey) {
             resolve(returnKey === key);
         }
-        store.put(entry, success, reject);
+        try {
+            store.put(entry, success, reject);
+        } catch (err) { // in case of InvalidStateError, most likely synchronous from store.put
+            reject(err);
+        }
     });
 }
 
@@ -119,7 +146,11 @@ function getEntry(store, key) {
 
             resolve(entry.value);
         }
-        store.get(key, success, reject);
+        try {
+            store.get(key, success, reject);
+        } catch (err) { // InvalidStateError
+            reject(err);
+        }
     });
 }
 
@@ -148,7 +179,11 @@ function getEntries(store) {
                 )
             );
         }
-        store.getAll(success, reject);
+        try {
+            store.getAll(success, reject);
+        } catch (err) { // InvalidStateError
+            reject(err);
+        }
     });
 }
 
@@ -163,7 +198,11 @@ function removeEntry(store, key) {
         function success(result) {
             resolve(result !== false);
         }
-        store.remove(key, success, reject);
+        try {
+            store.remove(key, success, reject);
+        } catch (err) { // InvalidStateError
+            reject(err);
+        }
     });
 }
 
@@ -173,7 +212,12 @@ function removeEntry(store, key) {
  */
 function getKnownStores() {
     if (!knownStores) {
-        knownStores = openStore(knownStoresName);
+        knownStores = openStore(knownStoresName, function () {
+            knownStores = null;
+        }).catch(function (err) {
+            knownStores = null;
+            throw err;
+        });
     }
     return knownStores;
 }
@@ -238,19 +282,54 @@ function indexDbBackend(storeName) {
     //keep a ref of the running store
     let innerStore;
 
+    function invalidateStore() {
+        innerStore = null;
+    }
+
     /**
      * Get the store
      * @returns {Promise} with store instance in resolve
      */
     function getStore() {
         if (!innerStore) {
-            innerStore = openStore(storeName).then(function (store) {
+            // Capture this open attempt so stale onclose/onversionchange handlers
+            // from an earlier connection cannot clear a newer cached promise.
+            const openAttempt = openStore(storeName, function () {
+                if (innerStore === openAttempt) {
+                    innerStore = null;
+                }
+            }).then(function (store) {
                 return registerStore(storeName).then(function () {
-                    return Promise.resolve(store);
+                    return store;
                 });
+            })
+            .catch(function (err) {
+                // if open fails, don't keep a rejected promise forever
+                if (innerStore === openAttempt) {
+                    innerStore = null;
+                }
+                throw err;
             });
+            innerStore = openAttempt;
         }
         return innerStore;
+    }
+
+    /**
+     * Run an op; if the cached connection died, drop it and retry once.
+     * @param {Function} op - (store) => Promise
+     * @returns {Promise}
+     */
+    function withStore(op) {
+        return getStore()
+            .then(op)
+            .catch(function (err) {
+                if (!isConnectionClosingError(err)) {
+                    throw err;
+                }
+                invalidateStore();
+                return getStore().then(op);
+            });
     }
 
     //keep a ref to the promise actually writing
@@ -297,7 +376,7 @@ function indexDbBackend(storeName) {
          */
         getItem(key) {
             return ensureSerie(function getWritingPromise() {
-                return getStore().then(function (store) {
+                return withStore(function (store) {
                     return getEntry(store, key);
                 });
             });
@@ -311,7 +390,7 @@ function indexDbBackend(storeName) {
          */
         setItem(key, value) {
             return ensureSerie(function getWritingPromise() {
-                return getStore().then(function (store) {
+                return withStore(function (store) {
                     return setEntry(store, key, value);
                 });
             });
@@ -324,7 +403,7 @@ function indexDbBackend(storeName) {
          */
         removeItem(key) {
             return ensureSerie(function getWritingPromise() {
-                return getStore().then(function (store) {
+                return withStore(function (store) {
                     return removeEntry(store, key);
                 });
             });
@@ -336,7 +415,7 @@ function indexDbBackend(storeName) {
          */
         getItems() {
             return ensureSerie(function getWritingPromise() {
-                return getStore().then(function (store) {
+                return withStore(function (store) {
                     return getEntries(store);
                 });
             });
@@ -348,12 +427,16 @@ function indexDbBackend(storeName) {
          */
         clear() {
             return ensureSerie(function getWritingPromise() {
-                return getStore().then(function (store) {
+                return withStore(function (store) {
                     return new Promise(function (resolve, reject) {
                         var success = function success() {
                             resolve(true);
                         };
-                        store.clear(success, reject);
+                        try {
+                            store.clear(success, reject);
+                        } catch (err) { // InvalidStateError
+                            reject(err);
+                        }
                     });
                 });
             });
@@ -365,8 +448,11 @@ function indexDbBackend(storeName) {
          */
         removeStore() {
             return ensureSerie(function getWritingPromise() {
-                return getStore().then(function (store) {
-                    return deleteStore(store, storeName);
+                return withStore(function (store) {
+                    return deleteStore(store, storeName).then(function (result) {
+                        invalidateStore();
+                        return result;
+                    });
                 });
             });
         }
